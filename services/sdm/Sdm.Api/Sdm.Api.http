@@ -1,0 +1,6 @@
+@Sdm.Api_HostAddress = http://localhost:5070
+
+GET {{Sdm.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
