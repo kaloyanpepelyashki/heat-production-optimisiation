@@ -4,3 +4,9 @@
 **/bin/
 **/obj/
 *.user
+
+# Keep the base config file
+!appsettings.json
+
+# Ignore environment-specific configs like dev etc. 
+appsettings.*.json

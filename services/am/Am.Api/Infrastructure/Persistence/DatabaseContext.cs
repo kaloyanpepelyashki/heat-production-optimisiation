@@ -1,0 +1,32 @@
+﻿using Am.Api.Infrastructure.Configuration;
+using Microsoft.Extensions.Options;
+using Supabase;
+
+namespace Am.Api.Infrastructure.Presistence;
+
+/// <summary>
+/// This class is soley responsible for exposing the database client (supabase client), to services that need it.
+/// The class is closed for any modification. 
+/// </summary>
+public sealed class DatabaseContext
+{
+    private Client _supabaseClient; 
+   
+    public DatabaseContext(IOptions<SupabaseSettings> options)
+    {
+       var configuration = options.Value;
+       
+       _supabaseClient = new Client(configuration.Url, configuration.ApiKey);
+    }
+    
+    /// <summary>
+    /// Used to get the superbase client. Returns an instance of the client client
+    /// </summary>
+    /// <returns>
+    /// Client - supabase client instance
+    /// </returns>
+    public Client GetClient()
+    {
+        return _supabaseClient;
+    }
+}
