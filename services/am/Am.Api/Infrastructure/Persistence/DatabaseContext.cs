@@ -14,9 +14,22 @@ public sealed class DatabaseContext
    
     public DatabaseContext(IOptions<SupabaseSettings> options)
     {
-       var configuration = options.Value;
-       
-       _supabaseClient = new Client(configuration.Url, configuration.ApiKey);
+        try
+        {
+            var configuration = options.Value;
+
+            var SupabaseOptions = new SupabaseOptions
+            {
+                Schema = "production_units"
+            }; 
+            
+            _supabaseClient = new Client(configuration.Url, configuration.ApiKey, SupabaseOptions);
+           
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Error in DatabaseConbtext . Error initialising Database Context:  {e.Message}, {e.GetType()}");
+        }
     }
     
     /// <summary>

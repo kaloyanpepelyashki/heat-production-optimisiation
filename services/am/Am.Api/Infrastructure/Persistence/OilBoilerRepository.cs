@@ -6,41 +6,37 @@ using Supabase.Postgrest.Responses;
 
 namespace Am.Api.Infrastructure.Presistence;
 
-/// <summary>
-/// Repository responsible for retrieving GasBoilerPersistence data from the database
-/// using the configured database client.
-/// </summary>
-public class GasBoilerRepository: IProductionUnitRepository<GasBoilerPersistence>
+public class OilBoilerRepository : IProductionUnitRepository<OilBoilerPersistence>
 {
     private readonly DatabaseContext _context;
     private readonly Client _client; 
     
 
-    public GasBoilerRepository(DatabaseContext context)
+    public OilBoilerRepository(DatabaseContext context)
     {
         _context = context;
         _client = context.GetClient();
     }
     
     /// <summary>
-    /// Retrieves all gas boiler records from the database.
+    /// Retrieves all oil boiler records from the database.
     /// Throws an exception if no data is returned.
     /// </summary>
-    /// <returns>A list of GasBoilerPersistence entities.</returns>
+    /// <returns>A list of OilBoilerPersistence entities (should be domain model that is returned).</returns>
     //TODO It should return a domain model, not a persistence/infrastructure model
-    public async Task<List<GasBoilerPersistence>> GetAllAsync()
+    public async Task<List<OilBoilerPersistence>> GetAllAsync()
     {
         try
         {
-            ModeledResponse<GasBoilerPersistence> result = await _client.From<GasBoilerPersistence>().Get();
-            List<GasBoilerPersistence> gasBoilers = result.Models;
+            ModeledResponse<OilBoilerPersistence> result = await _client.From<OilBoilerPersistence>().Get();
+            List<OilBoilerPersistence> oilBoilers = result.Models;
 
-            if ( gasBoilers == null || gasBoilers.Count == 0 )
+            if (oilBoilers == null || oilBoilers.Count == 0 )
             {
                 throw new NoAssetsFoundException("No asset data received. Gas Boiler set empty");
             }
 
-            return gasBoilers;
+            return oilBoilers;
        }
         catch (Exception e)
         {
@@ -49,22 +45,22 @@ public class GasBoilerRepository: IProductionUnitRepository<GasBoilerPersistence
         }
     }
     /// <summary>
-    /// Retrieves a gas boiler record by its identifier.
+    /// Retrieves an oil boiler record by its identifier.
     /// </summary>
     /// <param name="id">The identifier of the gas boiler.</param>
-    /// <returns>A GasBoilerPersistence entity matching the given id.</returns>
+    /// <returns>A OilBoilerPersistence entity matching the given id.</returns>
     //TODO It should return a domain model, not a persistence/infrastructure model
-    public async  Task<GasBoilerPersistence> GetByIdAsync(int id)
+    public async  Task<OilBoilerPersistence> GetByIdAsync(int id)
     {
         try
         {
-            ModeledResponse<GasBoilerPersistence> result = await _client.From<GasBoilerPersistence>().Select(obj => new object[] { obj.Id }).Get();
+            ModeledResponse<OilBoilerPersistence> result = await _client.From<OilBoilerPersistence>().Select(obj => new object[] { obj.Id }).Get();
 
-            GasBoilerPersistence gasBoiler = result.Model;
+            OilBoilerPersistence oilBoiler = result.Model;
             //TODO - Should do mapping to a domain model here (not persistence model, but a domain model)
             //TODO - To be finished. Validation check is to be done here
             
-            return gasBoiler;
+            return oilBoiler;
         }
         catch (Exception e)
         {
