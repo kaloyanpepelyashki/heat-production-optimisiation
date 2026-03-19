@@ -2,6 +2,7 @@
 
 namespace Am.Api.Model.DTOs;
 
+[Table("gas_motors")]
 public class GasMotorPersistence: ProductionUnitGeneralPersistence
 {
     [Column("max_electricity")]

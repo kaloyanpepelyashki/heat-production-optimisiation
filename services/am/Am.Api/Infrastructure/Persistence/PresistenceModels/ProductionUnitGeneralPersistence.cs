@@ -12,7 +12,7 @@ public class ProductionUnitGeneralPersistence: BaseModel
     public string Name { get; set; }
 
     [Column("max_heat")] 
-    public float maxHeat { get; set; }
+    public float MaxHeat { get; set; }
     
     [Column("production_cost")]
     public float ProductionCost { get; set; }

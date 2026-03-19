@@ -2,6 +2,7 @@
 
 namespace Am.Api.Model.DTOs;
 
+[Table("oil_boilers")]
 public class OilBoilerPersistence: ProductionUnitGeneralPersistence
 {
     [Column("co2_emissions")]

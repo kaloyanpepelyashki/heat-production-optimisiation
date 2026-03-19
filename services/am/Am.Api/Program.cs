@@ -21,9 +21,11 @@ builder.Services.AddSingleton<DatabaseContext>();
 //TODO, THE <T> OF THE IProductionUnitRepository has to be changed to a domain model, not persistence model. 
 builder.Services.AddScoped<IProductionUnitRepository<GasBoilerPersistence>, GasBoilerRepository>();
 builder.Services.AddScoped<IProductionUnitRepository<OilBoilerPersistence>, OilBoilerRepository>();
+builder.Services.AddScoped<IProductionUnitRepository<ElectricBoilerPersistence>, ElectricBoilerRepository>();
+builder.Services.AddScoped<IProductionUnitRepository<GasMotorPersistence>, GasMotorRepository>();
 //
 
-
+//Registers the ProductionUnitService as a scope service (important for the dependency injection container. 
 builder.Services.AddScoped<IProductionUnitService, ProductionUnitService>();
 
 var app = builder.Build();

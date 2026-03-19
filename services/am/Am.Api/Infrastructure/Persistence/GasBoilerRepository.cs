@@ -19,7 +19,7 @@ public class GasBoilerRepository: IProductionUnitRepository<GasBoilerPersistence
     public GasBoilerRepository(DatabaseContext context)
     {
         _context = context;
-        _client = context.GetClient();
+        _client = _context.GetClient();
     }
     
     /// <summary>
@@ -33,15 +33,15 @@ public class GasBoilerRepository: IProductionUnitRepository<GasBoilerPersistence
         try
         {
             ModeledResponse<GasBoilerPersistence> result = await _client.From<GasBoilerPersistence>().Get();
-            List<GasBoilerPersistence> gasBoilers = result.Models;
+            List<GasBoilerPersistence> gasBoilersPersistenceList = result.Models;
 
-            if ( gasBoilers == null || gasBoilers.Count == 0 )
+            if ( gasBoilersPersistenceList == null || gasBoilersPersistenceList.Count == 0 )
             {
                 throw new NoAssetsFoundException("No asset data received. Gas Boiler set empty");
             }
 
-            return gasBoilers;
-       }
+            return gasBoilersPersistenceList;
+        }
         catch (Exception e)
         {
             Console.WriteLine($"Error fetching all in GasBoilerRepository: {e.GetType()} {e.Message}");
