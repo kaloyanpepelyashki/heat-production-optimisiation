@@ -1,5 +1,6 @@
 using Scalar.AspNetCore;
 using Sdm.Api.Application.Interfaces;
+using Sdm.Api.Application.Services;
 using Sdm.Api.Infrastructure.Configuration;
 using Sdm.Api.Infrastructure.Persistence;
 
@@ -14,6 +15,7 @@ builder.Services.Configure<SupabaseSettings>(builder.Configuration.GetSection("S
 
 builder.Services.AddSingleton<DatabaseContext>();
 builder.Services.AddScoped<ISourceDataRepository, SourceDataRepository>();
+builder.Services.AddScoped<ISourceDataService , SourceDataService>();
 
 var app = builder.Build();
 

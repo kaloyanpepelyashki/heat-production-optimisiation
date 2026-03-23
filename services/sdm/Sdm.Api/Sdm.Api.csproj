@@ -21,9 +21,4 @@
     <ProjectReference Include="..\..\..\shared\Shared\Shared.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Application\Services\" />
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
 </Project>
