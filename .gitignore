@@ -10,3 +10,7 @@
 
 # Ignore environment-specific configs like dev etc. 
 appsettings.*.json
+
+# Ignores data injection script
+ImportData.py
+2026 Heat Production Optimization - Danfoss Deliveries - Source Data Manager(SDM).csv
