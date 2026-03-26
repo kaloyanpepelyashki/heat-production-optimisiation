@@ -3,17 +3,24 @@ using Am.Api.Domain.Models;
 
 namespace Am.Api.Application.Services;
 
-class AssetManager {
-    private List<ProductionUnit>? productionUnits;
+public class AssetManager
+{
+    private List<ProductionUnit>? productionUnits = new List<ProductionUnit>();
     private HeatingGrid? heatingGrid;
+
     public ProductionUnit GetUnitById(int id)
     {
         return productionUnits.SingleOrDefault(productionUnit => productionUnit.Id == id);
     } 
 
-    public ProductionUnit GetUnitbyName(string name)
+    public ProductionUnit GetUnitByName(string name)
     {
         return productionUnits.SingleOrDefault(productionUnit => productionUnit.Name == name);
+    }
+
+    public void AddProductionUnit(ProductionUnit productionUnit)
+    {
+        productionUnits.Add(productionUnit);
     }
 
     public List<ProductionUnit> GetAllUnits()
@@ -21,12 +28,12 @@ class AssetManager {
         return productionUnits;
     }
 
-    public void TurnOffUnit(ProductionUnit productionUnit)
+    public void TurnUnitOff(ProductionUnit productionUnit)
     {
         productionUnit.Active = false;
     }
 
-    public void TurnOnUnit(ProductionUnit productionUnit)
+    public void TurnUnitOn(ProductionUnit productionUnit)
     {
         productionUnit.Active = false;
     }
@@ -34,5 +41,10 @@ class AssetManager {
     public HeatingGrid GetHeatingGrid()
     {
         return heatingGrid;
+    }
+
+    public void AddHeatingGrid(HeatingGrid HG)
+    {
+        heatingGrid = HG;
     }
 }

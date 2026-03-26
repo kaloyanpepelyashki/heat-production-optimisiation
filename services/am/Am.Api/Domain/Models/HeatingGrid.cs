@@ -9,7 +9,7 @@ using System.Drawing;
 public class HeatingGrid
 {
     public string? Architecture;
-    public string? Size;
+    public int? Size;
     public string? City;
     public string? ImageFilePath;
 }

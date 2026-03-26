@@ -7,6 +7,7 @@ namespace Am.Api.Domain.Models;
 public class GasMotor : ProductionUnit
 {
 	    public double? MaxElectricity;
+
 	    public int? CO2Emission;
 	    public double? GasConsumption;
 }
