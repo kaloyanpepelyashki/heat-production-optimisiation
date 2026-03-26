@@ -6,4 +6,9 @@ namespace Am.Api.Domain.Models;
 public class ElectricBoiler : ProductionUnit
 {
     public double? MaxElectricity;
+
+    public ElectricBoiler()
+    {
+        type = this.GetType().Name.ToLower();
+    }
 }

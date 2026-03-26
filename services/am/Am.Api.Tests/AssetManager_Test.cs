@@ -16,9 +16,19 @@ public class AssetManager_Test
             MaxElectricity = 500.0,
     };
 
-    private OilBoiler oilBoiler = new OilBoiler()
+    private ElectricBoiler electricBoiler2 = new ElectricBoiler()
     {
             Id = 2,
+            Name = "EB2",
+            MaxHeat = 3.0f,
+            ProductionCost = 510,
+            Active = true,
+            MaxElectricity = 500.0,
+    };
+
+    private OilBoiler oilBoiler = new OilBoiler()
+    {
+            Id = 1,
             Name = "OB1",
             MaxHeat = 3.0f,
             ProductionCost = 510,
@@ -29,7 +39,7 @@ public class AssetManager_Test
 
     private GasBoiler gasBoiler = new GasBoiler()
     {
-            Id = 3,
+            Id = 1,
             Name = "GB1",
             MaxHeat = 3.0f,
             ProductionCost = 510,
@@ -40,7 +50,7 @@ public class AssetManager_Test
 
     private GasMotor gasMotor = new GasMotor()
     {
-            Id = 4,
+            Id = 1,
             Name = "GM1",
             MaxHeat = 3.0f,
             ProductionCost = 510,
@@ -74,14 +84,28 @@ public class AssetManager_Test
     }
 
     [Fact]
+    public async Task GetAllProductionUNitsOfTheSameType_Returns_List_()
+    {
+        AssetManager assetManager = new AssetManager();
+        assetManager.AddProductionUnit(electricBoiler);
+        assetManager.AddProductionUnit(electricBoiler2);
+
+        List<ProductionUnit> units = assetManager.GetAllUnits("ElectricBoiler");
+
+        Assert.NotEmpty(units);
+        Assert.Equal(1, units[0].Id);
+        Assert.Equal("EB2", units[1].Name);
+    }
+
+    [Fact]
     public async Task GetUnitById_Returns_ProductionUnit()
     {
         AssetManager assetManager = new AssetManager();
         assetManager.AddProductionUnit(oilBoiler);
         assetManager.AddProductionUnit(electricBoiler);
 
-        Assert.Equal(oilBoiler, assetManager.GetUnitById(2));
-        Assert.Equal("EB1", assetManager.GetUnitById(1).Name);
+        Assert.Equal(oilBoiler, assetManager.GetUnitById("OilBoiler", 1));
+        Assert.Equal("EB1", assetManager.GetUnitById("ElectricBoiler", 1).Name);
     }
 
     [Fact]
