@@ -11,4 +11,5 @@ public abstract class ProductionUnit
     public int? ProductionCost;
     public double? MaxHeat;
     public bool Active;
+    public string? type;
 }
