@@ -8,56 +8,56 @@ public class AssetManager_Test
 {
     private ElectricBoiler electricBoiler = new ElectricBoiler()
     {
-            Id = 1,
-            Name = "EB1",
-            MaxHeat = 3.0f,
-            ProductionCost = 510,
-            Active = true,
-            MaxElectricity = 500.0,
+        Id = 1,
+        Name = "EB1",
+        MaxHeat = 3.0f,
+        ProductionCost = 510,
+        Active = true,
+        MaxElectricity = 500.0,
     };
 
     private ElectricBoiler electricBoiler2 = new ElectricBoiler()
     {
-            Id = 2,
-            Name = "EB2",
-            MaxHeat = 3.0f,
-            ProductionCost = 510,
-            Active = true,
-            MaxElectricity = 500.0,
+        Id = 2,
+        Name = "EB2",
+        MaxHeat = 3.0f,
+        ProductionCost = 510,
+        Active = true,
+        MaxElectricity = 500.0,
     };
 
     private OilBoiler oilBoiler = new OilBoiler()
     {
-            Id = 1,
-            Name = "OB1",
-            MaxHeat = 3.0f,
-            ProductionCost = 510,
-            Active = true,
-            CO2Emission = 10,
-            OilConsumption = 100.0,
+        Id = 1,
+        Name = "OB1",
+        MaxHeat = 3.0f,
+        ProductionCost = 510,
+        Active = true,
+        CO2Emission = 10,
+        OilConsumption = 100.0,
     };
 
     private GasBoiler gasBoiler = new GasBoiler()
     {
-            Id = 1,
-            Name = "GB1",
-            MaxHeat = 3.0f,
-            ProductionCost = 510,
-            Active = true,
-            CO2Emission = 10,
-            GasConsumption = 100.0,
+        Id = 1,
+        Name = "GB1",
+        MaxHeat = 3.0f,
+        ProductionCost = 510,
+        Active = true,
+        CO2Emission = 10,
+        GasConsumption = 100.0,
     };
 
     private GasMotor gasMotor = new GasMotor()
     {
-            Id = 1,
-            Name = "GM1",
-            MaxHeat = 3.0f,
-            ProductionCost = 510,
-            Active = true,
-            MaxElectricity = 500.0,
-            CO2Emission = 10,
-            GasConsumption = 100.0,
+        Id = 1,
+        Name = "GM1",
+        MaxHeat = 3.0f,
+        ProductionCost = 510,
+        Active = true,
+        MaxElectricity = 500.0,
+        CO2Emission = 10,
+        GasConsumption = 100.0,
     };
 
     private HeatingGrid heatingGrid = new HeatingGrid()
@@ -65,7 +65,7 @@ public class AssetManager_Test
         Architecture = "IDk",
         Size = 1600,
         City = "Sonderborg",
-        ImageFilePath = "file",
+        ImageFilePath = @"Assets/HeatingGrid.png",
     };
 
     [Fact]
