@@ -26,6 +26,16 @@ By integration of energy market data, our microservices layer on top of Danfoss'
 
 ---
 
+## Tech Stack
+
+- **Backend:** The system is developed in **C# using the .NET platform**, with the application architecture split into **independent microservices** corresponding to the different system modules (e.g., Asset Manager, Source Data Manager, Optimizer, etc.).  
+- **Containerization:** All services are packaged using **Docker**, ensuring consistent environments across development, testing, and deployment.  
+- **CI/CD:** A **CI/CD pipeline** is used to automate **unit testing, building, and deployment**, improving reliability and enabling continuous integration of new features.  
+- **Deployment:** Services are deployed and exposed through **Render**, providing a managed hosting environment for running the containerized microservices.  
+- **Database:** The project uses **Supabase** as a **Database-as-a-Service (DBaaS)** solution. Data is stored in a **relational PostgreSQL database**, enabling structured data storage and efficient querying across the system components.
+
+---
+
 ## Current Progress
 
 ### Project Setup & Planning
@@ -38,15 +48,9 @@ By integration of energy market data, our microservices layer on top of Danfoss'
 - **Monorepo architecture decided** - All services and components will be co-located in a single repository to streamline dependency management and deployment.
 - **CI/CD pipeline setup in progress** - Working on establishing a Continuous Integration / Continuous Deployment (CI/CD) DevOps workflow to automate testing and deployment across services.
 
----
-
-## Tech Stack
-
-- **Backend:** The system is developed in **C# using the .NET platform**, with the application architecture split into **independent microservices** corresponding to the different system modules (e.g., Asset Manager, Source Data Manager, Optimizer, etc.).  
-- **Containerization:** All services are packaged using **Docker**, ensuring consistent environments across development, testing, and deployment.  
-- **CI/CD:** A **CI/CD pipeline** is used to automate **unit testing, building, and deployment**, improving reliability and enabling continuous integration of new features.  
-- **Deployment:** Services are deployed and exposed through **Render**, providing a managed hosting environment for running the containerized microservices.  
-- **Database:** The project uses **Supabase** as a **Database-as-a-Service (DBaaS)** solution. Data is stored in a **relational PostgreSQL database**, enabling structured data storage and efficient querying across the system components.
+### Technology & Architecture
+- **Tech Stack Finalized** - Backend technologies, containerization, CI/CD, deployment, and database solutions have been selected and documented.
+- **Microservice Design** - Services are being built following microservice architecture patterns with clear separation of concerns.
 
 ---
 
