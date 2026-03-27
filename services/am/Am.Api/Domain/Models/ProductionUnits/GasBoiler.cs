@@ -6,12 +6,6 @@ namespace Am.Api.Domain.Models;
 
 public class GasBoiler : ProductionUnit
 {
-    public int? CO2Emission;
-    public double? GasConsumption;
-
-    public GasBoiler()
-    {
-        type = this.GetType().Name.ToLower();
-    }
+    public int Co2Emissions;
+    public float GasConsumption;
 }
-

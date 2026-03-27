@@ -1,12 +1,13 @@
 ﻿using Am.Api.Model.DTOs;
+using Am.Api.Domain.Models;
 
 namespace Am.Api.Application.Interfaces;
 
 public interface IProductionUnitService
 {
-   Task<List<GasBoilerPersistence>> GetAllGasBoilersAsync();
-   Task <List<OilBoilerPersistence>> GetAllOilBoilersAsync();
-   Task<List<ElectricBoilerPersistence>> GetAllElectricBoilersAsync();
-   Task<List<GasMotorPersistence>> GetAllGasMotorsAsync();
+   Task<List<GasBoiler>> GetAllGasBoilersAsync();
+   Task <List<OilBoiler>> GetAllOilBoilersAsync();
+   Task<List<ElectricBoiler>> GetAllElectricBoilersAsync();
+   Task<List<GasMotor>> GetAllGasMotorsAsync();
    //TODO More to be added
 }

@@ -1,12 +1,13 @@
 ﻿using Am.Api.Application.Exceptions;
 using Am.Api.Application.Interfaces;
 using Am.Api.Model.DTOs;
+using Am.Api.Domain.Models;
 using Supabase;
 using Supabase.Postgrest.Responses;
 
 namespace Am.Api.Infrastructure.Presistence;
 
-public class ElectricBoilerRepository: IProductionUnitRepository<ElectricBoilerPersistence>
+public class ElectricBoilerRepository: IProductionUnitRepository<ElectricBoiler>
 {   
    private readonly DatabaseContext _context;
    private readonly Client _client;
@@ -17,7 +18,7 @@ public class ElectricBoilerRepository: IProductionUnitRepository<ElectricBoilerP
         _client = _context.GetClient(); 
     }
 
-    public async Task<List<ElectricBoilerPersistence>> GetAllAsync()
+    public async Task<List<ElectricBoiler>> GetAllAsync()
     {
         try
         {
@@ -29,7 +30,14 @@ public class ElectricBoilerRepository: IProductionUnitRepository<ElectricBoilerP
                 throw new NoAssetsFoundException("No asset data received. Electric Boiler set empty");
             }
 
-            return electricBoilersPersistence;
+            List<ElectricBoiler> electricBoilers = new List<ElectricBoiler>();
+
+            foreach (ElectricBoilerPersistence electricBoiler in electricBoilersPersistence)
+            {
+                electricBoilers.Add(ToDomain(electricBoiler));
+            }
+
+            return electricBoilers;
         }
         catch (Exception e)
         {
@@ -38,22 +46,38 @@ public class ElectricBoilerRepository: IProductionUnitRepository<ElectricBoilerP
         }
     }
 
-    public async Task<ElectricBoilerPersistence> GetByIdAsync(int id)
+    public async Task<ElectricBoiler> GetByIdAsync(int id)
     {
             try
             {
                 ModeledResponse<ElectricBoilerPersistence> result = await _client.From<ElectricBoilerPersistence>().Select(obj => new object[] { obj.Id }).Get();
 
                 ElectricBoilerPersistence electricBoilerPersistence = result.Model;
-                //TODO - Should do mapping to a domain model here (not persistence model, but a domain model)
                 //TODO - To be finished. Validation check is to be done here
             
-                return electricBoilerPersistence;
+                return ToDomain(electricBoilerPersistence);
             }
             catch (Exception e)
             {
                 Console.WriteLine($"Error fetching electricBoilerRepository: {e.GetType()} {e.Message}");
                 throw;
             }
+    }
+
+    /// <summary>
+    /// Turns Persistance Model into a Domain model.
+    /// </summary>
+    /// <param name="p">The Persistance model.</param>
+    /// <returns>A domain model.</returns>
+    public static ElectricBoiler ToDomain(ElectricBoilerPersistence p)
+    {
+        return new ElectricBoiler
+        {
+            Id = p.Id,
+            Name = p.Name,
+            MaxHeat = p.MaxHeat,
+            ProductionCost = (int)p.ProductionCost,
+            MaxElectricity = p.MaxElectricity,
+        };
     }
 }

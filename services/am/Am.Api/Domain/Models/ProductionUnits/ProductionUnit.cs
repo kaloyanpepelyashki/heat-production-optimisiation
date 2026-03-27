@@ -6,10 +6,9 @@ namespace Am.Api.Domain.Models;
 
 public abstract class ProductionUnit
 {
-    public int? Id;
-    public string? Name;
-    public int? ProductionCost;
-    public double? MaxHeat;
+    public int Id;
+    public string Name;
+    public int ProductionCost;
+    public float MaxHeat;
     public bool Active;
-    public string? type;
 }

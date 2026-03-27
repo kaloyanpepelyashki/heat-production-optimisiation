@@ -2,6 +2,7 @@
 using Am.Api.Infrastructure.DTOs;
 using Am.Api.Model.DTOs;
 using Microsoft.AspNetCore.Mvc;
+using Am.Api.Domain.Models;
 
 namespace Am.Api.Controllers;
 
@@ -22,7 +23,7 @@ public class GetProductionUnits : Controller
     {
         try
         {
-            List<GasBoilerPersistence> gasBoilersResult = await _productionUnitService.GetAllGasBoilersAsync();
+            List<GasBoiler> gasBoilersResult = await _productionUnitService.GetAllGasBoilersAsync();
             
             List<GasBoilerDTO> gasBoilersDTOs = gasBoilersResult.Select(x => new GasBoilerDTO
             {
@@ -31,7 +32,7 @@ public class GetProductionUnits : Controller
                 MaxHeat = x.MaxHeat,
                 ProductionCost = x.ProductionCost,
                 Co2Emissions = x.Co2Emissions,
-                GasConsumption = x.GasConsumption
+                GasConsumption = x.GasConsumption,
             }).ToList();
             
             return Ok(gasBoilersDTOs);
@@ -49,7 +50,7 @@ public class GetProductionUnits : Controller
     {
         try
         {
-            List<OilBoilerPersistence> oilBoilerResult = await _productionUnitService.GetAllOilBoilersAsync();
+            List<OilBoiler> oilBoilerResult = await _productionUnitService.GetAllOilBoilersAsync();
             
             List<OilBoilerDTO> oilBoilerDtos = oilBoilerResult.Select(obj => new OilBoilerDTO
             {
@@ -76,7 +77,7 @@ public class GetProductionUnits : Controller
     {
         try
         {
-            List<ElectricBoilerPersistence> electricBoilersResult =
+            List<ElectricBoiler> electricBoilersResult =
                 await _productionUnitService.GetAllElectricBoilersAsync();
 
             List<ElectricBoilerDTO> electricBoilerDtos = electricBoilersResult.Select(elBoiler =>
@@ -103,7 +104,7 @@ public class GetProductionUnits : Controller
     {
         try
         {
-            List<GasMotorPersistence> gasMotorResult = await _productionUnitService.GetAllGasMotorsAsync();
+            List<GasMotor> gasMotorResult = await _productionUnitService.GetAllGasMotorsAsync();
 
             List<GasMotorDTO> gasMotorDtos = gasMotorResult.Select(gasMotor => new GasMotorDTO
             {

@@ -1,12 +1,13 @@
 ﻿using Am.Api.Application.Exceptions;
 using Am.Api.Application.Interfaces;
 using Am.Api.Model.DTOs;
+using Am.Api.Domain.Models;
 using Supabase;
 using Supabase.Postgrest.Responses;
 
 namespace Am.Api.Infrastructure.Presistence;
 
-public class GasMotorRepository : IProductionUnitRepository<GasMotorPersistence>
+public class GasMotorRepository : IProductionUnitRepository<GasMotor>
 {
     private readonly DatabaseContext _context;
     private readonly Client _client;
@@ -17,7 +18,7 @@ public class GasMotorRepository : IProductionUnitRepository<GasMotorPersistence>
         _client = _context.GetClient();
     }
 
-    public async Task<List<GasMotorPersistence>> GetAllAsync()
+    public async Task<List<GasMotor>> GetAllAsync()
     {
         try
         {
@@ -28,8 +29,14 @@ public class GasMotorRepository : IProductionUnitRepository<GasMotorPersistence>
             {
                 throw new NoAssetsFoundException("No asset data received. Gas Boiler set empty");
             }
-            
-            return gasMotorsPersistence;
+
+            List<GasMotor> gasMotors = new List<GasMotor>();
+
+            foreach (GasMotorPersistence gasMotor in gasMotorsPersistence)
+            {
+                gasMotors.Add(ToDomain(gasMotor));
+            }
+            return gasMotors;
         }
         catch (Exception e)
         {
@@ -38,7 +45,7 @@ public class GasMotorRepository : IProductionUnitRepository<GasMotorPersistence>
         }
     }
 
-    public async Task<GasMotorPersistence> GetByIdAsync(int id)
+    public async Task<GasMotor> GetByIdAsync(int id)
     {
         try
         {
@@ -47,12 +54,31 @@ public class GasMotorRepository : IProductionUnitRepository<GasMotorPersistence>
 
             GasMotorPersistence gasMotorPersistence = result.Model;
 
-            return gasMotorPersistence;
+            return ToDomain(gasMotorPersistence);
         }
         catch (Exception e)
         {
             Console.WriteLine($"Error fetching specific item {id} in GasMotorRepository: {e.GetType()} {e.Message}");
             throw;
         }
+    }
+
+    /// <summary>
+    /// Turns Persistance Model into a Domain model.
+    /// </summary>
+    /// <param name="p">The Persistance model.</param>
+    /// <returns>A domain model.</returns>
+    public static GasMotor ToDomain(GasMotorPersistence p)
+    {
+        return new GasMotor
+        {
+            Id = p.Id,
+            Name = p.Name,
+            MaxHeat = p.MaxHeat,
+            ProductionCost = (int)p.ProductionCost,
+            Co2Emissions = p.Co2Emissions,
+            MaxElectricity = p.MaxElectricity,
+            GasConsumption = p.GasConsumption,
+        };
     }
 }

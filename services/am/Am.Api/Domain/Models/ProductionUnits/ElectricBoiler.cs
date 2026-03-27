@@ -5,10 +5,6 @@ namespace Am.Api.Domain.Models;
 /// </summary>n
 public class ElectricBoiler : ProductionUnit
 {
-    public double? MaxElectricity;
+    public float MaxElectricity;
 
-    public ElectricBoiler()
-    {
-        type = this.GetType().Name.ToLower();
-    }
 }
