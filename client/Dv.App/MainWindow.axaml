@@ -2,8 +2,48 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:models="using:Dv.App.Models"
+        xmlns:viewModels="using:Dv.App.ViewModels"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Dv.App.MainWindow"
-        Title="Dv.App">
-    Welcome to Avalonia!
+        x:DataType="viewModels:MainWindowViewModel"
+        MinWidth="900"
+        MinHeight="600"
+        Title="Heat Optimization">
+    <Grid ColumnDefinitions="2*,7*">
+        <Border Grid.Column="0"
+                Background="#0B4F86"
+                Padding="16">
+            <Grid RowDefinitions="Auto,*"
+                  RowSpacing="18">
+                <TextBlock Grid.Row="0"
+                           Text="Heat Optimization"
+                           Foreground="White"
+                           FontSize="22"
+                           FontWeight="SemiBold" />
+
+                <ListBox Grid.Row="1"
+                         Classes="nav-list"
+                         Background="Transparent"
+                         BorderThickness="0"
+                         SelectionMode="Single"
+                         ItemsSource="{Binding NavigationItems}"
+                         SelectedItem="{Binding SelectedNavigationItem}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="models:NavigationItem">
+                            <TextBlock Text="{Binding Title}"
+                                       FontSize="18"
+                                       Foreground="White" />
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Grid>
+        </Border>
+
+        <Border Grid.Column="1"
+                Background="#EEF1F5"
+                Padding="24">
+            <ContentControl Content="{Binding CurrentViewModel}" />
+        </Border>
+    </Grid>
 </Window>

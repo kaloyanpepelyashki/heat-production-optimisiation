@@ -1,0 +1,12 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Dv.App.Views.DashboardView">
+  <Grid>
+    <TextBlock HorizontalAlignment="Center"
+               VerticalAlignment="Center"
+               FontSize="28"
+               FontWeight="SemiBold"
+               Foreground="#2C3E50"
+               Text="Dashboard View" />
+  </Grid>
+</UserControl>
