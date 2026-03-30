@@ -1,25 +1,26 @@
 ﻿using Am.Api.Application.Interfaces;
 using Am.Api.Application.Services;
 using Am.Api.Model.DTOs;
+using Am.Api.Domain.Models;
 using Moq;
 
 namespace Am.Api.Tests;
 
 public class ProductionUnitService_Test
 {
-    Mock<IProductionUnitRepository<GasBoilerPersistence>> repoGasBoiler = new Mock<IProductionUnitRepository<GasBoilerPersistence>>();
-    Mock<IProductionUnitRepository<GasMotorPersistence>> repoGasMotor = new Mock<IProductionUnitRepository<GasMotorPersistence>>();
-    Mock<IProductionUnitRepository<ElectricBoilerPersistence>> repoElectricBoiler = new Mock<IProductionUnitRepository<ElectricBoilerPersistence>>();
-    Mock<IProductionUnitRepository<OilBoilerPersistence>> repoOilBoiler = new Mock<IProductionUnitRepository<OilBoilerPersistence>>();
+    Mock<IProductionUnitRepository<GasBoiler>> repoGasBoiler = new Mock<IProductionUnitRepository<GasBoiler>>();
+    Mock<IProductionUnitRepository<GasMotor>> repoGasMotor = new Mock<IProductionUnitRepository<GasMotor>>();
+    Mock<IProductionUnitRepository<ElectricBoiler>> repoElectricBoiler = new Mock<IProductionUnitRepository<ElectricBoiler>>();
+    Mock<IProductionUnitRepository<OilBoiler>> repoOilBoiler = new Mock<IProductionUnitRepository<OilBoiler>>();
     
     [Fact]
     public async Task GetAllGasBoilersAsync_Returns_List_Of_Boilers()
     {
         
         //Arrange
-        repoGasBoiler.Setup(x => x.GetAllAsync()).ReturnsAsync(new List<GasBoilerPersistence>
+        repoGasBoiler.Setup(x => x.GetAllAsync()).ReturnsAsync(new List<GasBoiler>
         {   
-            new GasBoilerPersistence{
+            new GasBoiler{
             Id = 1,
             Name = "GB1",
             MaxHeat = 3.0f,
@@ -27,7 +28,7 @@ public class ProductionUnitService_Test
             Co2Emissions = 132,
             GasConsumption = 1.05f
             },
-            new GasBoilerPersistence
+            new GasBoiler
             {
                 Id = 2,
                 Name = "GB1",
@@ -35,7 +36,7 @@ public class ProductionUnitService_Test
                 ProductionCost = 512,
                 Co2Emissions = 141,
                 GasConsumption = 1.09f 
-            }
+            },
         });
         
         var service = new ProductionUnitService(repoGasBoiler.Object, repoOilBoiler.Object, repoElectricBoiler.Object, repoGasMotor.Object);
@@ -54,9 +55,9 @@ public class ProductionUnitService_Test
     public async Task GetAllGasMotorsAsync_Returns_List_Of_Motors()
     {
         //Arrange
-        repoGasMotor.Setup(x => x.GetAllAsync()).ReturnsAsync(new List<GasMotorPersistence>
+        repoGasMotor.Setup(x => x.GetAllAsync()).ReturnsAsync(new List<GasMotor>
         {
-            new GasMotorPersistence
+            new GasMotor
             {
                 Id = 1,
                 Name = "GM1",
@@ -64,8 +65,8 @@ public class ProductionUnitService_Test
                 MaxElectricity = 3.9f,
                 ProductionCost = 975,
                 Co2Emissions = 227,
-                GasConsumption = 1.05f
-            }
+                GasConsumption = 1.05f,
+            },
         });
         
         var service = new ProductionUnitService(repoGasBoiler.Object, repoOilBoiler.Object, repoElectricBoiler.Object, repoGasMotor.Object);
@@ -74,7 +75,7 @@ public class ProductionUnitService_Test
         var result = await service.GetAllGasMotorsAsync();
         
         //Assert
-        Assert.IsType<List<GasMotorPersistence>>(result);
+        Assert.IsType<List<GasMotor>>(result);
         Assert.Equal(1, result[0].Id);
         Assert.Equal("GM1", result[0].Name);
     }
@@ -83,9 +84,9 @@ public class ProductionUnitService_Test
     public async Task GetAllElectricBoilersAsync_Returns_List_Of_Boilers()
     {
         //Arrange
-        repoElectricBoiler.Setup(x => x.GetAllAsync()).ReturnsAsync(new List<ElectricBoilerPersistence>
+        repoElectricBoiler.Setup(x => x.GetAllAsync()).ReturnsAsync(new List<ElectricBoiler>
         {
-            new ElectricBoilerPersistence
+            new ElectricBoiler
             {
                 Id = 1,
                 Name = "EB1",
@@ -93,7 +94,7 @@ public class ProductionUnitService_Test
                 MaxElectricity = 6f,
                 ProductionCost = 15,
 
-            }
+            },
         });
         
         var service = new ProductionUnitService(repoGasBoiler.Object, repoOilBoiler.Object, repoElectricBoiler.Object, repoGasMotor.Object );
@@ -103,7 +104,7 @@ public class ProductionUnitService_Test
         
         //Assert
         Assert.NotEmpty(result);
-        Assert.IsType<List<ElectricBoilerPersistence>>(result);
+        Assert.IsType<List<ElectricBoiler>>(result);
         Assert.Equal(1, result[0].Id);
         Assert.Equal("EB1", result[0].Name);
     }
@@ -112,17 +113,17 @@ public class ProductionUnitService_Test
     public async Task GetAllOilBoilersAsync_Returns_List_Of_Boilers()
     {
         //Arrange
-        repoOilBoiler.Setup(x => x.GetAllAsync()).ReturnsAsync(new List<OilBoilerPersistence>
+        repoOilBoiler.Setup(x => x.GetAllAsync()).ReturnsAsync(new List<OilBoiler>
         {
-            new OilBoilerPersistence
+            new OilBoiler
             {
                 Id = 1,
                 Name = "OB1",
                 MaxHeat = 6.0f,
-                ProductionCost = 690f,
+                ProductionCost = 690,
                 Co2Emissions = 147,
                 OilConsumption = 1.05f
-            }
+            },
         });
         
         var service = new ProductionUnitService(repoGasBoiler.Object, repoOilBoiler.Object,  repoElectricBoiler.Object, repoGasMotor.Object);
@@ -132,7 +133,7 @@ public class ProductionUnitService_Test
         
         //Assert
         Assert.NotEmpty(result);
-        Assert.IsType<List<OilBoilerPersistence>>(result);
+        Assert.IsType<List<OilBoiler>>(result);
         Assert.Equal(1, result[0].Id);
     }
 }

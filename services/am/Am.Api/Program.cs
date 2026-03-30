@@ -2,6 +2,7 @@ using Am.Api.Application.Interfaces;
 using Am.Api.Application.Services;
 using Am.Api.Infrastructure.Configuration;
 using Am.Api.Infrastructure.Presistence;
+using Am.Api.Domain.Models;
 using Am.Api.Model.DTOs;
 using Scalar.AspNetCore;
 
@@ -18,11 +19,10 @@ builder.Services.Configure<SupabaseSettings>(builder.Configuration.GetSection("S
 
 builder.Services.AddSingleton<DatabaseContext>();
 
-//TODO, THE <T> OF THE IProductionUnitRepository has to be changed to a domain model, not persistence model. 
-builder.Services.AddScoped<IProductionUnitRepository<GasBoilerPersistence>, GasBoilerRepository>();
-builder.Services.AddScoped<IProductionUnitRepository<OilBoilerPersistence>, OilBoilerRepository>();
-builder.Services.AddScoped<IProductionUnitRepository<ElectricBoilerPersistence>, ElectricBoilerRepository>();
-builder.Services.AddScoped<IProductionUnitRepository<GasMotorPersistence>, GasMotorRepository>();
+builder.Services.AddScoped<IProductionUnitRepository<GasBoiler>, GasBoilerRepository>();
+builder.Services.AddScoped<IProductionUnitRepository<OilBoiler>, OilBoilerRepository>();
+builder.Services.AddScoped<IProductionUnitRepository<ElectricBoiler>, ElectricBoilerRepository>();
+builder.Services.AddScoped<IProductionUnitRepository<GasMotor>, GasMotorRepository>();
 //
 
 //Registers the ProductionUnitService as a scope service (important for the dependency injection container. 

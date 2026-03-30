@@ -6,7 +6,7 @@ namespace Am.Api.Infrastructure.Presistence;
 
 /// <summary>
 /// This class is soley responsible for exposing the database client (supabase client), to services that need it.
-/// The class is closed for any modification. 
+/// The class is closed for any modification.
 /// </summary>
 public sealed class DatabaseContext
 {

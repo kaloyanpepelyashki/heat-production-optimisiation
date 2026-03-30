@@ -1,21 +1,22 @@
 ﻿using Am.Api.Application.Interfaces;
 using Am.Api.Infrastructure.Presistence;
 using Am.Api.Model.DTOs;
+using Am.Api.Domain.Models;
 
 namespace Am.Api.Application.Services;
 
 /// <summary>
 /// In charge of handling all operations in relation to a production unit. Maps the functionality to specific use cases.
-/// The class stores methods about retrieval of different production units
+/// The class stores methods about retrieval of different production units.
 /// </summary>
 public class ProductionUnitService: IProductionUnitService
 {   
-    private IProductionUnitRepository<GasBoilerPersistence> _gasBoilerRepository;
-    private IProductionUnitRepository<OilBoilerPersistence> _oilBoilerRepository;
-    private IProductionUnitRepository<ElectricBoilerPersistence> _electricBoilerRepository;
-    private IProductionUnitRepository<GasMotorPersistence> _gasMotorRepository; 
+    private IProductionUnitRepository<GasBoiler> _gasBoilerRepository;
+    private IProductionUnitRepository<OilBoiler> _oilBoilerRepository;
+    private IProductionUnitRepository<ElectricBoiler> _electricBoilerRepository;
+    private IProductionUnitRepository<GasMotor> _gasMotorRepository; 
     
-    public ProductionUnitService(IProductionUnitRepository<GasBoilerPersistence> gasBoilerRepository, IProductionUnitRepository<OilBoilerPersistence> oilBoilerRepository, IProductionUnitRepository<ElectricBoilerPersistence> electricBoilerRepository, IProductionUnitRepository<GasMotorPersistence> gasMotorRepository) 
+    public ProductionUnitService(IProductionUnitRepository<GasBoiler> gasBoilerRepository, IProductionUnitRepository<OilBoiler> oilBoilerRepository, IProductionUnitRepository<ElectricBoiler> electricBoilerRepository, IProductionUnitRepository<GasMotor> gasMotorRepository) 
     {
         _gasBoilerRepository = gasBoilerRepository;
         _oilBoilerRepository = oilBoilerRepository;
@@ -23,8 +24,7 @@ public class ProductionUnitService: IProductionUnitService
         _gasMotorRepository = gasMotorRepository;
     }
 
-    //TODO This should be changed to return domain model, not persistence
-    public async Task<List<GasBoilerPersistence>> GetAllGasBoilersAsync()
+    public async Task<List<GasBoiler>> GetAllGasBoilersAsync()
     {
         try
         {
@@ -37,8 +37,7 @@ public class ProductionUnitService: IProductionUnitService
         }
     }
     
-    //TODO This should be changed to return domain model, not persistence
-    public async Task<List<OilBoilerPersistence>> GetAllOilBoilersAsync()
+    public async Task<List<OilBoiler>> GetAllOilBoilersAsync()
     {
         try
         {
@@ -51,12 +50,12 @@ public class ProductionUnitService: IProductionUnitService
         }
     }
 
-    public async Task<List<ElectricBoilerPersistence>> GetAllElectricBoilersAsync()
+    public async Task<List<ElectricBoiler>> GetAllElectricBoilersAsync()
     {
-        return await  _electricBoilerRepository.GetAllAsync();;
+        return await  _electricBoilerRepository.GetAllAsync();
     }
 
-    public async Task<List<GasMotorPersistence>> GetAllGasMotorsAsync()
+    public async Task<List<GasMotor>> GetAllGasMotorsAsync()
     {
         return await  _gasMotorRepository.GetAllAsync();
     }
