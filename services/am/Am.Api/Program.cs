@@ -37,6 +37,14 @@ if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
     app.MapScalarApiReference();
 }
 
+//Todo - To be removed later
+app.MapGet("/diag/config", (IConfiguration config, IHostEnvironment env) => new
+{
+    Environment = env.EnvironmentName,
+    Url = config["SupabaseSettings:Url"],
+    ApiKeyPresent = !string.IsNullOrWhiteSpace(config["SupabaseSettings:ApiKey"])
+});
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();

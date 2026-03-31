@@ -11,11 +11,13 @@ public class ElectricBoilerRepository: IProductionUnitRepository<ElectricBoiler>
 {   
    private readonly DatabaseContext _context;
    private readonly Client _client;
+   private readonly ILogger<ElectricBoilerRepository> _logger;
    
-    public ElectricBoilerRepository(DatabaseContext context)
+    public ElectricBoilerRepository(DatabaseContext context, ILogger<ElectricBoilerRepository> logger)
     {
         _context = context;
         _client = _context.GetClient(); 
+        _logger = logger;
     }
 
     public async Task<List<ElectricBoiler>> GetAllAsync()
@@ -24,7 +26,8 @@ public class ElectricBoilerRepository: IProductionUnitRepository<ElectricBoiler>
         {
             ModeledResponse<ElectricBoilerPersistence> result = await _client.From<ElectricBoilerPersistence>().Get();
             List<ElectricBoilerPersistence> electricBoilersPersistence = result.Models;
-
+            
+            _logger.LogInformation($"Request GetAllAsync for ElectricBoilers. Returned:  {electricBoilersPersistence}");
             if (electricBoilersPersistence == null || electricBoilersPersistence.Count == 0)
             {
                 throw new NoAssetsFoundException("No asset data received. Electric Boiler set empty");
@@ -42,6 +45,7 @@ public class ElectricBoilerRepository: IProductionUnitRepository<ElectricBoiler>
         catch (Exception e)
         {
             Console.WriteLine($"Error fetching all in ElectricBoilerRepository: {e.GetType()} {e.Message}");
+            _logger.LogError($"Error fetching all in ElectricBoilerRepository: {e.GetType()} {e.Message}");
             throw;
         }
     }
@@ -51,8 +55,9 @@ public class ElectricBoilerRepository: IProductionUnitRepository<ElectricBoiler>
             try
             {
                 ModeledResponse<ElectricBoilerPersistence> result = await _client.From<ElectricBoilerPersistence>().Select(obj => new object[] { obj.Id }).Get();
-
+                
                 ElectricBoilerPersistence electricBoilerPersistence = result.Model;
+                _logger.LogInformation($"Request GetByIdAsync for ElectricBoilers. Returned:  {electricBoilerPersistence}");
                 //TODO - To be finished. Validation check is to be done here
             
                 return ToDomain(electricBoilerPersistence);
@@ -60,6 +65,7 @@ public class ElectricBoilerRepository: IProductionUnitRepository<ElectricBoiler>
             catch (Exception e)
             {
                 Console.WriteLine($"Error fetching electricBoilerRepository: {e.GetType()} {e.Message}");
+                _logger.LogError($"Error fetching electricBoilerRepository: {e.GetType()} {e.Message}");
                 throw;
             }
     }

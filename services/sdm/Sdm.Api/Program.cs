@@ -15,7 +15,7 @@ builder.Services.Configure<SupabaseSettings>(builder.Configuration.GetSection("S
 
 builder.Services.AddSingleton<DatabaseContext>();
 builder.Services.AddScoped<ISourceDataRepository, SourceDataRepository>();
-builder.Services.AddScoped<ISourceDataService , SourceDataService>();
+builder.Services.AddScoped<ISourceDataService, SourceDataService>();
 
 var app = builder.Build();
 
@@ -23,8 +23,17 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
 {
     app.MapOpenApi();
-    app.MapScalarApiReference();    
+    app.MapScalarApiReference();
 }
+
+
+//TODO TO be removed later
+app.MapGet("/diag/config", (IConfiguration config, IHostEnvironment env) => new
+{
+    Environment = env.EnvironmentName,
+    Url = config["SupabaseSettings:Url"],
+    ApiKeyPresent = !string.IsNullOrWhiteSpace(config["SupabaseSettings:ApiKey"])
+});
 
 app.UseHttpsRedirection();
 
