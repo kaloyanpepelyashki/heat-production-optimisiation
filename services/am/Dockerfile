@@ -1,11 +1,9 @@
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
-COPY shared/Shared/Shared.csproj shared/Shared/
 COPY services/am/Am.Api/Am.Api.csproj services/am/Am.Api/
 RUN dotnet restore services/am/Am.Api/Am.Api.csproj
 
-COPY shared/Shared/ shared/Shared/
 COPY services/am/Am.Api/ services/am/Am.Api/
 RUN dotnet publish services/am/Am.Api/Am.Api.csproj -c Release -o /app/publish --no-restore
 
