@@ -45,6 +45,17 @@ app.MapGet("/diag/config", (IConfiguration config, IHostEnvironment env) => new
     ApiKeyPresent = !string.IsNullOrWhiteSpace(config["SupabaseSettings:ApiKey"])
 });
 
+app.MapGet("/diag/supabase", (IConfiguration config) =>
+{
+    return config.AsEnumerable()
+        .Where(kv => kv.Key.Contains("Supabase", StringComparison.OrdinalIgnoreCase))
+        .Select(kv => new
+        {
+            kv.Key,
+            ValuePresent = !string.IsNullOrWhiteSpace(kv.Value)
+        });
+});
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
