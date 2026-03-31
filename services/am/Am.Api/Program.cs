@@ -70,6 +70,19 @@ app.MapGet("/diag/options", (IOptions<SupabaseSettings> options) => new
     ApiKeyPresent = !string.IsNullOrWhiteSpace(options.Value.ApiKey)
 });
 
+//TODO REMOVE REMOVE REMOVE- DANGEROUS
+app.MapGet("/diag/raw-env", () => new
+{
+    UrlRaw = Environment.GetEnvironmentVariable("SupabaseSettings__Url"),
+    ApiKeyRawPresent = !string.IsNullOrWhiteSpace(
+        Environment.GetEnvironmentVariable("SupabaseSettings__ApiKey"))
+});
+
+app.MapGet("/diag/env", (IWebHostEnvironment env) => new
+{
+    env.EnvironmentName
+});
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
