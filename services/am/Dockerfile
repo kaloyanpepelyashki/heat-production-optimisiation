@@ -1,10 +1,10 @@
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
-COPY Am.Api/Am.Api.csproj /Am.Api/
+COPY Am.Api/Am.Api.csproj Am.Api/
 RUN dotnet restore Am.Api/Am.Api.csproj
 
-COPY Am.Api/ /Am.Api/
+COPY Am.Api/ Am.Api/
 RUN dotnet publish Am.Api/Am.Api.csproj -c Release -o /app/publish --no-restore
 
 FROM mcr.microsoft.com/dotnet/aspnet:9.0
