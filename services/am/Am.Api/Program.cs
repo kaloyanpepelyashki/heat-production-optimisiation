@@ -4,6 +4,7 @@ using Am.Api.Infrastructure.Configuration;
 using Am.Api.Infrastructure.Presistence;
 using Am.Api.Domain.Models;
 using Am.Api.Model.DTOs;
+using Microsoft.Extensions.Options;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -54,6 +55,19 @@ app.MapGet("/diag/supabase", (IConfiguration config) =>
             kv.Key,
             ValuePresent = !string.IsNullOrWhiteSpace(kv.Value)
         });
+});
+
+app.MapGet("/diag/config", (IConfiguration config, IWebHostEnvironment env) => new
+{
+    Environment = env.EnvironmentName,
+    SupabaseUrl = config["SupabaseSettings:Url"],
+    SupabaseApiKeyPresent = !string.IsNullOrWhiteSpace(config["SupabaseSettings:ApiKey"])
+});
+
+app.MapGet("/diag/options", (IOptions<SupabaseSettings> options) => new
+{
+    Url = options.Value.Url,
+    ApiKeyPresent = !string.IsNullOrWhiteSpace(options.Value.ApiKey)
 });
 
 app.UseHttpsRedirection();

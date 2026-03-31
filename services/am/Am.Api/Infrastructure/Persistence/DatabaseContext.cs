@@ -14,9 +14,14 @@ public sealed class DatabaseContext
    
     public DatabaseContext(IOptions<SupabaseSettings> options)
     {
-        try
-        {
             var configuration = options.Value;
+            
+            if (string.IsNullOrWhiteSpace(configuration.Url))
+                throw new InvalidOperationException("SupabaseSettings:Url is missing.");
+
+            if (string.IsNullOrWhiteSpace(configuration.ApiKey))
+                throw new InvalidOperationException("SupabaseSettings:ApiKey is missing.");
+
 
             var SupabaseOptions = new SupabaseOptions
             {
@@ -24,12 +29,7 @@ public sealed class DatabaseContext
             }; 
             
             _supabaseClient = new Client(configuration.Url, configuration.ApiKey, SupabaseOptions);
-           
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine($"Error in DatabaseConbtext . Error initialising Database Context:  {e.Message}, {e.GetType()}");
-        }
+            
     }
     
     /// <summary>
