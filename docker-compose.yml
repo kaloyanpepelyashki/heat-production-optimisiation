@@ -19,6 +19,16 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - SUPABASE_CONNECTION_STRING=${SUPABASE_CONNECTION_STRING}
 
+  ffa:
+    build:
+      context: .
+      dockerfile: services/ffa/Dockerfile
+    ports:
+      - "5005:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - SDM_API_URL=http://sdm:8080
+
   opt:
     build:
       context: .
