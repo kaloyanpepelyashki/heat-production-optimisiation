@@ -22,6 +22,7 @@ public class GasBoilerRepository: IProductionUnitRepository<GasBoiler>
     {
         _context = context;
         _client = _context.GetClient();
+        _logger = logger;
     }
     
     /// <summary>

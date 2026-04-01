@@ -18,6 +18,7 @@ public class SourceDataRepository : ISourceDataRepository
         {
             _context = context;
             _client = context.GetClient();
+            _logger = logger;
         }
         catch (DatabaseContextException e)
         {
@@ -49,8 +50,8 @@ public class SourceDataRepository : ISourceDataRepository
         }
         catch (Exception e)
         {
-            Console.WriteLine($"Error fetching all in GasBoilerRepository: {e.GetType()} {e.Message}");
-            _logger.LogError($"Error fetching all in GasBoilerRepository: {e.GetType()} {e.Message}");
+            Console.WriteLine($"Error fetching all SourceDataPersistence: {e.GetType()} {e.Message}");
+            _logger.LogError($"Error fetching all SourceDataPersistence: {e.GetType()} {e.Message}");
             throw;
         }
     }

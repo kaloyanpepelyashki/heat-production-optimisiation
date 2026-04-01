@@ -6,6 +6,7 @@ using Sdm.Api.Infrastructure.Persistence.PersistenceModels;
 namespace Sdm.Api.Controllers;
 
 [ApiController]
+[Route("api/[controller]")]
 public class GetAllSourceDataController : Controller
 {
     private ISourceDataService _sourceDataService;
