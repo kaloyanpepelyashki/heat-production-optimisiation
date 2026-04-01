@@ -15,15 +15,15 @@ builder.Services.Configure<SupabaseSettings>(builder.Configuration.GetSection("S
 
 builder.Services.AddSingleton<DatabaseContext>();
 builder.Services.AddScoped<ISourceDataRepository, SourceDataRepository>();
-builder.Services.AddScoped<ISourceDataService , SourceDataService>();
+builder.Services.AddScoped<ISourceDataService, SourceDataService>();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
 {
     app.MapOpenApi();
-    app.MapScalarApiReference();    
+    app.MapScalarApiReference();
 }
 
 app.UseHttpsRedirection();

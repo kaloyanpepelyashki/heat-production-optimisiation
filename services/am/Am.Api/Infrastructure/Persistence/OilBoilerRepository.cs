@@ -11,6 +11,7 @@ public class OilBoilerRepository : IProductionUnitRepository<OilBoiler>
 {
     private readonly DatabaseContext _context;
     private readonly Client _client; 
+    private readonly ILogger<OilBoilerRepository> _logger;
     
 
     public OilBoilerRepository(DatabaseContext context)
@@ -30,6 +31,7 @@ public class OilBoilerRepository : IProductionUnitRepository<OilBoiler>
         {
             ModeledResponse<OilBoilerPersistence> result = await _client.From<OilBoilerPersistence>().Get();
             List<OilBoilerPersistence> oilBoilersPersistence = result.Models;
+            _logger.LogInformation($"Request GetAllAsync for OilBoilers: {oilBoilersPersistence}");
 
             if (oilBoilersPersistence == null || oilBoilersPersistence.Count == 0 )
             {
@@ -47,7 +49,8 @@ public class OilBoilerRepository : IProductionUnitRepository<OilBoiler>
         }
         catch (Exception e)
         {
-            Console.WriteLine($"Error fetching all in GasBoilerRepository: {e.GetType()} {e.Message}");
+            Console.WriteLine($"Error fetching all in oilBoilerRepository: {e.GetType()} {e.Message}");
+            _logger.LogError($"Error fetching all in oilBoilerRepository: {e.GetType()} {e.Message}");
             throw;
         }
     }
@@ -63,13 +66,15 @@ public class OilBoilerRepository : IProductionUnitRepository<OilBoiler>
             ModeledResponse<OilBoilerPersistence> result = await _client.From<OilBoilerPersistence>().Select(obj => new object[] { obj.Id }).Get();
 
             OilBoilerPersistence oilBoiler = result.Model;
+            _logger.LogInformation($"Request GetByIdAsync for OilBoiler: {oilBoiler}");
             //TODO - To be finished. Validation check is to be done here
             
             return ToDomain(oilBoiler);
         }
         catch (Exception e)
         {
-            Console.WriteLine($"Error fetching GasBoilerRepository: {e.GetType()} {e.Message}");
+            Console.WriteLine($"Error fetching oilBoilerRepository: {e.GetType()} {e.Message}");
+            _logger.LogError($"Error fetching oilBoilerRepository: {e.GetType()} {e.Message}");
             throw;
         }
     }

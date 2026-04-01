@@ -11,21 +11,21 @@ public class DatabaseContext
 
     public DatabaseContext(IOptions<SupabaseSettings> options)
     {
-        try
-        {
-            var _options = options.Value;
+            var configuration = options.Value;
+            
+            if (string.IsNullOrWhiteSpace(configuration.Url))
+                throw new InvalidOperationException("Failed to compose DatabaseClient connection Url is missing.");
+
+            if (string.IsNullOrWhiteSpace(configuration.ApiKey))
+                throw new InvalidOperationException("Failed to compose DatabaseClient connection ApiKey is missing.");
 
             var SupabaseOptions = new SupabaseOptions
             {
                 Schema = "source_data_manager"
             };
             
-            _supabseClient = new Client(_options.Url, _options.ApiKey, SupabaseOptions);
-        }
-        catch (Exception e)
-        {
-            throw new DatabaseContextException($"Error in DatabaseContext. Error initialising DatabaseContext: {e.Message}, {e.GetType()}", e);
-        }
+            _supabseClient = new Client(configuration.Url, configuration.ApiKey, SupabaseOptions);
+        
     }
 
 

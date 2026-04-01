@@ -4,6 +4,7 @@ using Am.Api.Infrastructure.Configuration;
 using Am.Api.Infrastructure.Presistence;
 using Am.Api.Domain.Models;
 using Am.Api.Model.DTOs;
+using Microsoft.Extensions.Options;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -31,7 +32,7 @@ builder.Services.AddScoped<IProductionUnitService, ProductionUnitService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
 {
     app.MapOpenApi();
     app.MapScalarApiReference();

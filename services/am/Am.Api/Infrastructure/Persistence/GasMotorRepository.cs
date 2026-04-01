@@ -11,11 +11,13 @@ public class GasMotorRepository : IProductionUnitRepository<GasMotor>
 {
     private readonly DatabaseContext _context;
     private readonly Client _client;
+    private readonly ILogger<GasMotorRepository> _logger;
 
-    public GasMotorRepository(DatabaseContext context)
+    public GasMotorRepository(DatabaseContext context, ILogger<GasMotorRepository> logger)
     {
         _context = context;
         _client = _context.GetClient();
+        _logger = logger;
     }
 
     public async Task<List<GasMotor>> GetAllAsync()
@@ -24,6 +26,8 @@ public class GasMotorRepository : IProductionUnitRepository<GasMotor>
         {
             ModeledResponse<GasMotorPersistence> result = await _client.From<GasMotorPersistence>().Get();
             List<GasMotorPersistence> gasMotorsPersistence = result.Models;
+            _logger.LogInformation($"Request GetAllAsync for GasMotors. Returned:  {gasMotorsPersistence}");
+            
 
             if (gasMotorsPersistence == null || gasMotorsPersistence.Count == 0)
             {
@@ -40,7 +44,8 @@ public class GasMotorRepository : IProductionUnitRepository<GasMotor>
         }
         catch (Exception e)
         {
-            Console.WriteLine($"Error fetching all in GasBoilerRepository: {e.GetType()} {e.Message}");
+            Console.WriteLine($"Error fetching all in GasMotorRepository: {e.GetType()} {e.Message}");
+            _logger.LogError($"Error fetching all in GasMotorRepository: {e.GetType()} {e.Message}");
             throw;
         }
     }
@@ -53,12 +58,14 @@ public class GasMotorRepository : IProductionUnitRepository<GasMotor>
                 await _client.From<GasMotorPersistence>().Select(motor => new object[] { motor.Id }).Get();
 
             GasMotorPersistence gasMotorPersistence = result.Model;
+            _logger.LogInformation($"Request GetByIdAsync for GasMotor: {gasMotorPersistence}");
 
             return ToDomain(gasMotorPersistence);
         }
         catch (Exception e)
         {
             Console.WriteLine($"Error fetching specific item {id} in GasMotorRepository: {e.GetType()} {e.Message}");
+            _logger.LogError($"Error fetching specific item {id} in GasMotorRepository: {e.GetType()} {e.Message}");
             throw;
         }
     }

@@ -1,11 +1,15 @@
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
-COPY shared/Shared/ shared/Shared/
-COPY services/rdm/Rdm.Api/ services/rdm/Rdm.Api/
-RUN dotnet publish services/rdm/Rdm.Api/Rdm.Api.csproj -c Release -o /app
 
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
+COPY Rdm.Api/Rdm.Api.csproj Rdm.Api/
+RUN dotnet restore Rdm.Api/Rdm.Api.csproj
+
+COPY Rdm.Api/ Rdm.Api/
+RUN dotnet publish Rdm.Api/Rdm.Api.csproj -c Release -o /app/publish --no-restore
+
+FROM mcr.microsoft.com/dotnet/aspnet:9.0
 WORKDIR /app
-COPY --from=build /app .
+ENV ASPNETCORE_URLS=http://+:8080
+COPY --from=build /app/publish .
 EXPOSE 8080
 ENTRYPOINT ["dotnet", "Rdm.Api.dll"]
