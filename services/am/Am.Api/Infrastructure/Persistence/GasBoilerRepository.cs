@@ -14,10 +14,11 @@ namespace Am.Api.Infrastructure.Presistence;
 public class GasBoilerRepository: IProductionUnitRepository<GasBoiler>
 {
     private readonly DatabaseContext _context;
-    private readonly Client _client; 
+    private readonly Client _client;
+    private readonly ILogger<GasBoilerRepository> _logger;
     
 
-    public GasBoilerRepository(DatabaseContext context)
+    public GasBoilerRepository(DatabaseContext context, ILogger<GasBoilerRepository> logger)
     {
         _context = context;
         _client = _context.GetClient();
@@ -34,6 +35,7 @@ public class GasBoilerRepository: IProductionUnitRepository<GasBoiler>
         {
             ModeledResponse<GasBoilerPersistence> result = await _client.From<GasBoilerPersistence>().Get();
             List<GasBoilerPersistence> gasBoilersPersistence = result.Models;
+            _logger.LogInformation($"Request GetAllAsync for GasBoilers. Returned:  {gasBoilersPersistence}");
 
             if ( gasBoilersPersistence == null || gasBoilersPersistence.Count == 0 )
             {
@@ -52,6 +54,7 @@ public class GasBoilerRepository: IProductionUnitRepository<GasBoiler>
         catch (Exception e)
         {
             Console.WriteLine($"Error fetching all in GasBoilerRepository: {e.GetType()} {e.Message}");
+            _logger.LogError($"Error fetching all in GasBoilerRepository: {e.GetType()} {e.Message}");
             throw;
         }
     }
@@ -67,6 +70,7 @@ public class GasBoilerRepository: IProductionUnitRepository<GasBoiler>
             ModeledResponse<GasBoilerPersistence> result = await _client.From<GasBoilerPersistence>().Select(obj => new object[] { obj.Id }).Get();
 
             GasBoilerPersistence gasBoiler = result.Model;
+            _logger.LogInformation($"Request GetByIdAsync for GasBoilers. Returned:  {gasBoiler}");
             //TODO - To be finished. Validation check is to be done here
             
             return ToDomain(gasBoiler);
@@ -74,6 +78,7 @@ public class GasBoilerRepository: IProductionUnitRepository<GasBoiler>
         catch (Exception e)
         {
             Console.WriteLine($"Error fetching GasBoilerRepository: {e.GetType()} {e.Message}");
+            _logger.LogError($"Error fetching GasBoilerRepository: {e.GetType()} {e.Message}");
             throw;
         }
     }

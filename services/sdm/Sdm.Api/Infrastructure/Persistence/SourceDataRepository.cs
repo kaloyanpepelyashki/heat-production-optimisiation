@@ -21,12 +21,14 @@ public class SourceDataRepository : ISourceDataRepository
         }
         catch (DatabaseContextException e)
         {
-            Console.WriteLine($"Error with SourceDataRepository. {e.Message}, {e.StackTrace}");
+            Console.WriteLine($"Error with SourceDataRepository. DatabaseContext issue {e.Message}, {e.StackTrace}");
+            _logger.LogError($"Error with SourceDataRepository. DatabaseContext issue {e.Message}, {e.StackTrace}");
             
         }
         catch (Exception e)
         {
             Console.WriteLine($"Error initialising SourceDataRepository: {e.Message}");
+            _logger.LogError($"Error initialising SourceDataRepository: {e.Message}");
             
         }
     }

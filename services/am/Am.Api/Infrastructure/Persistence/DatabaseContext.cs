@@ -17,10 +17,10 @@ public sealed class DatabaseContext
             var configuration = options.Value;
             
             if (string.IsNullOrWhiteSpace(configuration.Url))
-                throw new InvalidOperationException("SupabaseSettings:Url is missing.");
+                throw new InvalidOperationException("Failed to compose DatabaseClient connection Url is missing.");
 
             if (string.IsNullOrWhiteSpace(configuration.ApiKey))
-                throw new InvalidOperationException("SupabaseSettings:ApiKey is missing.");
+                throw new InvalidOperationException("Failed to compose DatabaseClient connection ApiKey is missing.");
 
 
             var SupabaseOptions = new SupabaseOptions

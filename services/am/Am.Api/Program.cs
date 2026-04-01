@@ -38,51 +38,6 @@ if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
     app.MapScalarApiReference();
 }
 
-//Todo - To be removed later
-app.MapGet("/diag/config", (IConfiguration config, IHostEnvironment env) => new
-{
-    Environment = env.EnvironmentName,
-    Url = config["SupabaseSettings:Url"],
-    ApiKeyPresent = !string.IsNullOrWhiteSpace(config["SupabaseSettings:ApiKey"])
-});
-
-app.MapGet("/diag/supabase", (IConfiguration config) =>
-{
-    return config.AsEnumerable()
-        .Where(kv => kv.Key.Contains("Supabase", StringComparison.OrdinalIgnoreCase))
-        .Select(kv => new
-        {
-            kv.Key,
-            ValuePresent = !string.IsNullOrWhiteSpace(kv.Value)
-        });
-});
-
-app.MapGet("/diag/config", (IConfiguration config, IWebHostEnvironment env) => new
-{
-    Environment = env.EnvironmentName,
-    SupabaseUrl = config["SupabaseSettings:Url"],
-    SupabaseApiKeyPresent = !string.IsNullOrWhiteSpace(config["SupabaseSettings:ApiKey"])
-});
-
-app.MapGet("/diag/options", (IOptions<SupabaseSettings> options) => new
-{
-    Url = options.Value.Url,
-    ApiKeyPresent = !string.IsNullOrWhiteSpace(options.Value.ApiKey)
-});
-
-//TODO REMOVE REMOVE REMOVE- DANGEROUS
-app.MapGet("/diag/raw-env", () => new
-{
-    UrlRaw = Environment.GetEnvironmentVariable("SupabaseSettings__Url"),
-    ApiKeyRawPresent = !string.IsNullOrWhiteSpace(
-        Environment.GetEnvironmentVariable("SupabaseSettings__ApiKey"))
-});
-
-app.MapGet("/diag/env", (IWebHostEnvironment env) => new
-{
-    env.EnvironmentName
-});
-
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
