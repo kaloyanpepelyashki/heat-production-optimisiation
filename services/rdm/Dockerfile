@@ -5,7 +5,7 @@ COPY Rdm.Api/Rdm.Api.csproj Rdm.Api/
 RUN dotnet restore Rdm.Api/Rdm.Api.csproj
 
 COPY Rdm.Api/ Rdm.Api/
-RUN dotnet publish Rdm.Api/Rdm.Api.csproj -c Release -o /app/publish --no-resotre
+RUN dotnet publish Rdm.Api/Rdm.Api.csproj -c Release -o /app/publish --no-restore
 
 FROM mcr.microsoft.com/dotnet/aspnet:9.0
 WORKDIR /app
