@@ -125,4 +125,82 @@ public class GetProductionUnits : Controller
             return StatusCode(500, "Internal Server Error");
         }
     }
+
+    [HttpGet("lowestProdictionCostBoiler")]
+    public async Task<IActionResult> GetLowestProdictionCostBoiler()
+    {
+        // gets all of the boilers
+        var actionResultGasBoilers = await GetAllGasBoilers();
+        var actionResultOilBoilers = await GetAllOilBoilers();
+
+        if (actionResultGasBoilers is OkObjectResult && actionResultOilBoilers is OkObjectResult)
+        {
+            OkObjectResult resultGasBoilers = (OkObjectResult)actionResultGasBoilers;
+            OkObjectResult resultOilBoilers = (OkObjectResult)actionResultOilBoilers;
+
+            List<IProductionCostDTO> boilers = (List<IProductionCostDTO>)resultGasBoilers.Value;       
+            boilers.AddRange((List<IProductionCostDTO>)resultOilBoilers.Value); // combining both lists
+
+            IProductionCostDTO lowestProductionCostBoiler = null;
+
+            // Finding the gas boiler with the lowest production cost
+            foreach (IProductionCostDTO boiler in boilers)
+            {
+                if (lowestProductionCostBoiler == null)
+                {
+                    lowestProductionCostBoiler = boiler;
+                }
+
+                if (boiler.ProductionCost < lowestProductionCostBoiler.ProductionCost)
+                {
+                    lowestProductionCostBoiler = boiler;
+                }
+            }
+            return Ok(lowestProductionCostBoiler);
+        }
+        else
+        {
+            Console.WriteLine($"Exception in Controller/lowestProdictionCostBoiler");
+            return StatusCode(500, "Internal Server Error");
+        }
+    }
+
+    [HttpGet("lowestConsumptionCostBoiler")]
+    public async Task<IActionResult> GetLowestConsumptionBoiler()
+    {
+        // gets all of the boilers
+        var actionResultGasBoilers = await GetAllGasBoilers();
+        var actionResultOilBoilers = await GetAllOilBoilers();
+
+        if (actionResultGasBoilers is OkObjectResult && actionResultOilBoilers is OkObjectResult)
+        {
+            OkObjectResult resultGasBoilers = (OkObjectResult)actionResultGasBoilers;
+            OkObjectResult resultOilBoilers = (OkObjectResult)actionResultOilBoilers;
+
+            List<IConsumptionDTO> boilers = (List<IConsumptionDTO>)resultGasBoilers.Value;       
+            boilers.AddRange((List<IConsumptionDTO>)resultOilBoilers.Value); // combining both lists
+
+            IConsumptionDTO lowestConsumptionBoiler = null;
+
+            // Finding the gas boiler with the lowest production cost
+            foreach (IConsumptionDTO boiler in boilers)
+            {
+                if (lowestConsumptionBoiler == null)
+                {
+                    lowestConsumptionBoiler = boiler;
+                }
+
+                if (boiler.Consumption < lowestConsumptionBoiler.Consumption)
+                {
+                    lowestConsumptionBoiler = boiler;
+                }
+            }
+            return Ok(lowestConsumptionBoiler);
+        }
+        else
+        {
+            Console.WriteLine($"Exception in Controller/lowestConsumptionBoiler");
+            return StatusCode(500, "Internal Server Error");
+        }
+    }
 }
