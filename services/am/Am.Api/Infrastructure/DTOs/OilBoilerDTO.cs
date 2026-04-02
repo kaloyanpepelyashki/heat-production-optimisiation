@@ -1,6 +1,6 @@
 ﻿namespace Am.Api.Infrastructure.DTOs;
 
-public class OilBoilerDTO
+public class OilBoilerDTO : IConsumptionDTO, IProductionCostDTO
 {
     public int Id { get; set; }
     public string Name { get; set; } = string.Empty;
@@ -8,4 +8,5 @@ public class OilBoilerDTO
     public float ProductionCost { get; set; }
     public int Co2Emissions { get; set; }
     public float OilConsumption { get; set; }
+    public float Consumption => OilConsumption;
 }
