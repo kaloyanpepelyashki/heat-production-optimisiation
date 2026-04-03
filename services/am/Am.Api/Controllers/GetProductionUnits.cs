@@ -126,8 +126,8 @@ public class GetProductionUnits : Controller
         }
     }
 
-    [HttpGet("lowestProdictionCostBoiler")]
-    public async Task<IActionResult> GetLowestProdictionCostBoiler()
+    [HttpGet("lowestProductionCostBoiler")]
+    public async Task<IActionResult> GetLowestProductionCostBoiler()
     {
         // gets all of the boilers
         var actionResultGasBoilers = await GetAllGasBoilers();
@@ -138,12 +138,15 @@ public class GetProductionUnits : Controller
             OkObjectResult resultGasBoilers = (OkObjectResult)actionResultGasBoilers;
             OkObjectResult resultOilBoilers = (OkObjectResult)actionResultOilBoilers;
 
-            List<IProductionCostDTO> boilers = (List<IProductionCostDTO>)resultGasBoilers.Value;       
-            boilers.AddRange((List<IProductionCostDTO>)resultOilBoilers.Value); // combining both lists
+            //combining the boilers into 1 list
+            List<IProductionCostDTO> boilers = ((List<GasBoilerDTO>)resultGasBoilers.Value)
+                .Cast<IProductionCostDTO>()
+                .ToList();
+            boilers.AddRange(((List<OilBoilerDTO>)resultOilBoilers.Value).Cast<IProductionCostDTO>()); // combining both lists
 
             IProductionCostDTO lowestProductionCostBoiler = null;
 
-            // Finding the gas boiler with the lowest production cost
+            // Finding the boiler with the lowest production cost
             foreach (IProductionCostDTO boiler in boilers)
             {
                 if (lowestProductionCostBoiler == null)
@@ -160,12 +163,12 @@ public class GetProductionUnits : Controller
         }
         else
         {
-            Console.WriteLine($"Exception in Controller/lowestProdictionCostBoiler");
+            Console.WriteLine($"Exception in Controller/lowestProductionCostBoiler");
             return StatusCode(500, "Internal Server Error");
         }
     }
 
-    [HttpGet("lowestConsumptionCostBoiler")]
+    [HttpGet("lowestConsumptionBoiler")]
     public async Task<IActionResult> GetLowestConsumptionBoiler()
     {
         // gets all of the boilers
@@ -177,12 +180,15 @@ public class GetProductionUnits : Controller
             OkObjectResult resultGasBoilers = (OkObjectResult)actionResultGasBoilers;
             OkObjectResult resultOilBoilers = (OkObjectResult)actionResultOilBoilers;
 
-            List<IConsumptionDTO> boilers = (List<IConsumptionDTO>)resultGasBoilers.Value;       
-            boilers.AddRange((List<IConsumptionDTO>)resultOilBoilers.Value); // combining both lists
+            //combining the boilers into 1 list
+            List<IConsumptionDTO> boilers = ((List<GasBoilerDTO>)resultGasBoilers.Value)
+                .Cast<IConsumptionDTO>()
+                .ToList();
+            boilers.AddRange(((List<OilBoilerDTO>)resultOilBoilers.Value).Cast<IConsumptionDTO>()); // combining both lists
 
             IConsumptionDTO lowestConsumptionBoiler = null;
 
-            // Finding the gas boiler with the lowest production cost
+            // Finding the boiler with the lowest production cost
             foreach (IConsumptionDTO boiler in boilers)
             {
                 if (lowestConsumptionBoiler == null)

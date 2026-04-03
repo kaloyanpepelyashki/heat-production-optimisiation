@@ -14,10 +14,11 @@ public class OilBoilerRepository : IProductionUnitRepository<OilBoiler>
     private readonly ILogger<OilBoilerRepository> _logger;
     
 
-    public OilBoilerRepository(DatabaseContext context)
+    public OilBoilerRepository(DatabaseContext context, ILogger<OilBoilerRepository> logger)
     {
         _context = context;
         _client = context.GetClient();
+        _logger = logger;
     }
     
     /// <summary>
