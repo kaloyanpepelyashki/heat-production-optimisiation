@@ -203,4 +203,108 @@ public class GetProductionUnits : Controller
             return StatusCode(500, "Internal Server Error");
         }
     }
+
+    [HttpGet("allActiveGasBoilers")]
+    public async Task<IActionResult> GetAllActiveGasBoilers()
+    {
+        var actionResult = await GetAllGasBoilers();
+        if (actionResult is OkObjectResult)
+        {
+            OkObjectResult OkResult = (OkObjectResult)actionResult;
+            List<GasBoilerDTO> boilers = (List<GasBoilerDTO>)OkResult.Value;
+            List<GasBoilerDTO> Activeboilers = new List<GasBoilerDTO>();
+
+            foreach(GasBoilerDTO boiler in boilers)
+            {
+                if (boiler.Active)
+                {
+                    Activeboilers.Add(boiler);
+                }
+            }
+            return Ok(Activeboilers);
+        }
+        else
+        {
+            Console.WriteLine($"Exception in Controller/allActiveGasBoilers");
+            return StatusCode(500, "Internal Server Error");
+        }
+    }
+
+    [HttpGet("allActiveOilBoilers")]
+    public async Task<IActionResult> GetAllActiveOilBoilers()
+    {
+        var actionResult = await GetAllOilBoilers();
+        if (actionResult is OkObjectResult)
+        {
+            OkObjectResult OkResult = (OkObjectResult)actionResult;
+            List<OilBoilerDTO> boilers = (List<OilBoilerDTO>)OkResult.Value;
+            List<OilBoilerDTO> Activeboilers = new List<OilBoilerDTO>();
+
+            foreach(OilBoilerDTO boiler in boilers)
+            {
+                if (boiler.Active)
+                {
+                    Activeboilers.Add(boiler);
+                }
+            }
+            return Ok(Activeboilers);
+        }
+        else
+        {
+            Console.WriteLine($"Exception in Controller/allActiveOilBoilers");
+            return StatusCode(500, "Internal Server Error");
+        }
+    }
+
+    [HttpGet("allActiveElectricBoilers")]
+    public async Task<IActionResult> GetAllActiveElectricBoilers()
+    {
+        var actionResult = await GetAllElectricBoilers();
+        if (actionResult is OkObjectResult)
+        {
+            OkObjectResult OkResult = (OkObjectResult)actionResult;
+            List<ElectricBoilerDTO> boilers = (List<ElectricBoilerDTO>)OkResult.Value;
+            List<ElectricBoilerDTO> Activeboilers = new List<ElectricBoilerDTO>();
+
+            foreach(ElectricBoilerDTO boiler in boilers)
+            {
+                if (boiler.Active)
+                {
+                    Activeboilers.Add(boiler);
+                }
+            }
+            return Ok(Activeboilers);
+        }
+        else
+        {
+            Console.WriteLine($"Exception in Controller/allActiveElectricBoilers");
+            return StatusCode(500, "Internal Server Error");
+        }
+    }
+
+    [HttpGet("allActiveGasMotors")]
+    public async Task<IActionResult> GetAllActiveGasMotors()
+    {
+        var actionResult = await GetAllGasMotors();
+        if (actionResult is OkObjectResult)
+        {
+            OkObjectResult OkResult = (OkObjectResult)actionResult;
+            List<GasMotorDTO> boilers = (List<GasMotorDTO>)OkResult.Value;
+            List<GasMotorDTO> Activeboilers = new List<GasMotorDTO>();
+
+            foreach(GasMotorDTO boiler in boilers)
+            {
+                if (boiler.Active)
+                {
+                    Activeboilers.Add(boiler);
+                }
+            }
+            return Ok(Activeboilers);
+        }
+        else
+        {
+            Console.WriteLine($"Exception in Controller/allActiveGasMotors");
+            return StatusCode(500, "Internal Server Error");
+        }
+    }
 }
