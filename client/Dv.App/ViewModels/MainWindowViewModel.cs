@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Dv.App.Models;
+using Dv.App.Services;
 
 namespace Dv.App.ViewModels;
 
@@ -9,9 +10,13 @@ public sealed class MainWindowViewModel : ViewModelBase
 	private readonly Dictionary<string, ViewModelBase> viewMap;
 	private ViewModelBase currentViewModel;
 	private NavigationItem? selectedNavigationItem;
+	private readonly IApiService apiService;
 
 	public MainWindowViewModel()
 	{
+		// 1. Initialize our API data retrieval client to call the Render microservices directly
+		this.apiService = new ApiService(); 
+
 		this.NavigationItems = new ObservableCollection<NavigationItem>
 		{
 			new NavigationItem { Title = "Dashboard", ViewKey = "dashboard" },
