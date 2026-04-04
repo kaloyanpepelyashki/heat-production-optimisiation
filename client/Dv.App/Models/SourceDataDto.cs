@@ -1,0 +1,22 @@
+// <copyright file="SourceDataDto.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
+namespace Dv.App.Models;
+
+using System;
+
+public class SourceDataDto
+{
+    public int Id { get; set; }
+
+    public int PeriodId { get; set; }
+
+    public DateTime TimeFrom { get; set; }
+
+    public DateTime TimeTo { get; set; }
+
+    public double HeatDemand { get; set; }
+
+    public double ElectricityPrice { get; set; }
+}

@@ -1,61 +1,58 @@
+// <copyright file="DashboardViewModel.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
+namespace Dv.App.ViewModels;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Dv.App.Models;
 using Dv.App.Services;
-
-namespace Dv.App.ViewModels;
-
-public class WeatherForecast
-{
-    public DateTime Date { get; set; }
-    public int TemperatureC { get; set; }
-    public int TemperatureF { get; set; }
-    public string? Summary { get; set; }
-}
 
 public sealed class DashboardViewModel : ViewModelBase
 {
-    private readonly IApiService _apiService;
-    private string _dashboardData = "Data will appear here once loaded...";
+    private readonly IApiService apiService;
+    private string dashboardData = "Data will appear here once loaded...";
 
-    public string DashboardData
-    {
-        get => _dashboardData;
-        set => this.SetProperty(ref _dashboardData, value);
-    }
-    
     // Allow parameterless initialization for now if desired, but ideally we inject it
     public DashboardViewModel(IApiService apiService = null!)
     {
-        _apiService = apiService ?? new ApiService();
-        
+        this.apiService = apiService ?? new ApiService();
+
         // Let's actually test it when the view model is created
-        _ = LoadDashboardDataAsync();
+        _ = this.LoadDashboardDataAsync();
+    }
+
+    public string DashboardData
+    {
+        get => this.dashboardData;
+        set => this.SetProperty(ref this.dashboardData, value);
     }
 
     private async Task LoadDashboardDataAsync()
     {
         try
         {
-            DashboardData = $"Pinging Render services...{Environment.NewLine}(Please wait, Render free tier can take up to 50s to wake up)";
-            
-            // Testing our Data Retrieval Layer by pinging the Opt service Render deployment
-            var forecasts = await _apiService.GetAsync<List<WeatherForecast>>(BackendService.Opt, "WeatherForecast");
-            
-            if (forecasts != null && forecasts.Any())
+            this.DashboardData = $"Pinging Render services...{Environment.NewLine}(Please wait, Render free tier can take up to 50s to wake up)";
+
+            // Testing our Data Retrieval Layer by pinging the actual SDM service Render deployment
+            var sourceData = await this.apiService.GetAsync<List<SourceDataDto>>(BackendService.Sdm, "getAll");
+
+            if (sourceData != null && sourceData.Any())
             {
-                var first = forecasts.First();
-                DashboardData = $"Success! Render responded. First forecast: {first.Summary} ({first.TemperatureC}°C) on {first.Date.ToShortDateString()}";
+                var first = sourceData.First();
+                this.DashboardData = $"Success! SDM API responded. First Data entry: Heat Demand {first.HeatDemand}, Electricity Price {first.ElectricityPrice} from {first.TimeFrom}";
             }
             else
             {
-                DashboardData = "Success! But Render returned an empty array.";
+                this.DashboardData = "Success! But SDM API returned an empty array.";
             }
         }
         catch (Exception ex)
         {
-            DashboardData = $"Test Failed: {ex.Message} (Check if the Render URL is correct and the service is deployed)";
+            this.DashboardData = $"Test Failed: {ex.Message} (Check if the Render URL is correct and the service is deployed)";
         }
     }
 }

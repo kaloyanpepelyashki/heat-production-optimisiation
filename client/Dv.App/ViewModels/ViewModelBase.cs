@@ -1,27 +1,32 @@
+// <copyright file="ViewModelBase.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
+namespace Dv.App.ViewModels;
+
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace Dv.App.ViewModels;
-
 public abstract class ViewModelBase : INotifyPropertyChanged
 {
-	public event PropertyChangedEventHandler? PropertyChanged;
+    /// <inheritdoc/>
+    public event PropertyChangedEventHandler? PropertyChanged;
 
-	protected bool SetProperty<T>(ref T storage, T value, [CallerMemberName] string? propertyName = null)
-	{
-		if (EqualityComparer<T>.Default.Equals(storage, value))
-		{
-			return false;
-		}
+    protected bool SetProperty<T>(ref T storage, T value, [CallerMemberName] string? propertyName = null)
+    {
+        if (EqualityComparer<T>.Default.Equals(storage, value))
+        {
+            return false;
+        }
 
-		storage = value;
-		this.OnPropertyChanged(propertyName);
-		return true;
-	}
+        storage = value;
+        this.OnPropertyChanged(propertyName);
+        return true;
+    }
 
-	protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-	{
-		this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-	}
+    protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
 }
