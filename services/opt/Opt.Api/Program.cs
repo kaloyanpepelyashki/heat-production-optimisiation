@@ -3,7 +3,8 @@ using Opt.Api.Infrastructure.Configuration;
 using Opt.Api.Infrastructure.Persistence;
 using Opt.Api.Application.Interfaces;
 using Opt.Api.Application.Services;
-
+using Opt.Api.Infrastructure.DTOs;
+using Supabase.Gotrue;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
