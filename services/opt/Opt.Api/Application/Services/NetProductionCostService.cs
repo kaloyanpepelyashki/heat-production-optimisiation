@@ -12,11 +12,11 @@ public class NetProductionCostService: INetProductionCostService
         _netProductionCostRepository = netProductionCostRepository;
     }
 
-    public async Task<List<NetProductionCostPersistence>> GetAllNetProductionCost()
+    public async Task<List<NetProductionCostPersistence>> GetAllNetProductionCostAsync()
     {
         try
         {
-            var netProductionCost = await _netProductionCostRepository.GetAllNetProductionCost();
+            var netProductionCost = await _netProductionCostRepository.GetAllNetProductionCostAsync();
             return netProductionCost;
         }
         catch (Exception e)

@@ -34,7 +34,7 @@ public class SelectedProductionUnitsRepository : ISelectedProductionUnitsReposit
         }
     }
 
-    public async Task<List<SelectedProductionUnitsPersistence>> GetAllSelectedProductionUnits()
+    public async Task<List<SelectedProductionUnitsPersistence>> GetAllSelectedProductionUnitsAsync()
     {
         try
         {

@@ -8,7 +8,7 @@ namespace Opt.Api.Infrastructure.Persistence;
 
 public class NetProductionCostRepository : INetProductionCostRepository
 {
-    private Client _client; 
+    private Client _client;
     private DatabaseContext _context;
     private readonly ILogger<NetProductionCostRepository> _logger;
 
@@ -24,17 +24,17 @@ public class NetProductionCostRepository : INetProductionCostRepository
         {
             Console.WriteLine($"Error with NetProductionCostRepository. DatabaseContext issue {e.Message}, {e.StackTrace}");
             _logger.LogError($"Error with NetProductionCostRepository. DatabaseContext issue {e.Message}, {e.StackTrace}");
-            
+
         }
         catch (Exception e)
         {
             Console.WriteLine($"Error initialising NetProductionCostRepository: {e.Message}");
             _logger.LogError($"Error initialising NetProductionCostRepository: {e.Message}");
-            
+
         }
     }
 
-    public async Task<List<NetProductionCostPersistence>> GetAllNetProductionCost()
+    public async Task<List<NetProductionCostPersistence>> GetAllNetProductionCostAsync()
     {
         try
         {
@@ -45,7 +45,7 @@ public class NetProductionCostRepository : INetProductionCostRepository
             {
                 throw new NoDataFoundException("No data found when Getting all source data");
             }
-            
+
             return netProductionCost;
         }
         catch (Exception e)

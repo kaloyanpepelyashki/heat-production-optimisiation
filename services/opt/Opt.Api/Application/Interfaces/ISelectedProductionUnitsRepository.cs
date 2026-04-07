@@ -4,5 +4,5 @@ namespace Opt.Api.Application.Interfaces;
 
 public interface ISelectedProductionUnitsRepository
 {
-    Task<List<SelectedProductionUnitsPersistence>> GetAllSelectedProductionUnits();
+    Task<List<SelectedProductionUnitsPersistence>> GetAllSelectedProductionUnitsAsync();
 }

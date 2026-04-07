@@ -4,5 +4,5 @@ namespace Opt.Api.Application.Interfaces;
 
 public interface INetProductionCostService
 {
-    Task<List<NetProductionCostPersistence>> GetAllNetProductionCost();
+    Task<List<NetProductionCostPersistence>> GetAllNetProductionCostAsync();
 }

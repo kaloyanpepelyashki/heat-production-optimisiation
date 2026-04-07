@@ -21,7 +21,7 @@ public class GetSelectedProductionUnitsController : Controller
     {
         try
         {
-            List<SelectedProductionUnitsPersistence> selectedProductionUnitsResult = await _selectedProductionUnitsService.GetAllSelectedProductionUnits();
+            List<SelectedProductionUnitsPersistence> selectedProductionUnitsResult = await _selectedProductionUnitsService.GetAllSelectedProductionUnitsAsync();
 
             List<SelectedProductionUnitsDTO> selectedProductionUnitsDTOs = selectedProductionUnitsResult.Select(res =>
 

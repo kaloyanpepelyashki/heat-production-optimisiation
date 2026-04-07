@@ -21,7 +21,7 @@ public class GetNetProductionCostController : Controller
     {
         try
         {
-            List<NetProductionCostPersistence> netProductionCostResult = await _netProductionCostService.GetAllNetProductionCost();
+            List<NetProductionCostPersistence> netProductionCostResult = await _netProductionCostService.GetAllNetProductionCostAsync();
 
             List<NetProductionCostDTO> netProductionCostDTOs = netProductionCostResult.Select(res =>
 

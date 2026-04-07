@@ -12,11 +12,11 @@ public class SelectedProductionUnitsService: ISelectedProductionUnitsService
         _selectedProductionUnitstRepository = selectedProductionUnitstRepository;
     }
 
-    public async Task<List<SelectedProductionUnitsPersistence>> GetAllSelectedProductionUnits()
+    public async Task<List<SelectedProductionUnitsPersistence>> GetAllSelectedProductionUnitsAsync()
     {
         try
         {
-            var selectedProductionUnitst = await _selectedProductionUnitstRepository.GetAllSelectedProductionUnits();
+            var selectedProductionUnitst = await _selectedProductionUnitstRepository.GetAllSelectedProductionUnitsAsync();
             return selectedProductionUnitst;
         }
         catch (Exception e)
