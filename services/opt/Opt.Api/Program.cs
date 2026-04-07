@@ -17,6 +17,8 @@ builder.Services.Configure<SupabaseSettings>(builder.Configuration.GetSection("S
 builder.Services.AddSingleton<DatabaseContext>();
 builder.Services.AddScoped<INetProductionCostRepository, NetProductionCostRepository>();
 builder.Services.AddScoped<INetProductionCostService, NetProductionCostService>();
+builder.Services.AddScoped<ISelectedProductionUnitsRepository, SelectedProductionUnitsRepository>();
+builder.Services.AddScoped<ISelectedProductionUnitsService, SelectedProductionUnitsService>();
 
 var app = builder.Build();
 

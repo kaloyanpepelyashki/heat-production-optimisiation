@@ -5,19 +5,19 @@ namespace Opt.Api.Application.Services;
 
 public class NetProductionCostService: INetProductionCostService
 {
-    private readonly INetProductionCostRepository _netPrductionCostRepository;
+    private readonly INetProductionCostRepository _netProductionCostRepository;
 
-    public NetProductionCostService(INetProductionCostRepository netPrductionCostRepository)
+    public NetProductionCostService(INetProductionCostRepository netProductionCostRepository)
     {
-        _netPrductionCostRepository = netPrductionCostRepository;
+        _netProductionCostRepository = netProductionCostRepository;
     }
 
     public async Task<List<NetProductionCostPersistence>> GetAllNetProductionCost()
     {
         try
         {
-            var netPrductionCost = await _netPrductionCostRepository.GetAllNetProductionCost();
-            return netPrductionCost;
+            var netProductionCost = await _netProductionCostRepository.GetAllNetProductionCost();
+            return netProductionCost;
         }
         catch (Exception e)
         {

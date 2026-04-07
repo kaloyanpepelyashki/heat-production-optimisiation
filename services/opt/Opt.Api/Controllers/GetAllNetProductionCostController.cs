@@ -31,7 +31,7 @@ public class GetNetProductionCostController : Controller
                     PeriodId = res.PeriodId,
                     TimeFrom = res.TimeFrom,
                     TimeTo = res.TimeTo,
-                    NetProductionCost = res.NetProdcutionCot,
+                    NetProductionCost = res.NetProdcutionCost,
                 }).ToList();
             
             return Ok(netProductionCostDTOs);

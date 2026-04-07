@@ -3,7 +3,7 @@ using Supabase.Postgrest.Models;
 
 namespace Opt.Api.Infrastructure.Persistence.PersistenceModels;
 
-[Table("source_data")]
+[Table("net_production_cost")]
 public class NetProductionCostPersistence : BaseModel
 {
     [PrimaryKey("Id")]
@@ -15,5 +15,5 @@ public class NetProductionCostPersistence : BaseModel
     [Column("time_to")]
     public DateTime TimeTo { get; set; }
     [Column("net_production_cost")]
-    public double NetProdcutionCot { get; set; }
+    public double NetProdcutionCost { get; set; }
 }
