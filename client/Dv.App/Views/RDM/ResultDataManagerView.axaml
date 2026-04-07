@@ -1,9 +1,271 @@
-﻿<Window xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-        x:Class="Dv.App.Views.RDM.ResultDataManagerView"
-        Title="ResultDataManagerView">
-    Welcome to Avalonia!
-</Window>
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Dv.App.Views.RDM.ResultDataManagerView">
+
+  <UserControl.Styles>
+    <Style Selector="Button">
+      <Setter Property="Cursor" Value="Hand" />
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border Name="PART_Border"
+                  Background="{TemplateBinding Background}"
+                  BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}"
+                  CornerRadius="{TemplateBinding CornerRadius}"
+                  Padding="{TemplateBinding Padding}">
+            <ContentPresenter Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+          </Border>
+        </ControlTemplate>
+      </Setter>
+    </Style>
+
+    <Style Selector="Button:pointerover /template/ Border#PART_Border">
+      <Setter Property="Background" Value="{TemplateBinding Background}" />
+    </Style>
+
+    <Style Selector="Button[Background=#0B4F86]:pointerover /template/ Border#PART_Border">
+      <Setter Property="Background" Value="#084265" />
+    </Style>
+
+    <Style Selector="Button[Background=#1E79BE]:pointerover /template/ Border#PART_Border">
+      <Setter Property="Background" Value="#1565B0" />
+    </Style>
+  </UserControl.Styles>
+
+  <ScrollViewer>
+    <Grid>
+      <StackPanel
+        Orientation="Vertical"
+        VerticalAlignment="Top"
+        HorizontalAlignment="Left">
+
+        <!-- Main Header -->
+        <TextBlock HorizontalAlignment="Left"
+                   VerticalAlignment="Top"
+                   FontSize="28"
+                   FontWeight="SemiBold"
+                   Foreground="#2C3E50"
+                   Text="Result Data Manager"
+                   Margin="10" />
+
+        <!-- Data Input Section -->
+        <TextBlock HorizontalAlignment="Left"
+                   VerticalAlignment="Top"
+                   FontSize="20"
+                   FontWeight="SemiBold"
+                   Foreground="#2C3E50"
+                   Text="Data Input"
+                   Margin="10,10,10,0" />
+
+        <Border Margin="10,10,10,10" BorderBrush="Gray" BorderThickness="1" CornerRadius="4" Padding="10">
+          <StackPanel Orientation="Vertical" Spacing="10">
+            <TextBlock Text="Load optimization results from CSV files"
+                       Foreground="#2C3E50"
+                       FontSize="14" />
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <Button Content="Import CSV"
+                      Background="#0B4F86"
+                      Foreground="White"
+                      Padding="12,8"
+                      CornerRadius="4"
+                      FontSize="14"
+                      FontWeight="SemiBold" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
+
+        <!-- Results by Unit Section -->
+        <TextBlock HorizontalAlignment="Left"
+                   VerticalAlignment="Top"
+                   FontSize="20"
+                   FontWeight="SemiBold"
+                   Foreground="#2C3E50"
+                   Text="Results by Production Unit"
+                   Margin="10,10,10,0" />
+
+        <!-- Gas Boiler Results -->
+        <TextBlock HorizontalAlignment="Left"
+                   VerticalAlignment="Top"
+                   FontSize="16"
+                   FontWeight="SemiBold"
+                   Foreground="#2C3E50"
+                   Text="Gas Boilers"
+                   Margin="10,10,10,0" />
+
+        <Border Margin="10,0,10,10" BorderBrush="Gray" BorderThickness="1" CornerRadius="4">
+          <Grid ColumnDefinitions="*,*,*,*,*,*" RowDefinitions="Auto,Auto,Auto,Auto" Margin="10">
+            
+            <!-- Header Row -->
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Unit Name" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="0" Grid.Column="1" Text="Heat Production" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="0" Grid.Column="2" Text="Expenses" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="0" Grid.Column="3" Text="Primary Energy" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="0" Grid.Column="4" Text="CO2 Emissions" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="0" Grid.Column="5" Text="Profit" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
+
+            <Rectangle Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="6" Height="1" Fill="LightGray" VerticalAlignment="Bottom"/>
+
+            <!-- Example results -->
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="GB1" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="1" Grid.Column="1" Text="-" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="1" Grid.Column="2" Text="-" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="1" Grid.Column="3" Text="-" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="1" Grid.Column="4" Text="-" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="1" Grid.Column="5" Text="-" Margin="10" Foreground="#2C3E50"/>
+
+            <Rectangle Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="6" Height="1" Fill="LightGray" VerticalAlignment="Bottom"/>
+
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="GB2" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="2" Grid.Column="1" Text="-" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="2" Grid.Column="2" Text="-" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="2" Grid.Column="3" Text="-" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="2" Grid.Column="4" Text="-" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="2" Grid.Column="5" Text="-" Margin="10" Foreground="#2C3E50"/>
+
+            <Rectangle Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="6" Height="1" Fill="LightGray" VerticalAlignment="Bottom"/>
+
+            <TextBlock Grid.Row="3" Grid.Column="0" Text="GB3" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="3" Grid.Column="1" Text="-" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="3" Grid.Column="2" Text="-" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="3" Grid.Column="3" Text="-" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="3" Grid.Column="4" Text="-" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="3" Grid.Column="5" Text="-" Margin="10" Foreground="#2C3E50"/>
+          </Grid>
+        </Border>
+
+        <!-- Oil Boiler Results -->
+        <TextBlock HorizontalAlignment="Left"
+                   VerticalAlignment="Top"
+                   FontSize="16"
+                   FontWeight="SemiBold"
+                   Foreground="#2C3E50"
+                   Text="Oil Boiler"
+                   Margin="10,10,10,0" />
+
+        <Border Margin="10,0,10,10" BorderBrush="Gray" BorderThickness="1" CornerRadius="4">
+          <Grid ColumnDefinitions="*,*,*,*,*,*" RowDefinitions="Auto,Auto" Margin="10">
+
+            <!-- Header Row -->
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Unit Name" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="0" Grid.Column="1" Text="Heat Production" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="0" Grid.Column="2" Text="Expenses" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="0" Grid.Column="3" Text="Primary Energy" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="0" Grid.Column="4" Text="CO2 Emissions" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="0" Grid.Column="5" Text="Profit" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
+
+            <Rectangle Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="6" Height="1" Fill="LightGray" VerticalAlignment="Bottom"/>
+
+            <!-- Example results -->
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="OB1" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="1" Grid.Column="1" Text="-" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="1" Grid.Column="2" Text="-" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="1" Grid.Column="3" Text="-" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="1" Grid.Column="4" Text="-" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="1" Grid.Column="5" Text="-" Margin="10" Foreground="#2C3E50"/>
+          </Grid>
+        </Border>
+
+        <!-- Gas Motor Results -->
+        <TextBlock HorizontalAlignment="Left"
+                   VerticalAlignment="Top"
+                   FontSize="16"
+                   FontWeight="SemiBold"
+                   Foreground="#2C3E50"
+                   Text="Gas Motor"
+                   Margin="10,10,10,0" />
+
+        <Border Margin="10,0,10,10" BorderBrush="Gray" BorderThickness="1" CornerRadius="4">
+          <Grid ColumnDefinitions="*,*,*,*,*,*,*" RowDefinitions="Auto,Auto" Margin="10">
+
+            <!-- Header Row -->
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Unit Name" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="0" Grid.Column="1" Text="Heat Production" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="0" Grid.Column="2" Text="Electricity Production" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="0" Grid.Column="3" Text="Expenses" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="0" Grid.Column="4" Text="Primary Energy" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="0" Grid.Column="5" Text="CO2 Emissions" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="0" Grid.Column="6" Text="Profit" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
+
+            <Rectangle Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="7" Height="1" Fill="LightGray" VerticalAlignment="Bottom"/>
+
+            <!-- Example results -->
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="GM1" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="1" Grid.Column="1" Text="-" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="1" Grid.Column="2" Text="-" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="1" Grid.Column="3" Text="-" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="1" Grid.Column="4" Text="-" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="1" Grid.Column="5" Text="-" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="1" Grid.Column="6" Text="-" Margin="10" Foreground="#2C3E50"/>
+          </Grid>
+        </Border>
+
+        <!-- Electric Boiler Results -->
+        <TextBlock HorizontalAlignment="Left"
+                   VerticalAlignment="Top"
+                   FontSize="16"
+                   FontWeight="SemiBold"
+                   Foreground="#2C3E50"
+                   Text="Electric Boiler"
+                   Margin="10,10,10,0" />
+
+        <Border Margin="10,0,10,10" BorderBrush="Gray" BorderThickness="1" CornerRadius="4">
+          <Grid ColumnDefinitions="*,*,*,*,*" RowDefinitions="Auto,Auto" Margin="10">
+
+            <!-- Header Row -->
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Unit Name" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="0" Grid.Column="1" Text="Electricity Consumption" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="0" Grid.Column="2" Text="Expenses" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="0" Grid.Column="3" Text="Primary Energy" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="0" Grid.Column="4" Text="Profit" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
+
+            <Rectangle Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5" Height="1" Fill="LightGray" VerticalAlignment="Bottom"/>
+
+            <!-- Example results -->
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="EB1" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="1" Grid.Column="1" Text="-" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="1" Grid.Column="2" Text="-" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="1" Grid.Column="3" Text="-" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="1" Grid.Column="4" Text="-" Margin="10" Foreground="#2C3E50"/>
+          </Grid>
+        </Border>
+
+        <!-- Data Output Section -->
+        <TextBlock HorizontalAlignment="Left"
+                   VerticalAlignment="Top"
+                   FontSize="20"
+                   FontWeight="SemiBold"
+                   Foreground="#2C3E50"
+                   Text="Data Output"
+                   Margin="10,30,10,0" />
+
+        <Border Margin="10,10,10,10" BorderBrush="Gray" BorderThickness="1" CornerRadius="4" Padding="10">
+          <StackPanel Orientation="Vertical" Spacing="10">
+            <TextBlock Text="Export optimization results in various formats"
+                       Foreground="#2C3E50"
+                       FontSize="14" />
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <Button Content="Export as CSV"
+                      Background="#0B4F86"
+                      Foreground="White"
+                      Padding="12,8"
+                      CornerRadius="4"
+                      FontSize="14"
+                      FontWeight="SemiBold" />
+              <Button Content="Export as JSON"
+                      Background="#1E79BE"
+                      Foreground="White"
+                      Padding="12,8"
+                      CornerRadius="4"
+                      FontSize="14"
+                      FontWeight="SemiBold" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
+
+      </StackPanel>
+    </Grid>
+  </ScrollViewer>
+</UserControl>

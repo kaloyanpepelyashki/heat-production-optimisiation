@@ -1,6 +1,6 @@
 ﻿namespace Dv.App.ViewModels;
 
-public class ResultDataManagerViewModel
+public class ResultDataManagerViewModel : ViewModelBase
 {
     
 }
