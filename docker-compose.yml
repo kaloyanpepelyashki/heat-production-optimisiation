@@ -40,16 +40,3 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - SUPABASE_CONNECTION_STRING=${SUPABASE_CONNECTION_STRING}
-
-  bff:
-    build:
-      context: .
-      dockerfile: services/bff/Dockerfile
-    ports:
-      - "5000:8080"
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - AM_API_URL=http://am:8080
-      - SDM_API_URL=http://sdm:8080
-      - OPT_API_URL=http://opt:8080
-      - RDM_API_URL=http://rdm:8080
