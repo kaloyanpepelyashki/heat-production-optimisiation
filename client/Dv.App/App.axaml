@@ -30,11 +30,11 @@
         </Style>
 
         <Style Selector="ListBox.nav-list > ListBoxItem:pointerover /template/ Border#ContainerBorder">
-            <Setter Property="Background" Value="#1E79BE" />
+            <Setter Property="Background" Value="#fe7575" />
         </Style>
 
         <Style Selector="ListBox.nav-list > ListBoxItem:selected /template/ Border#ContainerBorder">
-            <Setter Property="Background" Value="#1363A4" />
+            <Setter Property="Background" Value="#fe7575" />
         </Style>
     </Application.Styles>
 
