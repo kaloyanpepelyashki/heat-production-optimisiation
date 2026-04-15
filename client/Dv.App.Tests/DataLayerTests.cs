@@ -80,10 +80,13 @@ public class DataLayerTests
     public async Task OptimizationViewModel_LoadsData_ShouldSetOptDataOnSuccess()
     {
         var mockApiService = new Mock<IApiService>();
+        mockApiService
+            .Setup(x => x.GetAsync<object>(BackendService.Opt, "WeatherForecast"))
+            .ReturnsAsync(new { status = "ok" });
 
         var viewModel = new OptimizationViewModel(mockApiService.Object);
         await Task.Delay(100);
 
-        Assert.Contains("Failed to fetch OPT data: Render endpoint not yet available.", viewModel.OptData);
+        Assert.Contains("OPT API responded. Data parsed: True", viewModel.OptData);
     }
 }
