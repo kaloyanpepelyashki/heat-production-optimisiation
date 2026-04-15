@@ -1,24 +1,211 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:vm="using:Dv.App.ViewModels"
-             x:DataType="vm:DashboardViewModel"
              x:Class="Dv.App.Views.DashboardView">
-  <Grid RowDefinitions="Auto,*">
-    <TextBlock Grid.Row="0"
-               HorizontalAlignment="Center"
-               VerticalAlignment="Center"
-               FontSize="28"
-               FontWeight="SemiBold"
-               Foreground="#2C3E50"
-               Margin="0,50,0,20"
-               Text="Dashboard View" />
-               
-    <TextBlock Grid.Row="1"
-               HorizontalAlignment="Center"
-               VerticalAlignment="Top"
-               FontSize="16"
-               TextWrapping="Wrap"
-               Foreground="#34495E"
-               Text="{Binding DashboardData}" />
-  </Grid>
+
+  <!-- Making scroll possible-->
+  <ScrollViewer>
+    
+    <Grid ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto" Margin="10">
+
+      <!-- Left side of first panel -->
+      <StackPanel Grid.Row="0" Grid.Column="0"
+                  Orientation="Vertical"
+                  VerticalAlignment="Top"
+                  HorizontalAlignment="Left"
+                  Width="450">
+
+        <TextBlock HorizontalAlignment="Left"
+                   VerticalAlignment="Top"
+                   FontSize="28"
+                   FontWeight="SemiBold"
+                   Foreground="#2C3E50"
+                   Text="District Heating Network"
+                   Margin="10" />
+
+        <TextBlock HorizontalAlignment="Left"
+                   VerticalAlignment="Top"
+                   FontSize="12"
+                   FontWeight="SemiBold"
+                   Foreground="#2C3E50"
+                   TextWrapping="Wrap"
+                   Text="District heating is a system where hot water from a central power plant is distributed to buildings throughout the city via highly insulated pipes. This efficient method provides both space heating and domestic hot water to connected buildings through heat exchangers."
+                   Margin="10" />
+                   <!-- wrap makes it so the text alligns with space it is given-->
+
+        <TextBlock HorizontalAlignment="Left"
+                   VerticalAlignment="Top"
+                   FontSize="12"
+                   FontWeight="SemiBold"
+                   Foreground="#2C3E50"
+                   TextWrapping="Wrap"
+                   Text="The cooled water is then returned to the plant where it is reheated and recirculated. This closed-loop system allows for centralized, efficient heat production that can leverage multiple energy sources and production technologies."
+                   Margin="10" />
+
+
+        <!-- The box with optimization goals-->
+        <Border Background="#F0F4F8"
+                CornerRadius="8"
+                BoxShadow="0 4 10 0 #33000000"
+                Margin="10">
+          <StackPanel>
+            <TextBlock HorizontalAlignment="Left"
+                       VerticalAlignment="Top"
+                       FontSize="18"
+                       FontWeight="SemiBold"
+                       Foreground="#2C3E50"
+                       Text="Optimization Goals"
+                       Margin="10" />
+            <StackPanel Orientation="Vertical"
+                        VerticalAlignment="Top"
+                        HorizontalAlignment="Left">
+
+              <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,10,0,10">
+                <Grid Margin="15,0,20,0" Width="30" Height="30">
+                  <Ellipse Fill="#22C55E"/>
+                  <Image Source="avares://Dv.App/Assets/dollaricon.png" Stretch="Uniform" Margin="5"/>
+                </Grid>
+                <TextBlock VerticalAlignment="Center" Foreground="#2C3E50" FontSize="14" Text="Minimize Production Costs"/>
+              </StackPanel>
+
+              <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,10,0,10">
+                <Grid Margin="15,0,20,0" Width="30" Height="30">
+                  <Ellipse Fill="#8379e1"/>
+                  <Image Source="avares://Dv.App/Assets/lightningicon.png" Stretch="Uniform" Margin="5"/>
+                </Grid>
+                <TextBlock VerticalAlignment="Center" Foreground="#2C3E50" FontSize="14" Text="Maximize Electricity Profits"/>
+              </StackPanel>
+
+              <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,10,0,15">
+                <Grid Margin="15,0,20,0" Width="30" Height="30">
+                  <Ellipse Fill="#ff9500"/>
+                  <Image Source="avares://Dv.App/Assets/gearicon.png" Stretch="Uniform" Margin="5"/>
+                </Grid>
+                <TextBlock VerticalAlignment="Center" Foreground="#2C3E50" FontSize="14" Text="Automated Scheduling"/>
+              </StackPanel>
+
+            </StackPanel>
+          </StackPanel>
+        </Border>
+
+        <TextBlock HorizontalAlignment="Left"
+                   VerticalAlignment="Top"
+                   FontSize="18"
+                   FontWeight="SemiBold"
+                   Foreground="#2C3E50"
+                   Text="System Overview"
+                   Margin="10,20,10,5" />
+        
+        <TextBlock HorizontalAlignment="Left"
+                   VerticalAlignment="Top"
+                   FontSize="12"
+                   FontWeight="SemiBold"
+                   Foreground="#2C3E50"
+                   TextWrapping="Wrap"
+                   Text="Hot water flows from our production facilities through insulated pipes to 1,600 buildings. After delivering heat, the cooled water returns to be reheated and recirculated, creating an efficient closed-loop system for the entire city of Heatington."
+                   Margin="10,0,10,10" />
+      </StackPanel>
+      <!--  -->
+
+      <!-- Right side with responsive pictures -->
+      <Grid Grid.Row="0" Grid.Column="1"
+            RowDefinitions="Auto, *"
+            Margin="20,10,20,10"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch">
+        
+        <!-- Danfoss logo top right-->
+        <Image Grid.Row="0"
+               Source="avares://Dv.App/Assets/danfosslogo.png"
+               Height="50"
+               Stretch="Uniform"
+               HorizontalAlignment="Right"
+               Margin="0,0,0,50"/>
+
+
+        <!-- Grid map with border - adding shadows -->
+        <Border Grid.Row="1"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top"
+                BoxShadow="0 12 30 2 #66000000"
+                CornerRadius="8"
+                Margin="10">
+          <Border CornerRadius="8" ClipToBounds="True" Background="White">
+            <Image Source="avares://Dv.App/Assets/HeatingGrid.png"
+                   Stretch="Uniform"/>
+          </Border>
+        </Border>
+      </Grid>
+
+      <!-- Enhanced Dashboard appearing at the bottom -->
+      <!--The columns span over the whole view-->
+      <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Margin="0,10,0,0">
+        <Border Background="#F0F4F8"
+                CornerRadius="8"
+                BoxShadow="0 4 10 0 #ca1616"
+                Margin="10">
+
+          <StackPanel>
+            <TextBlock HorizontalAlignment="Center"
+                       VerticalAlignment="Top"
+                       FontSize="18"
+                       FontWeight="SemiBold"
+                       Foreground="#2C3E50"
+                       Text="Enhanced Dashboard"
+                       Margin="10" />
+
+            <!-- Border around coming soon-->
+            <Border Background="#40FF3333"
+                    CornerRadius="8"
+                    BoxShadow="0 4 10 0 #33000000"
+                    Margin="10,0,10,0"
+                    HorizontalAlignment="Center">
+              <TextBlock HorizontalAlignment="Center"
+                         VerticalAlignment="Top"
+                         FontSize="12"
+                         FontWeight="SemiBold"
+                         Foreground="#2C3E50"
+                         Text="Coming Soon!"
+                         Margin="20,10,20,10" />
+            </Border>
+
+            <!-- New features part-->
+            <TextBlock HorizontalAlignment="Left"
+                       VerticalAlignment="Top"
+                       FontSize="16"
+                       FontWeight="SemiBold"
+                       Foreground="#2C3E50"
+                       Text="New Features:"
+                       Margin="20,0,20,10" />
+
+            <StackPanel Margin="30,0,20,20" Orientation="Vertical">
+              <TextBlock HorizontalAlignment="Left"
+                         FontSize="14"
+                         Foreground="#2C3E50"
+                         TextWrapping="Wrap"
+                         Margin="0,0,0,8">
+                <Run FontWeight="Bold">• Customizable Widget Dashboard:</Run> Custom dashboard builder allowing user to create personalized views with their most important metrics and visualizations.
+              </TextBlock>
+              <TextBlock HorizontalAlignment="Left"
+                         FontSize="14"
+                         Foreground="#2C3E50"
+                         TextWrapping="Wrap"
+                         Margin="0,0,0,8">
+                <Run FontWeight="Bold">• Predictive Analytics Dashboard:</Run> AI powered forecasting for heat demand, optimal unit scheduling based on historical patterns and weather data.
+              </TextBlock>
+              <TextBlock HorizontalAlignment="Left"
+                         FontSize="14"
+                         Foreground="#2C3E50"
+                         TextWrapping="Wrap"
+                         Margin="0,0,0,0">
+                <Run FontWeight="Bold">• Interactive Scenario Simulator:</Run> Test "what if" conditions by adjusting fuel prices or unit availability to instantly visualize the change in expected costs and schedules before applying them.
+                <!-- Run is used when editing parts of text-->
+              </TextBlock>
+            </StackPanel>
+          </StackPanel>
+
+        </Border>
+      </StackPanel>
+
+    </Grid>
+  </ScrollViewer>
 </UserControl>

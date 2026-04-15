@@ -1,12 +1,289 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Dv.App.Views.ProductionUnitsView">
-  <Grid>
-    <TextBlock HorizontalAlignment="Center"
-               VerticalAlignment="Center"
-               FontSize="28"
-               FontWeight="SemiBold"
-               Foreground="#2C3E50"
-               Text="Production Units View" />
-  </Grid>
+
+  <!-- Scrollbar -->
+  <ScrollViewer>
+    <Grid>
+      <StackPanel
+      Orientation="Vertical"
+      VerticalAlignment="Top"
+      HorizontalAlignment= "Left">
+
+        <!-- Upper Header -->
+        <TextBlock HorizontalAlignment="Left"
+                   VerticalAlignment="Top"
+                   FontSize="28"
+                   FontWeight="SemiBold"
+                   Foreground="#2C3E50"
+                   Text="Production Units"
+                   Margin= "10" />
+
+        <!-- Header 2 -->
+        <TextBlock HorizontalAlignment="Left"
+                   VerticalAlignment="Top"
+                   FontSize="20"
+                   FontWeight="SemiBold"
+                   Foreground="#2C3E50"
+                   Text="Gas Boilers"
+                   Margin= "10,10,10,0" />
+
+        <!-- Boilers Table -->
+        <Border Margin="10,0,10,10" BorderBrush="Gray" BorderThickness="1" CornerRadius="4">
+          <Grid ColumnDefinitions="*,*,*,*,*" RowDefinitions="Auto,Auto,Auto,Auto" Margin="10">
+
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Name" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="0" Grid.Column="1" Text="Max Heat" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="0" Grid.Column="2" Text="Production Cost" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="0" Grid.Column="3" Text="C02 Emissions" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="0" Grid.Column="4" Text="Fuel Consumption" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
+
+            <!-- Line Separatig Rows -->
+            <Rectangle Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5" Height="1" Fill="LightGray" VerticalAlignment="Bottom"/>
+
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="GB1" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="1" Grid.Column="1" Text="3,0MW" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="1" Grid.Column="2" Text="510DKK" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="1" Grid.Column="3" Text="132kg" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="1" Grid.Column="4" Text="1,05MWh(gas)" Margin="10" Foreground="#2C3E50"/>
+
+            <!-- Line Separating Rows -->
+            <Rectangle Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="5" Height="1" Fill="LightGray" VerticalAlignment="Bottom"/>
+
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="GB2" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="2" Grid.Column="1" Text="2.0MW" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="2" Grid.Column="2" Text="540DKK" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="2" Grid.Column="3" Text="134kg" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="2" Grid.Column="4" Text="1,08MWh(gas)" Margin="10" Foreground="#2C3E50"/>
+
+            <!-- Line Separating Rows -->
+            <Rectangle Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="5" Height="1" Fill="LightGray" VerticalAlignment="Bottom"/>
+
+            <TextBlock Grid.Row="3" Grid.Column="0" Text="GB3" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="3" Grid.Column="1" Text="4.0MW" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="3" Grid.Column="2" Text="580DKK" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="3" Grid.Column="3" Text="136kg" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="3" Grid.Column="4" Text="1,09MWh(gas)" Margin="10" Foreground="#2C3E50"/>
+          </Grid>
+        </Border>
+
+        <!-- Additional info for first table -->
+        <TextBlock HorizontalAlignment="Left"
+                   VerticalAlignment="Top"
+                   FontSize="12"
+                   FontWeight="SemiBold"
+                   Foreground="#2C3E50"
+                   Text="*Production Costs, CO2 Emissions and Gas Consumption are listed per MWh(th)"
+                   Margin= "10,0,10,10" />
+
+        <TextBlock HorizontalAlignment="Left"
+                   VerticalAlignment="Top"
+                   FontSize="20"
+                   FontWeight="SemiBold"
+                   Foreground="#2C3E50"
+                   Text="Oil Boiler"
+                   Margin= "10,10,10,0" />
+
+        <Border Margin="10,0,10,10" BorderBrush="Gray" BorderThickness="1" CornerRadius="4">
+
+          <Grid ColumnDefinitions="*,*,*,*,*" RowDefinitions="Auto,Auto" Margin="10">
+
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Name" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="0" Grid.Column="1" Text="Max Heat" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="0" Grid.Column="2" Text="Production Cost" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="0" Grid.Column="3" Text="C02 Emissions" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="0" Grid.Column="4" Text="Fuel Consumption" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
+
+            <!-- Line Separating Rows -->
+            <Rectangle Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5" Height="1" Fill="LightGray" VerticalAlignment="Bottom"/>
+
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="OB1" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="1" Grid.Column="1" Text="6.0MW" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="1" Grid.Column="2" Text="690DKK" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="1" Grid.Column="3" Text="147kg" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="1" Grid.Column="4" Text="1,18MWh(oil)" Margin="10" Foreground="#2C3E50"/>
+          </Grid>
+        </Border>
+
+        <TextBlock HorizontalAlignment="Left"
+                   VerticalAlignment="Top"
+                   FontSize="12"
+                   FontWeight="SemiBold"
+                   Foreground="#2C3E50"
+                   Text="*Production Costs, CO2 Emissions and Gas Consumption are listed per MWh(th)"
+                   Margin= "10,0,10,10" />
+        
+        <!-- Headline 2 -->
+        <TextBlock HorizontalAlignment="Left"
+                   VerticalAlignment="Top"
+                   FontSize="20"
+                   FontWeight="SemiBold"
+                   Foreground="#2C3E50"
+                   Text="Gas Motor"
+                   Margin= "10,10,10,0" />
+
+        <!-- Second table, gas motor -->
+        <Border Margin="10,0,10,10" BorderBrush="Gray" BorderThickness="1" CornerRadius="4">
+          <Grid ColumnDefinitions="*,*,*,*,*,*" RowDefinitions="Auto,Auto," Margin="10">
+
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Name" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="0" Grid.Column="1" Text="Max Heat" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="0" Grid.Column="2" Text="Max Electricity" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="0" Grid.Column="3" Text="Production Cost" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="0" Grid.Column="4" Text="CO2 Emissions" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="0" Grid.Column="5" Text="Fuel Consumption" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
+
+            <!-- Line Separating Rows -->
+            <Rectangle Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="6" Height="1" Fill="LightGray" VerticalAlignment="Bottom"/>
+
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="GM1" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="1" Grid.Column="1" Text="5,3MW" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="1" Grid.Column="2" Text="3,9MW" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="1" Grid.Column="3" Text="975DKK" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="1" Grid.Column="4" Text= "227kg" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="1" Grid.Column="5" Text="1,82	MWh(gas) " Foreground="#2C3E50" Margin="10"/>
+          </Grid>
+        </Border>
+
+        <!-- Additional info for second table -->
+        <TextBlock HorizontalAlignment="Left"
+                   VerticalAlignment="Top"
+                   FontSize="12"
+                   FontWeight="SemiBold"
+                   Foreground="#2C3E50"
+                   Text="*Production Costs, CO2 Emissions and Gas Consumption are listed per MWh(th)"
+                   Margin= "10,0,10,10" />
+
+        <TextBlock HorizontalAlignment="Left"
+                   VerticalAlignment="Top"
+                   FontSize="20"
+                   FontWeight="SemiBold"
+                   Foreground="#2C3E50"
+                   Text="Electric Boiler"
+                   Margin= "10,10,10,0" />
+
+        <!-- Table for ElectricBoiler -->
+        <Border Margin="10,0,10,10" BorderBrush="Gray" BorderThickness="1" CornerRadius="4">
+          <Grid ColumnDefinitions="*,*,*,*" RowDefinitions="Auto,Auto," Margin="10">
+
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Name" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="0" Grid.Column="1" Text="Max Heat" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="0" Grid.Column="2" Text="Max Electricity" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="0" Grid.Column="3" Text="Production Cost" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
+
+            <!-- Line Separating Rows -->
+            <Rectangle Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="6" Height="1" Fill="LightGray" VerticalAlignment="Bottom"/>
+
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="EB1" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="1" Grid.Column="1" Text="6,0MW" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="1" Grid.Column="2" Text="-6,0MW" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="1" Grid.Column="3" Text="15DKK" Margin="10" Foreground="#2C3E50"/>
+          </Grid>
+        </Border>
+
+        <!-- Additional info for third table -->
+        <TextBlock HorizontalAlignment="Left"
+                   VerticalAlignment="Top"
+                   FontSize="12"
+                   FontWeight="SemiBold"
+                   Foreground="#2C3E50"
+                   Text="*Production Costs are listed per MWh(th)"
+                   Margin= "10,0,10,10" />
+
+        <TextBlock HorizontalAlignment="Left"
+                   VerticalAlignment="Top"
+                   FontSize="20"
+                   FontWeight="SemiBold"
+                   Foreground="#2C3E50"
+                   Text="Gallery"
+                   Margin= "10,30,10,0" />
+        
+        <!-- StackPanel for Asset pictures -->
+        <StackPanel
+        Orientation="Horizontal"
+        VerticalAlignment="Top"
+        HorizontalAlignment= "Left"
+        Margin= "10,0,10,0">
+
+          <Image Source="avares://Dv.App/Assets/gasboiler.png" Width="200" Height="100" Stretch="UniformToFill" VerticalAlignment="Top"/>
+          <Image Source="avares://Dv.App/Assets/oilboiler.png" Width="200" Height="100" Stretch="UniformToFill" VerticalAlignment="Top"/>
+          <Image Source="avares://Dv.App/Assets/gasmotor.png" Width="200" Height="100" Stretch="UniformToFill" VerticalAlignment="Top"/>
+          <Image Source="avares://Dv.App/Assets/electricboiler.png" Width="200" Height="100" Stretch="UniformToFill" VerticalAlignment="Top"/>
+        </StackPanel>
+
+        <!-- StackPanel for picture names -->
+        <StackPanel
+        Orientation="Horizontal"
+        VerticalAlignment="Top"
+        HorizontalAlignment= "Left"
+        Margin= "10,0,10,0">
+
+          <TextBlock 
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            FontSize="12"
+            FontWeight="SemiBold"
+            Foreground="#2C3E50"
+            Text="Gas Boilers"
+            Margin= "10,5,10,10"/>
+
+          <TextBlock 
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            FontSize="12"
+            FontWeight="SemiBold"
+            Foreground="#2C3E50"
+            Text="Oil Boiler"
+            Margin= "130,5,10,10"/>
+
+          <TextBlock 
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            FontSize="12"
+            FontWeight="SemiBold"
+            Foreground="#2C3E50"
+            Text="Gas Motor"
+            Margin= "130,5,10,10"/>
+
+          <TextBlock 
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            FontSize="12"
+            FontWeight="SemiBold"
+            Foreground="#2C3E50"
+            Text="Electric Boiler"
+            Margin= "130,5,10,10"/>
+
+        </StackPanel>
+        <TextBlock HorizontalAlignment="Left"
+                   VerticalAlignment="Top"
+                   FontSize="20"
+                   FontWeight="SemiBold"
+                   Foreground="#2C3E50"
+                   Text="Maintenance Schedule"
+                   Margin= "10,30,10,0" />
+
+        <!-- Maintenance Table -->
+        <Border Margin="10,0,10,10" BorderBrush="Gray" BorderThickness="1" CornerRadius="4">
+          <!-- Prepared for Database bindings-->
+          <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto" Margin="10">
+
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Asset Name" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="0" Grid.Column="1" Text="From (Date)" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="0" Grid.Column="2" Text="To (Date)" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
+
+            <!-- Line Separating Rows -->
+            <Rectangle Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Height="1" Fill="LightGray" VerticalAlignment="Bottom"/>
+
+            <!-- Mock Data ~30 hours of maintenance -->
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="GB1" Margin="10" Foreground="#2C3E50"/>
+            <!-- Gonna use {Binding StartDate, StringFormat='{}{0:yyyy-MM-dd HH:mm}'} later -->
+            <TextBlock Grid.Row="1" Grid.Column="1" Text="2026-04-01 08:00" Margin="10" Foreground="#2C3E50"/>
+            <!-- Gonna use {Binding EndDate, StringFormat='{}{0:yyyy-MM-dd HH:mm}'} later -->
+            <TextBlock Grid.Row="1" Grid.Column="2" Text="2026-04-02 14:00" Margin="10" Foreground="#2C3E50"/>
+          </Grid>
+        </Border>
+      </StackPanel>
+    </Grid>
+  </ScrollViewer>
 </UserControl>
