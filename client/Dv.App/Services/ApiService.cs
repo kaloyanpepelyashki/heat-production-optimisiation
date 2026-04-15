@@ -24,7 +24,7 @@ public class ApiService : IApiService
     {
         { BackendService.Rdm, "https://rdm-api.onrender.com/" },
         { BackendService.Sdm, "https://sdm-api.onrender.com/" },
-        { BackendService.Am, "https://am-api.onrender.com/" },
+        { BackendService.Am, "https://heat-production-optimisiation.onrender.com/" },
     };
 
     public ApiService()
