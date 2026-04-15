@@ -1,4 +1,4 @@
-﻿namespace Rdm.Api.Inrastructure.Configuration;
+﻿namespace Rdm.Api.Infrastructure.Configuration;
 
 public class SupabaseSettings
 {
