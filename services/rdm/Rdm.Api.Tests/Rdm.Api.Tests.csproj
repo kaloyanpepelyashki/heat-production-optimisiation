@@ -23,4 +23,8 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Rdm.Api\Rdm.Api.csproj" />
+  </ItemGroup>
+
 </Project>
