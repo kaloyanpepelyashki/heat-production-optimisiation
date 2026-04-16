@@ -16,7 +16,7 @@ public class GetNetProductionCostController : Controller
         _netProductionCostService = netProductionCostService;
     }
 
-    [HttpGet("/getAll")]
+    [HttpGet("getAllNPC")]
     public async Task<IActionResult> GetAll()
     {
         try
@@ -33,7 +33,7 @@ public class GetNetProductionCostController : Controller
                     TimeTo = res.TimeTo,
                     NetProductionCost = res.NetProdcutionCost,
                 }).ToList();
-            
+
             return Ok(netProductionCostDTOs);
         }
         catch (Exception e)

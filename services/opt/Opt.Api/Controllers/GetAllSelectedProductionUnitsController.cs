@@ -16,7 +16,7 @@ public class GetSelectedProductionUnitsController : Controller
         _selectedProductionUnitsService = selectedProductionUnitsService;
     }
 
-    [HttpGet("/getAll")]
+    [HttpGet("getAll")]
     public async Task<IActionResult> GetAll()
     {
         try
