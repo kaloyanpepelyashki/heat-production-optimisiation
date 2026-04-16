@@ -1,6 +1,6 @@
 @Opt.Api_HostAddress = http://localhost:5042
 
-GET {{Opt.Api_HostAddress}}/weatherforecast/
+GET {{Opt.Api_HostAddress}}/api/optimization/status
 Accept: application/json
 
 ###

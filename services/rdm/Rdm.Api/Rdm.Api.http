@@ -1,6 +1,6 @@
 @Rdm.Api_HostAddress = http://localhost:5011
 
-GET {{Rdm.Api_HostAddress}}/weatherforecast/
+GET {{Rdm.Api_HostAddress}}/api/getresult/test
 Accept: application/json
 
 ###

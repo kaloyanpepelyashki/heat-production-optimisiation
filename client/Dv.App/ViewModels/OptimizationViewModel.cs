@@ -30,7 +30,7 @@ public sealed class OptimizationViewModel : ViewModelBase
         try
         {
             this.OptData = $"Pinging OPT Render services...{Environment.NewLine}(Please wait, Render free tier can take up to 50s to wake up)";
-            var response = await this.apiService.GetAsync<object>(BackendService.Opt, "WeatherForecast");
+            var response = await this.apiService.GetAsync<object>(BackendService.Opt, "api/optimization/status");
             this.OptData = $"Success! OPT API responded. Data parsed: {response != null}";
         }
         catch (Exception ex)
