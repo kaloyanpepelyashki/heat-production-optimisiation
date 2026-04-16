@@ -6,6 +6,8 @@ public class OptimizationResultDTO
 
     public string ProductionUnit { get; set; } = string.Empty;
 
+    public string Period { get; set; } = string.Empty;
+
     public float TotalHeat { get; set; }
 
     public float TotalCost { get; set; }
@@ -18,6 +20,8 @@ public class OptimizationResultDTO
 public class CreateOptimizationResultDTO
 {
     public string ProductionUnit { get; set; } = string.Empty;
+
+    public string Period { get; set; } = string.Empty;
 
     public float TotalHeat { get; set; }
 

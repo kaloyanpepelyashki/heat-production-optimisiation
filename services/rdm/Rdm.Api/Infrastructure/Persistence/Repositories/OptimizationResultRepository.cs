@@ -24,7 +24,7 @@ public class OptimizationResultRepository : IOptimizationResultRepository
     public async Task<List<OptimizationResult>> GetByPeriodAsync(string period)
     {
         var response = await _client.From<OptimizationResultData>()
-            .Where(r => r.ProductionUnit.Contains(period))
+            .Where(r => r.Period == period)
             .Get();
         return response.Models.Select(ToDomain).ToList();
     }
@@ -34,30 +34,15 @@ public class OptimizationResultRepository : IOptimizationResultRepository
         var data = new OptimizationResultData
         {
             ProductionUnit = result.ProductionUnit,
+            Period = result.Period,
             TotalHeat = result.TotalHeat,
             TotalCost = result.TotalCost,
             TotalEmissions = result.TotalEmissions,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
         };
 
         var response = await _client.From<OptimizationResultData>().Insert(data);
         return ToDomain(response.Models.First());
-    }
-
-    public async Task<OptimizationResult?> UpdateAsync(int id, OptimizationResult result)
-    {
-        var data = new OptimizationResultData
-        {
-            ProductionUnit = result.ProductionUnit,
-            TotalHeat = result.TotalHeat,
-            TotalCost = result.TotalCost,
-            TotalEmissions = result.TotalEmissions
-        };
-
-        var response = await _client.From<OptimizationResultData>()
-            .Where(r => r.Id == id)
-            .Update(data);
-        return response.Models.Count > 0 ? ToDomain(response.Models.First()) : null;
     }
 
     private static OptimizationResult ToDomain(OptimizationResultData data)
@@ -66,10 +51,11 @@ public class OptimizationResultRepository : IOptimizationResultRepository
         {
             Id = data.Id,
             ProductionUnit = data.ProductionUnit,
+            Period = data.Period,
             TotalHeat = data.TotalHeat,
             TotalCost = data.TotalCost,
             TotalEmissions = data.TotalEmissions,
-            CreatedAt = data.CreatedAt
+            CreatedAt = data.CreatedAt,
         };
     }
 }
@@ -80,8 +66,11 @@ public class OptimizationResultData : BaseModel
     [PrimaryKey("id")]
     public int Id { get; set; }
 
-    [Column("production_unit")]
+    [Column("production_units")]
     public string ProductionUnit { get; set; } = string.Empty;
+
+    [Column("period")]
+    public string Period { get; set; } = string.Empty;
 
     [Column("total_heat")]
     public float TotalHeat { get; set; }

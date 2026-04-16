@@ -9,7 +9,5 @@ public interface IOptimizationResultService
     Task<List<OptimizationResult>> GetResultsByPeriodAsync(string period);
 
     Task<OptimizationResult> CreateResultAsync(OptimizationResult result);
-
-    Task<OptimizationResult?> UpdateResultAsync(int id, OptimizationResult result);
 }
 

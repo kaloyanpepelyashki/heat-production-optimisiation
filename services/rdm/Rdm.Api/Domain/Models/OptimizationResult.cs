@@ -6,6 +6,8 @@ public class OptimizationResult
 
     public string ProductionUnit { get; set; } = string.Empty;
 
+    public string Period { get; set; } = string.Empty;
+
     public float TotalHeat { get; set; }
 
     public float TotalCost { get; set; }

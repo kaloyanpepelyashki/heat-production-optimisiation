@@ -24,25 +24,6 @@ public class OptimizationResultService : IOptimizationResultService
 
     public async Task<OptimizationResult> CreateResultAsync(OptimizationResult result)
     {
-        ValidateResult(result);
         return await _repository.CreateAsync(result);
-    }
-
-    public async Task<OptimizationResult?> UpdateResultAsync(int id, OptimizationResult result)
-    {
-        ValidateResult(result);
-        return await _repository.UpdateAsync(id, result);
-    }
-
-    private void ValidateResult(OptimizationResult result)
-    {
-        if (result == null)
-            throw new ArgumentNullException(nameof(result));
-
-        if (string.IsNullOrWhiteSpace(result.ProductionUnit))
-            throw new ArgumentException("ProductionUnit cannot be null or empty.", nameof(result.ProductionUnit));
-
-        if (result.TotalHeat < 0 || result.TotalCost < 0 || result.TotalEmissions < 0)
-            throw new ArgumentException("Values cannot be negative.");
     }
 }

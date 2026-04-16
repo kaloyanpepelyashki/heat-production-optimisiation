@@ -38,29 +38,14 @@ public class OptimizationResults : Controller
         var result = new OptimizationResult
         {
             ProductionUnit = createDto.ProductionUnit,
+            Period = createDto.Period,
             TotalHeat = createDto.TotalHeat,
             TotalCost = createDto.TotalCost,
-            TotalEmissions = createDto.TotalEmissions
+            TotalEmissions = createDto.TotalEmissions,
         };
 
         var createdResult = await _service.CreateResultAsync(result);
         return Created(string.Empty, MapToDto(createdResult));
-    }
-
-    [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateResult(int id, [FromBody] CreateOptimizationResultDTO updateDto)
-    {
-        var result = new OptimizationResult
-        {
-            ProductionUnit = updateDto.ProductionUnit,
-            TotalHeat = updateDto.TotalHeat,
-            TotalCost = updateDto.TotalCost,
-            TotalEmissions = updateDto.TotalEmissions
-        };
-
-        var updatedResult = await _service.UpdateResultAsync(id, result);
-
-        return Ok(MapToDto(updatedResult));
     }
 
     [HttpGet("/test")]
@@ -75,10 +60,11 @@ public class OptimizationResults : Controller
         {
             Id = result.Id,
             ProductionUnit = result.ProductionUnit,
+            Period = result.Period,
             TotalHeat = result.TotalHeat,
             TotalCost = result.TotalCost,
             TotalEmissions = result.TotalEmissions,
-            CreatedAt = result.CreatedAt
+            CreatedAt = result.CreatedAt,
         };
     }
 }
