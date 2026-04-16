@@ -1,6 +1,108 @@
-@Rdm.Api_HostAddress = http://localhost:5011
+@rdmApi = http://localhost:5000
+@rdmApiSecure = https://localhost:7001
+@contentType = application/json
 
-GET {{Rdm.Api_HostAddress}}/weatherforecast/
-Accept: application/json
+### Health Check
+GET {{rdmApiSecure}}/test
 
-###
+### Get All Results
+GET {{rdmApiSecure}}/api/optimizationresults/all
+
+### Get Result by ID (ID: 1)
+GET {{rdmApiSecure}}/api/optimizationresults/1
+
+### Get Result by ID - Not Found (ID: 999)
+GET {{rdmApiSecure}}/api/optimizationresults/999
+
+### Get Results by Period - Summer
+GET {{rdmApiSecure}}/api/optimizationresults/period/summer
+
+### Get Results by Period - Winter
+GET {{rdmApiSecure}}/api/optimizationresults/period/winter
+
+### Create New Optimization Result - Summer
+POST {{rdmApiSecure}}/api/optimizationresults/create
+Content-Type: {{contentType}}
+
+{
+  "resultName": "Summer Optimization 2026-03",
+  "period": "summer",
+  "totalHeatGenerated": 16000,
+  "totalCost": 5200,
+  "totalCo2Emissions": 270,
+  "productionUnitConfiguration": "{\"gasBoilers\": 2, \"electricBoilers\": 1, \"oilBoilers\": 0}",
+  "optimizationMetrics": "{\"efficiency\": 0.86, \"utilization\": 0.93}"
+}
+
+### Create New Optimization Result - Winter
+POST {{rdmApiSecure}}/api/optimizationresults/create
+Content-Type: {{contentType}}
+
+{
+  "resultName": "Winter Optimization 2026-02",
+  "period": "winter",
+  "totalHeatGenerated": 26000,
+  "totalCost": 8800,
+  "totalCo2Emissions": 480,
+  "productionUnitConfiguration": "{\"gasBoilers\": 3, \"electricBoilers\": 2, \"gasMotors\": 1, \"oilBoilers\": 0}",
+  "optimizationMetrics": "{\"efficiency\": 0.89, \"utilization\": 0.96}"
+}
+
+### Update Existing Result (ID: 1)
+PUT {{rdmApiSecure}}/api/optimizationresults/1
+Content-Type: {{contentType}}
+
+{
+  "resultName": "Summer Optimization 2026-01 (Updated)",
+  "period": "summer",
+  "totalHeatGenerated": 15500,
+  "totalCost": 5100,
+  "totalCo2Emissions": 260,
+  "productionUnitConfiguration": "{\"gasBoilers\": 2, \"electricBoilers\": 1}",
+  "optimizationMetrics": "{\"efficiency\": 0.87, \"utilization\": 0.94}"
+}
+
+### Delete Result (ID: 3)
+DELETE {{rdmApiSecure}}/api/optimizationresults/3
+
+### Create Invalid Result - Missing Period
+POST {{rdmApiSecure}}/api/optimizationresults/create
+Content-Type: {{contentType}}
+
+{
+  "resultName": "Invalid Result",
+  "period": "",
+  "totalHeatGenerated": 15000,
+  "totalCost": 5000,
+  "totalCo2Emissions": 250,
+  "productionUnitConfiguration": "{}",
+  "optimizationMetrics": "{}"
+}
+
+### Create Invalid Result - Invalid Period
+POST {{rdmApiSecure}}/api/optimizationresults/create
+Content-Type: {{contentType}}
+
+{
+  "resultName": "Invalid Period Result",
+  "period": "spring",
+  "totalHeatGenerated": 15000,
+  "totalCost": 5000,
+  "totalCo2Emissions": 250,
+  "productionUnitConfiguration": "{}",
+  "optimizationMetrics": "{}"
+}
+
+### Create Invalid Result - Negative Values
+POST {{rdmApiSecure}}/api/optimizationresults/create
+Content-Type: {{contentType}}
+
+{
+  "resultName": "Negative Values Result",
+  "period": "summer",
+  "totalHeatGenerated": -15000,
+  "totalCost": 5000,
+  "totalCo2Emissions": 250,
+  "productionUnitConfiguration": "{}",
+  "optimizationMetrics": "{}"
+}

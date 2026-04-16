@@ -1,14 +1,27 @@
+using Rdm.Api.Application.Interfaces;
+using Rdm.Api.Application.Services;
+using Rdm.Api.Infrastructure.Persistence;
+using Rdm.Api.Infrastructure.Persistence.Repositories;
 using Rdm.Api.Inrastructure.Configuration;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddOpenApi();
+
+// Register RDM services
+builder.Services.Configure<SupabaseSettings>(builder.Configuration.GetSection("SupabaseSettings"));
+builder.Services.AddSingleton<DatabaseContext>();
+builder.Services.AddScoped<IOptimizationResultRepository, OptimizationResultRepository>(sp =>
+{
+    var context = sp.GetRequiredService<DatabaseContext>();
+    return new OptimizationResultRepository(context.GetClient());
+});
+builder.Services.AddScoped<IOptimizationResultService, OptimizationResultService>();
 
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
-builder.Services.Configure<SupabaseSettings>(builder.Configuration.GetSection("SupabaseSettings"));
 
 var app = builder.Build();
 
