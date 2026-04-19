@@ -33,10 +33,10 @@ public class ProductionUnitService: IProductionUnitService
         catch (Exception e)
         {
             Console.WriteLine($"Error in ProductionUnitService.GetAllGasBoilersAsync: {e.Message}");
-            throw; 
+            throw;
         }
     }
-    
+
     public async Task<List<OilBoiler>> GetAllOilBoilersAsync()
     {
         try
