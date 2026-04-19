@@ -4,9 +4,6 @@ using Supabase.Postgrest.Models;
 
 namespace Am.Api.Model.DTOs;
 
-/// <summary>
-/// Represents the polymorphic junction table connecting Production Units and Maintenance Periods.
-/// </summary>
 [Table("production_unit_maintenance")]
 public class ProductionUnitMaintenancePersistence : BaseModel
 {

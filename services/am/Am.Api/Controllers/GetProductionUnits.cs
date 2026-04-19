@@ -225,12 +225,12 @@ public class GetProductionUnits : Controller
     }
 
     [HttpGet("allActiveGasBoilers")]
-    public async Task<IActionResult> GetAllActiveGasBoilers()
+    public async Task<IActionResult> GetAllActiveGasBoilers([FromQuery] DateTime startPeriod)
     {
         try
         {
-            List<GasBoiler> gasBoilersResult = await _productionUnitService.GetAllGasBoilersAsync();
-            
+            List<GasBoiler> gasBoilersResult = await _productionUnitService.GetActiveGasBoilersAsync(startPeriod);
+
             List<GasBoilerDTO> gasBoilersDTOs = gasBoilersResult.Select(x => new GasBoilerDTO
             {
                 Id = x.Id,
@@ -241,17 +241,7 @@ public class GetProductionUnits : Controller
                 GasConsumption = x.GasConsumption,
             }).ToList();
 
-            List<GasBoilerDTO> Activeboilers = new List<GasBoilerDTO>();
-
-            foreach(GasBoilerDTO boiler in gasBoilersDTOs)
-            {
-                if (boiler.Active)
-                {
-                    Activeboilers.Add(boiler);
-                }
-            }
-
-            return Ok(Activeboilers);
+            return Ok(gasBoilersDTOs);
         }
         catch (Exception e)
         {
@@ -261,11 +251,11 @@ public class GetProductionUnits : Controller
     }
 
     [HttpGet("allActiveOilBoilers")]
-    public async Task<IActionResult> GetAllActiveOilBoilers()
+    public async Task<IActionResult> GetAllActiveOilBoilers([FromQuery] DateTime startPeriod)
     {
         try
         {
-            List<OilBoiler> oilBoilerResult = await _productionUnitService.GetAllOilBoilersAsync();
+            List<OilBoiler> oilBoilerResult = await _productionUnitService.GetActiveOilBoilersAsync(startPeriod);
 
             List<OilBoilerDTO> oilBoilerDtos = oilBoilerResult.Select(obj => new OilBoilerDTO
             {
@@ -277,17 +267,7 @@ public class GetProductionUnits : Controller
                 OilConsumption = obj.OilConsumption,
             }).ToList();
 
-            List<OilBoilerDTO> Activeboilers = new List<OilBoilerDTO>();
-
-            foreach(OilBoilerDTO boiler in oilBoilerDtos)
-            {
-                if (boiler.Active)
-                {
-                    Activeboilers.Add(boiler);
-                }
-            }
-
-            return Ok(Activeboilers);
+            return Ok(oilBoilerDtos);
         }
         catch (Exception e)
         {
@@ -297,11 +277,11 @@ public class GetProductionUnits : Controller
     }
 
     [HttpGet("allActiveElectricBoilers")]
-    public async Task<IActionResult> GetAllActiveElectricBoilers()
+    public async Task<IActionResult> GetAllActiveElectricBoilers([FromQuery] DateTime startPeriod)
     {
         try
         {
-            List<ElectricBoiler> electricBoilersResult = await _productionUnitService.GetAllElectricBoilersAsync();
+            List<ElectricBoiler> electricBoilersResult = await _productionUnitService.GetActiveElectricBoilersAsync(startPeriod);
 
             List<ElectricBoilerDTO> boilers = electricBoilersResult.Select(elBoiler => new ElectricBoilerDTO
             {
@@ -312,16 +292,7 @@ public class GetProductionUnits : Controller
                 MaxElectricity = elBoiler.MaxElectricity,
             }).ToList();
 
-            List<ElectricBoilerDTO> Activeboilers = new List<ElectricBoilerDTO>();
-            foreach(ElectricBoilerDTO boiler in boilers)
-            {
-                if (boiler.Active)
-                {
-                    Activeboilers.Add(boiler);
-                }
-            }
-
-            return Ok(Activeboilers);
+            return Ok(boilers);
         }
         catch (Exception e)
         {
@@ -331,11 +302,11 @@ public class GetProductionUnits : Controller
     }
 
     [HttpGet("allActiveGasMotors")]
-    public async Task<IActionResult> GetAllActiveGasMotors()
+    public async Task<IActionResult> GetAllActiveGasMotors([FromQuery] DateTime startPeriod)
     {
         try
         {
-            List<GasMotor> gasMotorResult = await _productionUnitService.GetAllGasMotorsAsync();
+            List<GasMotor> gasMotorResult = await _productionUnitService.GetActiveGasMotorsAsync(startPeriod);
 
             List<GasMotorDTO> motors = gasMotorResult.Select(gasMotor => new GasMotorDTO
             {
@@ -348,15 +319,7 @@ public class GetProductionUnits : Controller
                 GasConsumption = gasMotor.GasConsumption
             }).ToList();
 
-            List<GasMotorDTO> ActiveMotors = new List<GasMotorDTO>();
-            foreach(GasMotorDTO motor in motors)
-            {
-                if (motor.Active)
-                {
-                    ActiveMotors.Add(motor);
-                }
-            }
-            return Ok(ActiveMotors);
+            return Ok(motors);
         }
         catch (Exception e)
         {

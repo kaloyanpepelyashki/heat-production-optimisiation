@@ -9,5 +9,10 @@ public interface IProductionUnitService
    Task <List<OilBoiler>> GetAllOilBoilersAsync();
    Task<List<ElectricBoiler>> GetAllElectricBoilersAsync();
    Task<List<GasMotor>> GetAllGasMotorsAsync();
+
+   Task<List<GasBoiler>> GetActiveGasBoilersAsync(DateTime startPeriod);
+   Task<List<OilBoiler>> GetActiveOilBoilersAsync(DateTime startPeriod);
+   Task<List<ElectricBoiler>> GetActiveElectricBoilersAsync(DateTime startPeriod);
+   Task<List<GasMotor>> GetActiveGasMotorsAsync(DateTime startPeriod);
    //TODO More to be added
 }
