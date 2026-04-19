@@ -4,6 +4,9 @@ using Supabase.Postgrest.Models;
 
 namespace Am.Api.Model.DTOs;
 
+/// <summary>
+/// Represents the Maintenance Period entity.
+/// </summary>
 [Table("maintenance_periods")]
 public class MaintenancePeriodPersistence : BaseModel
 {
