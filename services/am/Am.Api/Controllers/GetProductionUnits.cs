@@ -129,41 +129,48 @@ public class GetProductionUnits : Controller
     [HttpGet("lowestProductionCostBoiler")]
     public async Task<IActionResult> GetLowestProductionCostBoiler()
     {
-        // gets all of the boilers
-        var actionResultGasBoilers = await GetAllGasBoilers();
-        var actionResultOilBoilers = await GetAllOilBoilers();
-
-        if (actionResultGasBoilers is OkObjectResult && actionResultOilBoilers is OkObjectResult)
+        try
         {
-            OkObjectResult resultGasBoilers = (OkObjectResult)actionResultGasBoilers;
-            OkObjectResult resultOilBoilers = (OkObjectResult)actionResultOilBoilers;
+            List<GasBoiler> gasBoilersResult = await _productionUnitService.GetAllGasBoilersAsync();
+            List<OilBoiler> oilBoilerResult = await _productionUnitService.GetAllOilBoilersAsync();
 
-            //combining the boilers into 1 list
-            List<IProductionCostDTO> boilers = ((List<GasBoilerDTO>)resultGasBoilers.Value)
-                .Cast<IProductionCostDTO>()
-                .ToList();
-            boilers.AddRange(((List<OilBoilerDTO>)resultOilBoilers.Value).Cast<IProductionCostDTO>()); // combining both lists
+            List<GasBoilerDTO> gasBoilersDTOs = gasBoilersResult.Select(x => new GasBoilerDTO
+            {
+                Id = x.Id,
+                Name = x.Name,
+                MaxHeat = x.MaxHeat,
+                ProductionCost = x.ProductionCost,
+                Co2Emissions = x.Co2Emissions,
+                GasConsumption = x.GasConsumption,
+            }).ToList();
 
-            IProductionCostDTO lowestProductionCostBoiler = null;
+            List<OilBoilerDTO> oilBoilerDtos = oilBoilerResult.Select(obj => new OilBoilerDTO
+            {
+                Id = obj.Id,
+                Name = obj.Name,
+                MaxHeat = obj.MaxHeat,
+                ProductionCost = obj.ProductionCost,
+                Co2Emissions = obj.Co2Emissions,
+                OilConsumption = obj.OilConsumption,
+            }).ToList();
 
-            // Finding the boiler with the lowest production cost
+            List<IProductionCostDTO> boilers = gasBoilersDTOs.Cast<IProductionCostDTO>().ToList();
+            boilers.AddRange(oilBoilerDtos.Cast<IProductionCostDTO>());
+
+            IProductionCostDTO? lowestProductionCostBoiler = null;
             foreach (IProductionCostDTO boiler in boilers)
             {
-                if (lowestProductionCostBoiler == null)
-                {
-                    lowestProductionCostBoiler = boiler;
-                }
-
-                if (boiler.ProductionCost < lowestProductionCostBoiler.ProductionCost)
+                if (lowestProductionCostBoiler == null || boiler.ProductionCost < lowestProductionCostBoiler.ProductionCost)
                 {
                     lowestProductionCostBoiler = boiler;
                 }
             }
+
             return Ok(lowestProductionCostBoiler);
         }
-        else
+        catch (Exception e)
         {
-            Console.WriteLine($"Exception in Controller/lowestProductionCostBoiler");
+            Console.WriteLine($"Exception in Controller/lowestProductionCostBoiler, {e.Message}, {e.GetType()}");
             return StatusCode(500, "Internal Server Error");
         }
     }
@@ -171,41 +178,48 @@ public class GetProductionUnits : Controller
     [HttpGet("lowestConsumptionBoiler")]
     public async Task<IActionResult> GetLowestConsumptionBoiler()
     {
-        // gets all of the boilers
-        var actionResultGasBoilers = await GetAllGasBoilers();
-        var actionResultOilBoilers = await GetAllOilBoilers();
-
-        if (actionResultGasBoilers is OkObjectResult && actionResultOilBoilers is OkObjectResult)
+        try
         {
-            OkObjectResult resultGasBoilers = (OkObjectResult)actionResultGasBoilers;
-            OkObjectResult resultOilBoilers = (OkObjectResult)actionResultOilBoilers;
+            List<GasBoiler> gasBoilersResult = await _productionUnitService.GetAllGasBoilersAsync();
+            List<OilBoiler> oilBoilerResult = await _productionUnitService.GetAllOilBoilersAsync();
 
-            //combining the boilers into 1 list
-            List<IConsumptionDTO> boilers = ((List<GasBoilerDTO>)resultGasBoilers.Value)
-                .Cast<IConsumptionDTO>()
-                .ToList();
-            boilers.AddRange(((List<OilBoilerDTO>)resultOilBoilers.Value).Cast<IConsumptionDTO>()); // combining both lists
+            List<GasBoilerDTO> gasBoilersDTOs = gasBoilersResult.Select(x => new GasBoilerDTO
+            {
+                Id = x.Id,
+                Name = x.Name,
+                MaxHeat = x.MaxHeat,
+                ProductionCost = x.ProductionCost,
+                Co2Emissions = x.Co2Emissions,
+                GasConsumption = x.GasConsumption,
+            }).ToList();
 
-            IConsumptionDTO lowestConsumptionBoiler = null;
+            List<OilBoilerDTO> oilBoilerDtos = oilBoilerResult.Select(obj => new OilBoilerDTO
+            {
+                Id = obj.Id,
+                Name = obj.Name,
+                MaxHeat = obj.MaxHeat,
+                ProductionCost = obj.ProductionCost,
+                Co2Emissions = obj.Co2Emissions,
+                OilConsumption = obj.OilConsumption,
+            }).ToList();
 
-            // Finding the boiler with the lowest production cost
+            List<IConsumptionDTO> boilers = gasBoilersDTOs.Cast<IConsumptionDTO>().ToList();
+            boilers.AddRange(oilBoilerDtos.Cast<IConsumptionDTO>());
+
+            IConsumptionDTO? lowestConsumptionBoiler = null;
             foreach (IConsumptionDTO boiler in boilers)
             {
-                if (lowestConsumptionBoiler == null)
-                {
-                    lowestConsumptionBoiler = boiler;
-                }
-
-                if (boiler.Consumption < lowestConsumptionBoiler.Consumption)
+                if (lowestConsumptionBoiler == null || boiler.Consumption < lowestConsumptionBoiler.Consumption)
                 {
                     lowestConsumptionBoiler = boiler;
                 }
             }
+
             return Ok(lowestConsumptionBoiler);
         }
-        else
+        catch (Exception e)
         {
-            Console.WriteLine($"Exception in Controller/lowestConsumptionBoiler");
+            Console.WriteLine($"Exception in Controller/lowestConsumptionBoiler, {e.Message}, {e.GetType()}");
             return StatusCode(500, "Internal Server Error");
         }
     }
@@ -213,25 +227,35 @@ public class GetProductionUnits : Controller
     [HttpGet("allActiveGasBoilers")]
     public async Task<IActionResult> GetAllActiveGasBoilers()
     {
-        var actionResult = await GetAllGasBoilers();
-        if (actionResult is OkObjectResult)
+        try
         {
-            OkObjectResult OkResult = (OkObjectResult)actionResult;
-            List<GasBoilerDTO> boilers = (List<GasBoilerDTO>)OkResult.Value;
+            List<GasBoiler> gasBoilersResult = await _productionUnitService.GetAllGasBoilersAsync();
+            
+            List<GasBoilerDTO> gasBoilersDTOs = gasBoilersResult.Select(x => new GasBoilerDTO
+            {
+                Id = x.Id,
+                Name = x.Name,
+                MaxHeat = x.MaxHeat,
+                ProductionCost = x.ProductionCost,
+                Co2Emissions = x.Co2Emissions,
+                GasConsumption = x.GasConsumption,
+            }).ToList();
+
             List<GasBoilerDTO> Activeboilers = new List<GasBoilerDTO>();
 
-            foreach(GasBoilerDTO boiler in boilers)
+            foreach(GasBoilerDTO boiler in gasBoilersDTOs)
             {
                 if (boiler.Active)
                 {
                     Activeboilers.Add(boiler);
                 }
             }
+
             return Ok(Activeboilers);
         }
-        else
+        catch (Exception e)
         {
-            Console.WriteLine($"Exception in Controller/allActiveGasBoilers");
+            Console.WriteLine($"Exception in Controller/allActiveGasBoilers, {e.Message}, {e.GetType()}");
             return StatusCode(500, "Internal Server Error");
         }
     }
@@ -239,25 +263,35 @@ public class GetProductionUnits : Controller
     [HttpGet("allActiveOilBoilers")]
     public async Task<IActionResult> GetAllActiveOilBoilers()
     {
-        var actionResult = await GetAllOilBoilers();
-        if (actionResult is OkObjectResult)
+        try
         {
-            OkObjectResult OkResult = (OkObjectResult)actionResult;
-            List<OilBoilerDTO> boilers = (List<OilBoilerDTO>)OkResult.Value;
+            List<OilBoiler> oilBoilerResult = await _productionUnitService.GetAllOilBoilersAsync();
+
+            List<OilBoilerDTO> oilBoilerDtos = oilBoilerResult.Select(obj => new OilBoilerDTO
+            {
+                Id = obj.Id,
+                Name = obj.Name,
+                MaxHeat = obj.MaxHeat,
+                ProductionCost = obj.ProductionCost,
+                Co2Emissions = obj.Co2Emissions,
+                OilConsumption = obj.OilConsumption,
+            }).ToList();
+
             List<OilBoilerDTO> Activeboilers = new List<OilBoilerDTO>();
 
-            foreach(OilBoilerDTO boiler in boilers)
+            foreach(OilBoilerDTO boiler in oilBoilerDtos)
             {
                 if (boiler.Active)
                 {
                     Activeboilers.Add(boiler);
                 }
             }
+
             return Ok(Activeboilers);
         }
-        else
+        catch (Exception e)
         {
-            Console.WriteLine($"Exception in Controller/allActiveOilBoilers");
+            Console.WriteLine($"Exception in Controller/allActiveOilBoilers, {e.Message}, {e.GetType()}");
             return StatusCode(500, "Internal Server Error");
         }
     }
@@ -265,13 +299,20 @@ public class GetProductionUnits : Controller
     [HttpGet("allActiveElectricBoilers")]
     public async Task<IActionResult> GetAllActiveElectricBoilers()
     {
-        var actionResult = await GetAllElectricBoilers();
-        if (actionResult is OkObjectResult)
+        try
         {
-            OkObjectResult OkResult = (OkObjectResult)actionResult;
-            List<ElectricBoilerDTO> boilers = (List<ElectricBoilerDTO>)OkResult.Value;
-            List<ElectricBoilerDTO> Activeboilers = new List<ElectricBoilerDTO>();
+            List<ElectricBoiler> electricBoilersResult = await _productionUnitService.GetAllElectricBoilersAsync();
 
+            List<ElectricBoilerDTO> boilers = electricBoilersResult.Select(elBoiler => new ElectricBoilerDTO
+            {
+                Id = elBoiler.Id,
+                Name = elBoiler.Name,
+                MaxHeat = elBoiler.MaxHeat,
+                ProductionCost = elBoiler.ProductionCost,
+                MaxElectricity = elBoiler.MaxElectricity,
+            }).ToList();
+
+            List<ElectricBoilerDTO> Activeboilers = new List<ElectricBoilerDTO>();
             foreach(ElectricBoilerDTO boiler in boilers)
             {
                 if (boiler.Active)
@@ -279,11 +320,12 @@ public class GetProductionUnits : Controller
                     Activeboilers.Add(boiler);
                 }
             }
+
             return Ok(Activeboilers);
         }
-        else
+        catch (Exception e)
         {
-            Console.WriteLine($"Exception in Controller/allActiveElectricBoilers");
+            Console.WriteLine($"Exception in Controller/allActiveElectricBoilers, {e.Message}, {e.GetType()}");
             return StatusCode(500, "Internal Server Error");
         }
     }
@@ -291,25 +333,34 @@ public class GetProductionUnits : Controller
     [HttpGet("allActiveGasMotors")]
     public async Task<IActionResult> GetAllActiveGasMotors()
     {
-        var actionResult = await GetAllGasMotors();
-        if (actionResult is OkObjectResult)
+        try
         {
-            OkObjectResult OkResult = (OkObjectResult)actionResult;
-            List<GasMotorDTO> boilers = (List<GasMotorDTO>)OkResult.Value;
-            List<GasMotorDTO> Activeboilers = new List<GasMotorDTO>();
+            List<GasMotor> gasMotorResult = await _productionUnitService.GetAllGasMotorsAsync();
 
-            foreach(GasMotorDTO boiler in boilers)
+            List<GasMotorDTO> motors = gasMotorResult.Select(gasMotor => new GasMotorDTO
             {
-                if (boiler.Active)
+                Id = gasMotor.Id,
+                Name = gasMotor.Name,
+                MaxHeat = gasMotor.MaxHeat,
+                ProductionCost = gasMotor.ProductionCost,
+                MaxElectricity = gasMotor.MaxElectricity,
+                Co2Emissions = gasMotor.Co2Emissions,
+                GasConsumption = gasMotor.GasConsumption
+            }).ToList();
+
+            List<GasMotorDTO> ActiveMotors = new List<GasMotorDTO>();
+            foreach(GasMotorDTO motor in motors)
+            {
+                if (motor.Active)
                 {
-                    Activeboilers.Add(boiler);
+                    ActiveMotors.Add(motor);
                 }
             }
-            return Ok(Activeboilers);
+            return Ok(ActiveMotors);
         }
-        else
+        catch (Exception e)
         {
-            Console.WriteLine($"Exception in Controller/allActiveGasMotors");
+            Console.WriteLine($"Exception in Controller/allActiveGasMotors, {e.Message}, {e.GetType()}");
             return StatusCode(500, "Internal Server Error");
         }
     }
