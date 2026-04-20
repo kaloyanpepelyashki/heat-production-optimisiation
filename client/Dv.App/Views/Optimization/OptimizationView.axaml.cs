@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 
+using Dv.App.Models;
+
 namespace Dv.App.Views;
 
 public partial class OptimizationView : UserControl
@@ -54,6 +56,15 @@ public partial class OptimizationView : UserControl
             Debug.WriteLine($"Start: {startDateTime:dd.MM.yyyy HH:mm}");
             Debug.WriteLine($"End:   {endDateTime:dd.MM.yyyy HH:mm}");
             Debug.WriteLine("=============================");
+
+            MaintenanceStore.MaintenanceSchedules.Add(new MaintenanceEvent
+            {
+                AssetName = boilerId,
+                StartDate = startDateTime,
+                EndDate = endDateTime,
+                Period = "Summer",
+                Scenario = "1"
+            });
         }
         else
         {
@@ -99,6 +110,15 @@ public partial class OptimizationView : UserControl
             Debug.WriteLine($"Start: {startDateTime:dd.MM.yyyy HH:mm}");
             Debug.WriteLine($"End:   {endDateTime:dd.MM.yyyy HH:mm}");
             Debug.WriteLine("=============================");
+
+            MaintenanceStore.MaintenanceSchedules.Add(new MaintenanceEvent
+            {
+                AssetName = boilerId,
+                StartDate = startDateTime,
+                EndDate = endDateTime,
+                Period = "Winter",
+                Scenario = "1"
+            });
         }
         else
         {

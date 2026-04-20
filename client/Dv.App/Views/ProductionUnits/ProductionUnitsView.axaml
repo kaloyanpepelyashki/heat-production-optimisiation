@@ -1,5 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Dv.App.ViewModels"
+             x:DataType="vm:ProductionUnitsViewModel"
              x:Class="Dv.App.Views.ProductionUnitsView">
 
   <!-- Scrollbar -->
@@ -28,8 +30,8 @@
                    Text="Gas Boilers"
                    Margin= "10,10,10,0" />
 
-        <!-- Boilers Table -->
-        <Border Margin="10,0,10,10" BorderBrush="Gray" BorderThickness="1" CornerRadius="4">
+        <!-- Gas Boilers Table -->
+        <Border Margin="10,0,10,10" BorderBrush="Gray" BorderThickness="1" CornerRadius="4" Padding="10" Background="#F0F4F8" BoxShadow="0 4 10 0 #33000000">
           <Grid ColumnDefinitions="*,*,*,*,*" RowDefinitions="Auto,Auto,Auto,Auto" Margin="10">
 
             <TextBlock Grid.Row="0" Grid.Column="0" Text="Name" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
@@ -84,7 +86,8 @@
                    Text="Oil Boiler"
                    Margin= "10,10,10,0" />
 
-        <Border Margin="10,0,10,10" BorderBrush="Gray" BorderThickness="1" CornerRadius="4">
+        <!-- Second table Oil Boilers-->
+        <Border Margin="10,0,10,10" BorderBrush="Gray" BorderThickness="1" CornerRadius="4" Padding="10" Background="#F0F4F8" BoxShadow="0 4 10 0 #33000000">
 
           <Grid ColumnDefinitions="*,*,*,*,*" RowDefinitions="Auto,Auto" Margin="10">
 
@@ -122,8 +125,8 @@
                    Text="Gas Motor"
                    Margin= "10,10,10,0" />
 
-        <!-- Second table, gas motor -->
-        <Border Margin="10,0,10,10" BorderBrush="Gray" BorderThickness="1" CornerRadius="4">
+        <!-- Third table, gas motor -->
+        <Border Margin="10,0,10,10" BorderBrush="Gray" BorderThickness="1" CornerRadius="4" Padding="10" Background="#F0F4F8" BoxShadow="0 4 10 0 #33000000">
           <Grid ColumnDefinitions="*,*,*,*,*,*" RowDefinitions="Auto,Auto," Margin="10">
 
             <TextBlock Grid.Row="0" Grid.Column="0" Text="Name" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
@@ -145,7 +148,7 @@
           </Grid>
         </Border>
 
-        <!-- Additional info for second table -->
+        <!-- Additional info for third table -->
         <TextBlock HorizontalAlignment="Left"
                    VerticalAlignment="Top"
                    FontSize="12"
@@ -163,7 +166,7 @@
                    Margin= "10,10,10,0" />
 
         <!-- Table for ElectricBoiler -->
-        <Border Margin="10,0,10,10" BorderBrush="Gray" BorderThickness="1" CornerRadius="4">
+        <Border Margin="10,0,10,10" BorderBrush="Gray" BorderThickness="1" CornerRadius="4" Padding="10" Background="#F0F4F8" BoxShadow="0 4 10 0 #33000000">
           <Grid ColumnDefinitions="*,*,*,*" RowDefinitions="Auto,Auto," Margin="10">
 
             <TextBlock Grid.Row="0" Grid.Column="0" Text="Name" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
@@ -181,7 +184,7 @@
           </Grid>
         </Border>
 
-        <!-- Additional info for third table -->
+        <!-- Additional info for fourth table -->
         <TextBlock HorizontalAlignment="Left"
                    VerticalAlignment="Top"
                    FontSize="12"
@@ -212,48 +215,11 @@
         </StackPanel>
 
         <!-- StackPanel for picture names -->
-        <StackPanel
-        Orientation="Horizontal"
-        VerticalAlignment="Top"
-        HorizontalAlignment= "Left"
-        Margin= "10,0,10,0">
-
-          <TextBlock 
-            HorizontalAlignment="Left"
-            VerticalAlignment="Top"
-            FontSize="12"
-            FontWeight="SemiBold"
-            Foreground="#2C3E50"
-            Text="Gas Boilers"
-            Margin= "10,5,10,10"/>
-
-          <TextBlock 
-            HorizontalAlignment="Left"
-            VerticalAlignment="Top"
-            FontSize="12"
-            FontWeight="SemiBold"
-            Foreground="#2C3E50"
-            Text="Oil Boiler"
-            Margin= "130,5,10,10"/>
-
-          <TextBlock 
-            HorizontalAlignment="Left"
-            VerticalAlignment="Top"
-            FontSize="12"
-            FontWeight="SemiBold"
-            Foreground="#2C3E50"
-            Text="Gas Motor"
-            Margin= "130,5,10,10"/>
-
-          <TextBlock 
-            HorizontalAlignment="Left"
-            VerticalAlignment="Top"
-            FontSize="12"
-            FontWeight="SemiBold"
-            Foreground="#2C3E50"
-            Text="Electric Boiler"
-            Margin= "130,5,10,10"/>
-
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10,0,10,0">
+          <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="12" FontWeight="SemiBold" Foreground="#2C3E50" Text="Gas Boilers" Margin="10,5,10,10" />
+          <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="12" FontWeight="SemiBold" Foreground="#2C3E50" Text="Oil Boiler" Margin="130,5,10,10" />
+          <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="12" FontWeight="SemiBold" Foreground="#2C3E50" Text="Gas Motor" Margin="130,5,10,10" />
+          <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="12" FontWeight="SemiBold" Foreground="#2C3E50" Text="Electric Boiler" Margin="130,5,10,10" />
         </StackPanel>
         <TextBlock HorizontalAlignment="Left"
                    VerticalAlignment="Top"
@@ -264,23 +230,32 @@
                    Margin= "10,30,10,0" />
 
         <!-- Maintenance Table -->
-        <Border Margin="10,0,10,10" BorderBrush="Gray" BorderThickness="1" CornerRadius="4">
-          <!-- Prepared for Database bindings-->
-          <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto" Margin="10">
+        <Border Margin="10,0,10,10" BorderBrush="Gray" BorderThickness="1" CornerRadius="4" Padding="10" Background="#F0F4F8" BoxShadow="0 4 10 0 #33000000">
+          <!-- Bindings to the OptimizationView-->
+          <Grid Margin="10" RowDefinitions="Auto,Auto,*" ColumnDefinitions="*,*,*,*,*">
 
             <TextBlock Grid.Row="0" Grid.Column="0" Text="Asset Name" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
             <TextBlock Grid.Row="0" Grid.Column="1" Text="From (Date)" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
             <TextBlock Grid.Row="0" Grid.Column="2" Text="To (Date)" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="0" Grid.Column="3" Text="Period" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
+            <TextBlock Grid.Row="0" Grid.Column="4" Text="Scenario" FontWeight="Bold" Margin="10" Foreground="#2C3E50"/>
 
             <!-- Line Separating Rows -->
-            <Rectangle Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Height="1" Fill="LightGray" VerticalAlignment="Bottom"/>
+            <Rectangle Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="5" Height="1" Fill="LightGray" VerticalAlignment="Bottom"/>
 
-            <!-- Mock Data ~30 hours of maintenance -->
-            <TextBlock Grid.Row="1" Grid.Column="0" Text="GB1" Margin="10" Foreground="#2C3E50"/>
-            <!-- Gonna use {Binding StartDate, StringFormat='{}{0:yyyy-MM-dd HH:mm}'} later -->
-            <TextBlock Grid.Row="1" Grid.Column="1" Text="2026-04-01 08:00" Margin="10" Foreground="#2C3E50"/>
-            <!-- Gonna use {Binding EndDate, StringFormat='{}{0:yyyy-MM-dd HH:mm}'} later -->
-            <TextBlock Grid.Row="1" Grid.Column="2" Text="2026-04-02 14:00" Margin="10" Foreground="#2C3E50"/>
+            <ItemsControl Grid.Row="2" Grid.ColumnSpan="5" ItemsSource="{Binding MaintenanceSchedules}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Grid ColumnDefinitions="*,*,*,*,*">
+                    <TextBlock Grid.Column="0" Text="{Binding AssetName}" Margin="10" Foreground="#2C3E50"/>
+                    <TextBlock Grid.Column="1" Text="{Binding StartDate, StringFormat='{}{0:yyyy-MM-dd HH:mm}'}" Margin="10" Foreground="#2C3E50"/>
+                    <TextBlock Grid.Column="2" Text="{Binding EndDate, StringFormat='{}{0:yyyy-MM-dd HH:mm}'}" Margin="10" Foreground="#2C3E50"/>
+                    <TextBlock Grid.Column="3" Text="{Binding Period}" Margin="10" Foreground="#2C3E50"/>
+                    <TextBlock Grid.Column="4" Text="{Binding Scenario}" Margin="10" Foreground="#2C3E50"/>
+                  </Grid>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
           </Grid>
         </Border>
       </StackPanel>
