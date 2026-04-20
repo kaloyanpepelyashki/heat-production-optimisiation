@@ -75,18 +75,4 @@ public class DataLayerTests
 
         Assert.Contains("AM API responded. Data parsed: True", viewModel.ProductionData);
     }
-
-    [Fact]
-    public async Task OptimizationViewModel_LoadsData_ShouldSetOptDataOnSuccess()
-    {
-        var mockApiService = new Mock<IApiService>();
-        mockApiService
-            .Setup(x => x.GetAsync<object>(BackendService.Opt, "api/optimization/status"))
-            .ReturnsAsync(new { status = "ok" });
-
-        var viewModel = new OptimizationViewModel(mockApiService.Object);
-        await Task.Delay(100);
-
-        Assert.Contains("OPT API responded. Data parsed: True", viewModel.OptData);
-    }
 }

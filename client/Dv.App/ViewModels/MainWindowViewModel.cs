@@ -22,7 +22,6 @@ public sealed class MainWindowViewModel : ViewModelBase
             new NavigationItem { Title = "Dashboard", ViewKey = "dashboard" },
             new NavigationItem { Title = "Production Units", ViewKey = "production-units" },
             new NavigationItem { Title = "Source Data", ViewKey = "source-data" },
-            new NavigationItem { Title = "Optimization", ViewKey = "optimization" },
             new NavigationItem { Title = "Settings", ViewKey = "settings" },
         };
 
@@ -31,7 +30,6 @@ public sealed class MainWindowViewModel : ViewModelBase
             ["dashboard"] = new DashboardViewModel(),
             ["production-units"] = new ProductionUnitsViewModel(),
             ["source-data"] = new SourceDataViewModel(),
-            ["optimization"] = new OptimizationViewModel(),
             ["settings"] = new SettingsViewModel(),
         };
 
