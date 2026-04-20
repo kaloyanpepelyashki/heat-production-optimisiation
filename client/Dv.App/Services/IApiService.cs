@@ -2,9 +2,6 @@ namespace Dv.App.Services;
 
 using System.Threading.Tasks;
 
-/// <summary>
-/// Interface for the main data retrieval layer that interacts with the backend services.
-/// </summary>
 public interface IApiService
 {
     Task<T?> GetAsync<T>(BackendService service, string endpoint);

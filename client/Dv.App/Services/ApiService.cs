@@ -7,10 +7,6 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-/// <summary>
-/// The data access layer of the Data Visualization tool (client side).
-/// This service acts like an HTTP client (e.g., Postman) to call the different backend services.
-/// </summary>
 public class ApiService : IApiService
 {
     private readonly HttpClient httpClient;
@@ -33,7 +29,6 @@ public class ApiService : IApiService
         };
     }
 
-    /// <inheritdoc/>
     public async Task<T?> GetAsync<T>(BackendService service, string endpoint)
     {
         var url = this.BuildUrl(service, endpoint);
@@ -42,7 +37,6 @@ public class ApiService : IApiService
         return await response.Content.ReadFromJsonAsync<T>(this.jsonOptions);
     }
 
-    /// <inheritdoc/>
     public async Task<TResponse?> PostAsync<TRequest, TResponse>(BackendService service, string endpoint, TRequest data)
     {
         var url = this.BuildUrl(service, endpoint);
@@ -51,7 +45,6 @@ public class ApiService : IApiService
         return await response.Content.ReadFromJsonAsync<TResponse>(this.jsonOptions);
     }
 
-    /// <inheritdoc/>
     public async Task<TResponse?> PutAsync<TRequest, TResponse>(BackendService service, string endpoint, TRequest data)
     {
         var url = this.BuildUrl(service, endpoint);
@@ -60,7 +53,6 @@ public class ApiService : IApiService
         return await response.Content.ReadFromJsonAsync<TResponse>(this.jsonOptions);
     }
 
-    /// <inheritdoc/>
     public async Task<bool> DeleteAsync(BackendService service, string endpoint)
     {
         var url = this.BuildUrl(service, endpoint);

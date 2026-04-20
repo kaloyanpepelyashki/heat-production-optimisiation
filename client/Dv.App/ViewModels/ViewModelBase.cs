@@ -6,7 +6,6 @@ using System.Runtime.CompilerServices;
 
 public abstract class ViewModelBase : INotifyPropertyChanged
 {
-    /// <inheritdoc/>
     public event PropertyChangedEventHandler? PropertyChanged;
 
     protected bool SetProperty<T>(ref T storage, T value, [CallerMemberName] string? propertyName = null)
