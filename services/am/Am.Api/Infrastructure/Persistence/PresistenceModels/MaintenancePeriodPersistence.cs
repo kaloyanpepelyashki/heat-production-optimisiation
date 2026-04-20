@@ -25,9 +25,6 @@ public class MaintenancePeriodPersistence : BaseModel
     [Column("end_time")]
     public DateTime EndTime { get; set; }
 
-    [Column("is_emergency")]
-    public bool IsEmergency { get; set; }
-
     [Column("status")]
     public string Status { get; set; }
 }
