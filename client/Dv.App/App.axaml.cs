@@ -1,7 +1,3 @@
-// <copyright file="App.axaml.cs" company="PlaceholderCompany">
-// Copyright (c) PlaceholderCompany. All rights reserved.
-// </copyright>
-
 namespace Dv.App;
 
 using Avalonia;

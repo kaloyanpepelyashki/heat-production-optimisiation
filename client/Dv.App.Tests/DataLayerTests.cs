@@ -81,7 +81,7 @@ public class DataLayerTests
     {
         var mockApiService = new Mock<IApiService>();
         mockApiService
-            .Setup(x => x.GetAsync<object>(BackendService.Opt, "WeatherForecast"))
+            .Setup(x => x.GetAsync<object>(BackendService.Opt, "api/optimization/status"))
             .ReturnsAsync(new { status = "ok" });
 
         var viewModel = new OptimizationViewModel(mockApiService.Object);

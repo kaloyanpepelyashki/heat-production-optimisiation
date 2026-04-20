@@ -1,7 +1,3 @@
-// <copyright file="ProductionUnitsView.axaml.cs" company="PlaceholderCompany">
-// Copyright (c) PlaceholderCompany. All rights reserved.
-// </copyright>
-
 namespace Dv.App.Views;
 
 using Avalonia.Controls;
