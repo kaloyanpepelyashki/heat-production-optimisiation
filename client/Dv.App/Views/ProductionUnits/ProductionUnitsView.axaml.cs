@@ -1,6 +1,6 @@
-namespace Dv.App.Views;
-
 using Avalonia.Controls;
+
+namespace Dv.App.Views;
 
 public partial class ProductionUnitsView : UserControl
 {

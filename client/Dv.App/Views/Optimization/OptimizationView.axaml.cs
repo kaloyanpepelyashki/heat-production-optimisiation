@@ -2,9 +2,9 @@ using Avalonia.Controls;
 
 namespace Dv.App.Views;
 
-public partial class SourceDataView : UserControl
+public partial class OptimizationView : UserControl
 {
-    public SourceDataView()
+    public OptimizationView()
     {
         this.InitializeComponent();
     }

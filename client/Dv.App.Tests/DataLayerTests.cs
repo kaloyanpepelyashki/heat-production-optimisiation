@@ -25,7 +25,7 @@ public class DataLayerTests
             .ReturnsAsync(sampleData);
 
         var viewModel = new DashboardViewModel(mockApiService.Object);
-        await Task.Delay(100); 
+        await viewModel.InitializationTask;
 
         Assert.Contains("Success! SDM API responded.", viewModel.DashboardData);
         Assert.Contains("Heat Demand 42", viewModel.DashboardData);
@@ -42,7 +42,7 @@ public class DataLayerTests
             .ReturnsAsync(emptyData);
 
         var viewModel = new DashboardViewModel(mockApiService.Object);
-        await Task.Delay(100);
+        await viewModel.InitializationTask;
 
         Assert.Contains("SDM API returned an empty array", viewModel.DashboardData);
     }
@@ -57,7 +57,7 @@ public class DataLayerTests
             .ThrowsAsync(new System.Exception("Network blip"));
 
         var viewModel = new DashboardViewModel(mockApiService.Object);
-        await Task.Delay(100);
+        await viewModel.InitializationTask;
 
         Assert.Contains("Test Failed: Network blip", viewModel.DashboardData);
     }
@@ -71,7 +71,7 @@ public class DataLayerTests
             .ReturnsAsync(new { status = "ok" });
 
         var viewModel = new ProductionUnitsViewModel(mockApiService.Object);
-        await Task.Delay(100);
+        await viewModel.InitializationTask;
 
         Assert.Contains("AM API responded. Data parsed: True", viewModel.ProductionData);
     }

@@ -70,6 +70,11 @@ public class GasMotorRepository : IProductionUnitRepository<GasMotor>
         }
     }
 
+    /// <summary>
+    /// Turns Persistance Model into a Domain model.
+    /// </summary>
+    /// <param name="p">The Persistance model.</param>
+    /// <returns>A domain model.</returns>
     public static GasMotor ToDomain(GasMotorPersistence p)
     {
         return new GasMotor

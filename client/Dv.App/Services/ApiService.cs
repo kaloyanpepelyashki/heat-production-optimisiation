@@ -63,7 +63,6 @@ public class ApiService : IApiService
     {
         var baseUrl = this.serviceUrls[service];
 
-        // Ensure we don't double up on slashes
         return $"{baseUrl.TrimEnd('/')}/{endpoint.TrimStart('/')}";
     }
 }

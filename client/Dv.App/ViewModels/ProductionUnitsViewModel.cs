@@ -9,10 +9,12 @@ public sealed class ProductionUnitsViewModel : ViewModelBase
     private readonly IApiService apiService;
     private string productionData = "Data will appear here once loaded...";
 
+    public Task InitializationTask { get; private set; }
+
     public ProductionUnitsViewModel(IApiService apiService = null!)
     {
         this.apiService = apiService ?? new ApiService();
-        _ = this.LoadProductionDataAsync();
+        this.InitializationTask = this.LoadProductionDataAsync();
     }
 
     public string ProductionData
