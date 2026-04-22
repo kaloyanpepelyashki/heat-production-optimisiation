@@ -15,8 +15,9 @@
                 CornerRadius="8"
                 Margin="10,0,10,10"
                 Padding="20">
-          <Grid VerticalAlignment="Top">
-            <TextBlock HorizontalAlignment="Left"
+          <Grid VerticalAlignment="Top" ColumnDefinitions="*, Auto" RowDefinitions="Auto, *">
+            <TextBlock Grid.Column="0" Grid.Row="0"
+                       HorizontalAlignment="Left"
                        VerticalAlignment="Center"
                        FontSize="28"
                        FontWeight="SemiBold"
@@ -25,7 +26,7 @@
                        Margin="10" />
 
 
-            <StackPanel Orientation="Horizontal"
+            <WrapPanel Grid.Column="1" Grid.Row="0"
                         HorizontalAlignment="Right"
                         VerticalAlignment="Center"
                         Margin="10">
@@ -36,11 +37,11 @@
                          Text="Choose Scenario: "
                          Margin="0,0,10,0" />
               <!-- Dropdown menu -->
-              <ComboBox x:Name="ScenarioComboBox" SelectedIndex="0" Width="150">
+              <ComboBox x:Name="ScenarioComboBox" SelectedIndex="0" MinWidth="120" MaxWidth="200">
                 <ComboBoxItem Content="Scenario 1" />
                 <ComboBoxItem Content="Scenario 2" />
               </ComboBox>
-            </StackPanel>
+            </WrapPanel>
           </Grid>
         </Border>
       </StackPanel>
@@ -62,8 +63,8 @@
                     Padding="20">
 
 
-              <Grid VerticalAlignment="Top" RowDefinitions="Auto,Auto">
-                <TextBlock Grid.Row="0"
+              <Grid VerticalAlignment="Top" ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+                <TextBlock Grid.Row="0" Grid.Column="0"
                            HorizontalAlignment="Left"
                            VerticalAlignment="Center"
                            FontSize="18"
@@ -72,8 +73,7 @@
                            Text="Optimization Period"
                            Margin="10" />
 
-                <StackPanel Grid.Row="0"
-                            Orientation="Horizontal"
+                <WrapPanel Grid.Row="0" Grid.Column="1"
                             HorizontalAlignment="Right"
                             VerticalAlignment="Center"
                             Margin="10">
@@ -84,39 +84,39 @@
                              Text="Choose Period: "
                              Margin="0,0,10,0" />
                   <!-- Dropdown menu periods-->
-                  <ComboBox x:Name="PeriodComboBox" SelectedIndex="0" Width="150">
+                  <ComboBox x:Name="PeriodComboBox" SelectedIndex="0" MinWidth="120" MaxWidth="200">
                     <ComboBoxItem Content="Summer" />
                     <ComboBoxItem Content="Winter" />
                   </ComboBox>
-                </StackPanel>
+                </WrapPanel>
 
 
                 <!-- Grid for two periods -->
-                <Carousel Grid.Row="1" SelectedIndex="{Binding #PeriodComboBox.SelectedIndex}" Margin="10,20,10,10">
+                <Carousel Grid.Row="1" Grid.ColumnSpan="2" SelectedIndex="{Binding #PeriodComboBox.SelectedIndex}" Margin="10,20,10,10">
                   <Carousel.Items>
 
 
                     <!-- Stackpanel for Summer view-->
                     <StackPanel Margin="10">
-                      <StackPanel Orientation="Horizontal" Spacing="40">
+                      <WrapPanel Margin="0,0,0,20">
 
                         <!-- Period Start Date -->
-                        <StackPanel Spacing="8">
+                        <StackPanel Spacing="8" Margin="0,0,20,20">
                           <TextBlock Text="Start Date" FontSize="14" Foreground="{DynamicResource AppTextPrimary}" FontWeight="SemiBold"/>
-                          <Border Background="{DynamicResource AppInputBackground}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="2" CornerRadius="4" Padding="10,8" Width="200">
+                          <Border Background="{DynamicResource AppInputBackground}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="2" CornerRadius="4" Padding="10,8" MaxWidth="250">
                             <TextBlock Text="08/09/2025 - 00:00" Foreground="{DynamicResource AppTextPrimary}" VerticalAlignment="Center" />
                           </Border>
                         </StackPanel>
 
                         <!-- Period End Date -->
-                        <StackPanel Spacing="8">
+                        <StackPanel Spacing="8" Margin="0,0,20,20">
                           <TextBlock Text="End Date" FontSize="14" Foreground="{DynamicResource AppTextPrimary}" FontWeight="SemiBold"/>
-                          <Border Background="{DynamicResource AppInputBackground}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="2" CornerRadius="4" Padding="10,8" Width="200">
+                          <Border Background="{DynamicResource AppInputBackground}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="2" CornerRadius="4" Padding="10,8" MaxWidth="250">
                             <TextBlock Text="21/09/2025 - 23:59" Foreground="{DynamicResource AppTextPrimary}" VerticalAlignment="Center" />
 
                           </Border>
                         </StackPanel>
-                      </StackPanel>
+                      </WrapPanel>
 
                       <TextBlock VerticalAlignment="Bottom"
                                  FontSize="18"
@@ -145,6 +145,11 @@
 
                           <!-- Selectable rows for maintenance -->
                           <ListBox x:Name="BoilersListBoxSummer" Background="Transparent" BorderThickness="0" CornerRadius="4">
+                            <ListBox.Styles>
+                              <Style Selector="ListBoxItem">
+                                <Setter Property="Padding" Value="0" />
+                              </Style>
+                            </ListBox.Styles>
                             <!-- GB1 -->
                             <ListBoxItem Padding="10" Tag="GB1">
                               <Grid ColumnDefinitions="2*, 1*, 1*">
@@ -185,34 +190,34 @@
                       </Border>
 
                       <!-- Maintenance Date choosing -->
-                      <Grid ColumnDefinitions="Auto, Auto, *" Margin="0,20,0,0">
+                      <WrapPanel Margin="0,20,0,0">
                         <!-- Maintenance start time -->
-                        <StackPanel Grid.Column="0" Spacing="8" Margin="0,0,40,0">
+                        <StackPanel Spacing="8" Margin="0,0,40,20">
                           <TextBlock Text="Maintenance Start" FontSize="14" Foreground="{DynamicResource AppTextPrimary}" FontWeight="SemiBold"/>
-                          <StackPanel Orientation="Horizontal" Spacing="10">
-                            <CalendarDatePicker x:Name="MaintenanceStartDatePickerSummer" Width="140" Watermark="Select date" />
-                            <TimePicker x:Name="MaintenanceStartTimePickerSummer" />
-                          </StackPanel>
+                          <WrapPanel Margin="0,0,0,-10">
+                            <CalendarDatePicker x:Name="MaintenanceStartDatePickerSummer" Width="140" Watermark="Select date" Margin="0,0,10,10"/>
+                            <TimePicker x:Name="MaintenanceStartTimePickerSummer" Margin="0,0,0,10"/>
+                          </WrapPanel>
                         </StackPanel>
 
                         <!-- Maintenance end time -->
-                        <StackPanel Grid.Column="1" Spacing="8">
+                        <StackPanel Spacing="8" Margin="0,0,20,20">
                           <TextBlock Text="Maintenance End" FontSize="14" Foreground="{DynamicResource AppTextPrimary}" FontWeight="SemiBold"/>
-                          <StackPanel Orientation="Horizontal" Spacing="10">
-                            <CalendarDatePicker x:Name="MaintenanceEndDatePickerSummer" Width="140" Watermark="Select date" />
-                            <TimePicker x:Name="MaintenanceEndTimePickerSummer" />
-                          </StackPanel>
+                          <WrapPanel Margin="0,0,0,-10">
+                            <CalendarDatePicker x:Name="MaintenanceEndDatePickerSummer" Width="140" Watermark="Select date" Margin="0,0,10,10"/>
+                            <TimePicker x:Name="MaintenanceEndTimePickerSummer" Margin="0,0,0,10"/>
+                          </WrapPanel>
                         </StackPanel>
 
                         <!-- Confirm Maintenance Button -->
-                        <Button Grid.Column="2" HorizontalAlignment="Right"
+                        <Button HorizontalAlignment="Right"
                                 Click="ConfirmMaintenanceSummer_Click"
                                 Content="Confirm Maintenance"
                                 FontWeight="SemiBold"
                                 CornerRadius="4"
                                 Padding="16,8"
                                 VerticalAlignment="Bottom"
-                                Margin="0,0,0,2">
+                                Margin="0,0,0,22">
                             <Button.Styles>
                               <!-- Default state -->
                               <Style Selector="Button">
@@ -226,31 +231,31 @@
                               </Style>
                             </Button.Styles>
                           </Button>
-                      </Grid>
+                      </WrapPanel>
 
                     </StackPanel>
 
                     <!-- Stackpanel for Winter view-->
                     <StackPanel Margin="10">
-                      <StackPanel Orientation="Horizontal" Spacing="40">
+                      <WrapPanel Margin="0,0,0,20">
 
                         <!-- Period Start Date -->
-                        <StackPanel Spacing="8">
+                        <StackPanel Spacing="8" Margin="0,0,20,20">
                           <TextBlock Text="Start Date" FontSize="14" Foreground="{DynamicResource AppTextPrimary}" FontWeight="SemiBold"/>
-                          <Border Background="{DynamicResource AppInputBackground}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="2" CornerRadius="4" Padding="10,8" Width="200">
+                          <Border Background="{DynamicResource AppInputBackground}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="2" CornerRadius="4" Padding="10,8" MaxWidth="250">
                             <TextBlock Text="05/01/2026 - 00:00" Foreground="{DynamicResource AppTextPrimary}" VerticalAlignment="Center" />
                           </Border>
                         </StackPanel>
 
                         <!-- Period End Date -->
-                        <StackPanel Spacing="8">
+                        <StackPanel Spacing="8" Margin="0,0,20,20">
                           <TextBlock Text="End Date" FontSize="14" Foreground="{DynamicResource AppTextPrimary}" FontWeight="SemiBold"/>
-                          <Border Background="{DynamicResource AppInputBackground}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="2" CornerRadius="4" Padding="10,8" Width="200">
+                          <Border Background="{DynamicResource AppInputBackground}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="2" CornerRadius="4" Padding="10,8" MaxWidth="250">
                             <TextBlock Text="18/01/2026 - 23:59" Foreground="{DynamicResource AppTextPrimary}" VerticalAlignment="Center" />
 
                           </Border>
                         </StackPanel>
-                      </StackPanel>
+                      </WrapPanel>
 
                       <TextBlock VerticalAlignment="Bottom"
                                  FontSize="18"
@@ -279,6 +284,11 @@
 
                           <!-- Selectable rows for maintenance -->
                           <ListBox x:Name="BoilersListBoxWinter" Background="Transparent" BorderThickness="0" CornerRadius="4">
+                            <ListBox.Styles>
+                              <Style Selector="ListBoxItem">
+                                <Setter Property="Padding" Value="0" />
+                              </Style>
+                            </ListBox.Styles>
                             <!-- GB1 -->
                             <ListBoxItem Padding="10" Tag="GB1">
                               <Grid ColumnDefinitions="2*, 1*, 1*">
@@ -319,34 +329,34 @@
                       </Border>
 
                       <!-- Maintenance Date choosing -->
-                      <Grid ColumnDefinitions="Auto, Auto, *" Margin="0,20,0,0">
+                      <WrapPanel Margin="0,20,0,0">
                         <!-- Maintenance start time -->
-                        <StackPanel Grid.Column="0" Spacing="8" Margin="0,0,40,0">
+                        <StackPanel Spacing="8" Margin="0,0,40,20">
                           <TextBlock Text="Maintenance Start" FontSize="14" Foreground="{DynamicResource AppTextPrimary}" FontWeight="SemiBold"/>
-                          <StackPanel Orientation="Horizontal" Spacing="10">
-                            <CalendarDatePicker x:Name="MaintenanceStartDatePickerWinter" Width="140" Watermark="Select date" />
-                            <TimePicker x:Name="MaintenanceStartTimePickerWinter" />
-                          </StackPanel>
+                          <WrapPanel Margin="0,0,0,-10">
+                            <CalendarDatePicker x:Name="MaintenanceStartDatePickerWinter" Width="140" Watermark="Select date" Margin="0,0,10,10" />
+                            <TimePicker x:Name="MaintenanceStartTimePickerWinter" Margin="0,0,0,10" />
+                          </WrapPanel>
                         </StackPanel>
 
                         <!-- Maintenance end time -->
-                        <StackPanel Grid.Column="1" Spacing="8">
+                        <StackPanel Spacing="8" Margin="0,0,20,20">
                           <TextBlock Text="Maintenance End" FontSize="14" Foreground="{DynamicResource AppTextPrimary}" FontWeight="SemiBold"/>
-                          <StackPanel Orientation="Horizontal" Spacing="10">
-                            <CalendarDatePicker x:Name="MaintenanceEndDatePickerWinter" Width="140" Watermark="Select date" />
-                            <TimePicker x:Name="MaintenanceEndTimePickerWinter" />
-                          </StackPanel>
+                          <WrapPanel Margin="0,0,0,-10">
+                            <CalendarDatePicker x:Name="MaintenanceEndDatePickerWinter" Width="140" Watermark="Select date" Margin="0,0,10,10"/>
+                            <TimePicker x:Name="MaintenanceEndTimePickerWinter" Margin="0,0,0,10"/>
+                          </WrapPanel>
                         </StackPanel>
 
                         <!-- Confirm Maintenance Button -->
-                        <Button Grid.Column="2" HorizontalAlignment="Right"
+                        <Button HorizontalAlignment="Right"
                                 Click="ConfirmMaintenanceWinter_Click"
                                 Content="Confirm Maintenance"
                                 FontWeight="SemiBold"
                                 CornerRadius="4"
                                 Padding="16,8"
                                 VerticalAlignment="Bottom"
-                                Margin="0,0,0,2">
+                                Margin="0,0,0,22">
                           <Button.Styles>
                             <!-- Default state -->
                             <Style Selector="Button">
@@ -360,7 +370,7 @@
                             </Style>
                           </Button.Styles>
                         </Button>
-                      </Grid>
+                      </WrapPanel>
 
                     </StackPanel>
 

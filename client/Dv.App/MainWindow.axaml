@@ -7,10 +7,10 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Dv.App.MainWindow"
         x:DataType="viewModels:MainWindowViewModel"
-        MinWidth="900"
-        MinHeight="600"
+        MinWidth="700"
+        MinHeight="500"
         Title="Heat Optimization">
-    <Grid ColumnDefinitions="2*,7*">
+    <Grid ColumnDefinitions="250,*">
         <Border Grid.Column="0"
                 Background="{DynamicResource AppSidebar}"
                 Padding="16">
