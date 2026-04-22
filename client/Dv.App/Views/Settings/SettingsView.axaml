@@ -162,19 +162,26 @@
               Padding="20">
         <StackPanel Spacing="16">
 
-          <StackPanel Orientation="Horizontal" Spacing="12">
-            <Border Background="#8379e1" CornerRadius="6" Width="32" Height="32">
-              <TextBlock Text="&#9654;" FontSize="12"
-                         HorizontalAlignment="Center"
-                         VerticalAlignment="Center"
-                         Foreground="White" />
-            </Border>
-            <TextBlock Text="Backend Services"
-                       FontSize="18"
-                       FontWeight="SemiBold"
-                       Foreground="{DynamicResource AppTextPrimary}"
-                       VerticalAlignment="Center" />
-          </StackPanel>
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="12">
+              <Border Background="#8379e1" CornerRadius="6" Width="32" Height="32">
+                <TextBlock Text="&#9654;" FontSize="12"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Foreground="White" />
+              </Border>
+              <TextBlock Text="Backend Services"
+                         FontSize="18"
+                         FontWeight="SemiBold"
+                         Foreground="{DynamicResource AppTextPrimary}"
+                         VerticalAlignment="Center" />
+            </StackPanel>
+            
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+              <TextBlock Text="{Binding LastRefreshedText}" FontSize="12" Foreground="{DynamicResource AppTextMuted}" VerticalAlignment="Center" />
+              <Button Content="Refresh" Command="{Binding RefreshServices}" Classes="accent" FontSize="12" Padding="12,6" CornerRadius="6" Background="#3B82F6" Foreground="White" />
+            </StackPanel>
+          </Grid>
 
           <Rectangle Height="1" Fill="{DynamicResource AppBorder}" />
 
@@ -284,10 +291,11 @@
               Padding="20"
               Margin="0,0,0,20">
         <StackPanel Spacing="16">
-
+          
           <StackPanel Orientation="Horizontal" Spacing="12">
             <Border Background="#ff9500" CornerRadius="6" Width="32" Height="32">
-              <TextBlock Text="&#9829;" FontSize="14"
+              <TextBlock Text="i" FontSize="18"
+                         FontFamily="Georgia" FontWeight="Bold"
                          HorizontalAlignment="Center"
                          VerticalAlignment="Center"
                          Foreground="White" />

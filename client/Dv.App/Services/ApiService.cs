@@ -12,7 +12,7 @@ public class ApiService : IApiService
     private static readonly HttpClient SharedHttpClient = new HttpClient();
     private readonly JsonSerializerOptions jsonOptions;
 
-    private readonly Dictionary<BackendService, string> serviceUrls = new()
+    public static readonly IReadOnlyDictionary<BackendService, string> ServiceUrls = new Dictionary<BackendService, string>
     {
         { BackendService.Rdm, "https://rdm-api.onrender.com/" },
         { BackendService.Sdm, "https://sdm-api.onrender.com/" },
@@ -60,7 +60,7 @@ public class ApiService : IApiService
 
     private string BuildUrl(BackendService service, string endpoint)
     {
-        var baseUrl = this.serviceUrls[service];
+        var baseUrl = ServiceUrls[service];
 
         return $"{baseUrl.TrimEnd('/')}/{endpoint.TrimStart('/')}";
     }

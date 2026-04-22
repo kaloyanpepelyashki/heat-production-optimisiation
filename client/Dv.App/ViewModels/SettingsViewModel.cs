@@ -20,6 +20,7 @@ public sealed class SettingsViewModel : ViewModelBase
     private bool sdmOnline;
     private bool amChecking = true;
     private bool amOnline;
+    private DateTime lastRefreshed = DateTime.Now;
 
     public SettingsViewModel()
     {
@@ -39,7 +40,7 @@ public sealed class SettingsViewModel : ViewModelBase
             }
         }
     }
-
+    
     public bool IsSystemTheme
     {
         get => this.selectedTheme == "Default";
@@ -82,6 +83,25 @@ public sealed class SettingsViewModel : ViewModelBase
 
     public bool IsAmOffline => !this.amChecking && !this.amOnline;
 
+    public string LastRefreshedText => $"Last refresh: {this.lastRefreshed:HH:mm:ss}";
+
+    public void RefreshServices()
+    {
+        this.IsRdmChecking = true;
+        this.IsRdmOnline = false;
+        this.OnPropertyChanged(nameof(this.IsRdmOffline));
+        
+        this.IsSdmChecking = true;
+        this.IsSdmOnline = false;
+        this.OnPropertyChanged(nameof(this.IsSdmOffline));
+
+        this.IsAmChecking = true;
+        this.IsAmOnline = false;
+        this.OnPropertyChanged(nameof(this.IsAmOffline));
+
+        _ = this.CheckServicesAsync();
+    }
+
     private void ApplyTheme(string themeVariant)
     {
         this.selectedTheme = themeVariant;
@@ -107,7 +127,7 @@ public sealed class SettingsViewModel : ViewModelBase
     {
         await Task.WhenAll(
             PingAndUpdate(
-                "https://rdm-api.onrender.com/",
+                ApiService.ServiceUrls[BackendService.Rdm],
                 online =>
                 {
                     this.IsRdmChecking = false;
@@ -115,7 +135,7 @@ public sealed class SettingsViewModel : ViewModelBase
                     this.OnPropertyChanged(nameof(this.IsRdmOffline));
                 }),
             PingAndUpdate(
-                "https://sdm-api.onrender.com/",
+                ApiService.ServiceUrls[BackendService.Sdm],
                 online =>
                 {
                     this.IsSdmChecking = false;
@@ -123,13 +143,16 @@ public sealed class SettingsViewModel : ViewModelBase
                     this.OnPropertyChanged(nameof(this.IsSdmOffline));
                 }),
             PingAndUpdate(
-                "https://heat-production-optimisiation.onrender.com/",
+                ApiService.ServiceUrls[BackendService.Am],
                 online =>
                 {
                     this.IsAmChecking = false;
                     this.IsAmOnline = online;
                     this.OnPropertyChanged(nameof(this.IsAmOffline));
                 }));
+
+        this.lastRefreshed = DateTime.Now;
+        this.OnPropertyChanged(nameof(this.LastRefreshedText));
     }
 
     private static async Task PingAndUpdate(string url, Action<bool> onResult)
