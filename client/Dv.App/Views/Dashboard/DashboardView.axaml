@@ -18,7 +18,7 @@
                    VerticalAlignment="Top"
                    FontSize="28"
                    FontWeight="SemiBold"
-                   Foreground="#2C3E50"
+                   Foreground="{DynamicResource AppTextPrimary}"
                    Text="District Heating Network"
                    Margin="10" />
 
@@ -26,7 +26,7 @@
                    VerticalAlignment="Top"
                    FontSize="12"
                    FontWeight="SemiBold"
-                   Foreground="#2C3E50"
+                   Foreground="{DynamicResource AppTextPrimary}"
                    TextWrapping="Wrap"
                    Text="District heating is a system where hot water from a central power plant is distributed to buildings throughout the city via highly insulated pipes. This efficient method provides both space heating and domestic hot water to connected buildings through heat exchangers."
                    Margin="10" />
@@ -36,14 +36,14 @@
                    VerticalAlignment="Top"
                    FontSize="12"
                    FontWeight="SemiBold"
-                   Foreground="#2C3E50"
+                   Foreground="{DynamicResource AppTextPrimary}"
                    TextWrapping="Wrap"
                    Text="The cooled water is then returned to the plant where it is reheated and recirculated. This closed-loop system allows for centralized, efficient heat production that can leverage multiple energy sources and production technologies."
                    Margin="10" />
 
 
         <!-- The box with optimization goals-->
-        <Border Background="#F0F4F8"
+        <Border Background="{DynamicResource AppCard}"
                 CornerRadius="8"
                 BoxShadow="0 4 10 0 #33000000"
                 Margin="10">
@@ -52,7 +52,7 @@
                        VerticalAlignment="Top"
                        FontSize="18"
                        FontWeight="SemiBold"
-                       Foreground="#2C3E50"
+                       Foreground="{DynamicResource AppTextPrimary}"
                        Text="Optimization Goals"
                        Margin="10" />
             <StackPanel Orientation="Vertical"
@@ -64,7 +64,7 @@
                   <Ellipse Fill="#22C55E"/>
                   <Image Source="avares://Dv.App/Assets/dollaricon.png" Stretch="Uniform" Margin="5"/>
                 </Grid>
-                <TextBlock VerticalAlignment="Center" Foreground="#2C3E50" FontSize="14" Text="Minimize Production Costs"/>
+                <TextBlock VerticalAlignment="Center" Foreground="{DynamicResource AppTextPrimary}" FontSize="14" Text="Minimize Production Costs"/>
               </StackPanel>
 
               <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,10,0,10">
@@ -72,7 +72,7 @@
                   <Ellipse Fill="#8379e1"/>
                   <Image Source="avares://Dv.App/Assets/lightningicon.png" Stretch="Uniform" Margin="5"/>
                 </Grid>
-                <TextBlock VerticalAlignment="Center" Foreground="#2C3E50" FontSize="14" Text="Maximize Electricity Profits"/>
+                <TextBlock VerticalAlignment="Center" Foreground="{DynamicResource AppTextPrimary}" FontSize="14" Text="Maximize Electricity Profits"/>
               </StackPanel>
 
               <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,10,0,15">
@@ -80,7 +80,7 @@
                   <Ellipse Fill="#ff9500"/>
                   <Image Source="avares://Dv.App/Assets/gearicon.png" Stretch="Uniform" Margin="5"/>
                 </Grid>
-                <TextBlock VerticalAlignment="Center" Foreground="#2C3E50" FontSize="14" Text="Automated Scheduling"/>
+                <TextBlock VerticalAlignment="Center" Foreground="{DynamicResource AppTextPrimary}" FontSize="14" Text="Automated Scheduling"/>
               </StackPanel>
 
             </StackPanel>
@@ -91,7 +91,7 @@
                    VerticalAlignment="Top"
                    FontSize="18"
                    FontWeight="SemiBold"
-                   Foreground="#2C3E50"
+                   Foreground="{DynamicResource AppTextPrimary}"
                    Text="System Overview"
                    Margin="10,20,10,5" />
         
@@ -99,7 +99,7 @@
                    VerticalAlignment="Top"
                    FontSize="12"
                    FontWeight="SemiBold"
-                   Foreground="#2C3E50"
+                   Foreground="{DynamicResource AppTextPrimary}"
                    TextWrapping="Wrap"
                    Text="Hot water flows from our production facilities through insulated pipes to 1,600 buildings. After delivering heat, the cooled water returns to be reheated and recirculated, creating an efficient closed-loop system for the entire city of Heatington."
                    Margin="10,0,10,10" />
@@ -129,7 +129,7 @@
                 BoxShadow="0 12 30 2 #66000000"
                 CornerRadius="8"
                 Margin="10">
-          <Border CornerRadius="8" ClipToBounds="True" Background="White">
+          <Border CornerRadius="8" ClipToBounds="True" Background="{DynamicResource AppCardInner}">
             <Image Source="avares://Dv.App/Assets/HeatingGrid.png"
                    Stretch="Uniform"/>
           </Border>
@@ -139,7 +139,7 @@
       <!-- Enhanced Dashboard appearing at the bottom -->
       <!--The columns span over the whole view-->
       <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Margin="0,10,0,0">
-        <Border Background="#F0F4F8"
+        <Border Background="{DynamicResource AppCard}"
                 CornerRadius="8"
                 BoxShadow="0 4 10 0 #ca1616"
                 Margin="10">
@@ -149,7 +149,7 @@
                        VerticalAlignment="Top"
                        FontSize="18"
                        FontWeight="SemiBold"
-                       Foreground="#2C3E50"
+                       Foreground="{DynamicResource AppTextPrimary}"
                        Text="Enhanced Dashboard"
                        Margin="10" />
 
@@ -163,7 +163,7 @@
                          VerticalAlignment="Top"
                          FontSize="12"
                          FontWeight="SemiBold"
-                         Foreground="#2C3E50"
+                         Foreground="{DynamicResource AppTextPrimary}"
                          Text="Coming Soon!"
                          Margin="20,10,20,10" />
             </Border>
@@ -173,28 +173,28 @@
                        VerticalAlignment="Top"
                        FontSize="16"
                        FontWeight="SemiBold"
-                       Foreground="#2C3E50"
+                       Foreground="{DynamicResource AppTextPrimary}"
                        Text="New Features:"
                        Margin="20,0,20,10" />
 
             <StackPanel Margin="30,0,20,20" Orientation="Vertical">
               <TextBlock HorizontalAlignment="Left"
                          FontSize="14"
-                         Foreground="#2C3E50"
+                         Foreground="{DynamicResource AppTextPrimary}"
                          TextWrapping="Wrap"
                          Margin="0,0,0,8">
                 <Run FontWeight="Bold">• Customizable Widget Dashboard:</Run> Custom dashboard builder allowing user to create personalized views with their most important metrics and visualizations.
               </TextBlock>
               <TextBlock HorizontalAlignment="Left"
                          FontSize="14"
-                         Foreground="#2C3E50"
+                         Foreground="{DynamicResource AppTextPrimary}"
                          TextWrapping="Wrap"
                          Margin="0,0,0,8">
                 <Run FontWeight="Bold">• Predictive Analytics Dashboard:</Run> AI powered forecasting for heat demand, optimal unit scheduling based on historical patterns and weather data.
               </TextBlock>
               <TextBlock HorizontalAlignment="Left"
                          FontSize="14"
-                         Foreground="#2C3E50"
+                         Foreground="{DynamicResource AppTextPrimary}"
                          TextWrapping="Wrap"
                          Margin="0,0,0,0">
                 <Run FontWeight="Bold">• Interactive Scenario Simulator:</Run> Test "what if" conditions by adjusting fuel prices or unit availability to instantly visualize the change in expected costs and schedules before applying them.

@@ -4,7 +4,33 @@
              xmlns:views="using:Dv.App.Views"
              x:Class="Dv.App.App"
              RequestedThemeVariant="Default">
-             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key="AppBackground"       Color="#f5eeee"/>
+                    <SolidColorBrush x:Key="AppSidebar"          Color="#db0b0b"/>
+                    <SolidColorBrush x:Key="AppTextPrimary"      Color="#2C3E50"/>
+                    <SolidColorBrush x:Key="AppTextMuted"        Color="#718096"/>
+                    <SolidColorBrush x:Key="AppCard"             Color="#F0F4F8"/>
+                    <SolidColorBrush x:Key="AppCardInner"        Color="#FFFFFF"/>
+                    <SolidColorBrush x:Key="AppBorder"           Color="#E2E8F0"/>
+                    <SolidColorBrush x:Key="AppInputBackground"  Color="#F9FAFB"/>
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key="AppBackground"       Color="#111827"/>
+                    <SolidColorBrush x:Key="AppSidebar"          Color="#7A0808"/>
+                    <SolidColorBrush x:Key="AppTextPrimary"      Color="#E2E8F0"/>
+                    <SolidColorBrush x:Key="AppTextMuted"        Color="#94A3B8"/>
+                    <SolidColorBrush x:Key="AppCard"             Color="#1F2937"/>
+                    <SolidColorBrush x:Key="AppCardInner"        Color="#374151"/>
+                    <SolidColorBrush x:Key="AppBorder"           Color="#4B5563"/>
+                    <SolidColorBrush x:Key="AppInputBackground"  Color="#2D3748"/>
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
 
     <Application.Styles>
         <FluentTheme />
