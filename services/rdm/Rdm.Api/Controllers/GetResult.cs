@@ -6,6 +6,11 @@ namespace Rdm.Api.Controllers;
 public class GetResult : Controller
 {
 
+    public GetResult()
+    {
+        
+    }
+    
     [HttpGet("/test")]
     public IActionResult Test()
     {
