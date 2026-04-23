@@ -4,7 +4,37 @@
              xmlns:views="using:Dv.App.Views"
              x:Class="Dv.App.App"
              RequestedThemeVariant="Default">
-             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key="AppBackground"       Color="#F8FAFC"/>
+                    <SolidColorBrush x:Key="AppSidebar"          Color="#DC2626"/>
+                    <SolidColorBrush x:Key="AppTextPrimary"      Color="#1E293B"/>
+                    <SolidColorBrush x:Key="AppTextMuted"        Color="#64748B"/>
+                    <SolidColorBrush x:Key="AppCard"             Color="#FFFFFF"/>
+                    <SolidColorBrush x:Key="AppCardInner"        Color="#F1F5F9"/>
+                    <SolidColorBrush x:Key="AppBorder"           Color="#E2E8F0"/>
+                    <SolidColorBrush x:Key="AppInputBackground"  Color="#F8FAFC"/>
+                    <SolidColorBrush x:Key="AppNavHover"         Color="#EF4444"/>
+                    <SolidColorBrush x:Key="AppNavSelected"      Color="#B91C1C"/>
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key="AppBackground"       Color="#0F172A"/>
+                    <SolidColorBrush x:Key="AppSidebar"          Color="#7F1D1D"/>
+                    <SolidColorBrush x:Key="AppTextPrimary"      Color="#F8FAFC"/>
+                    <SolidColorBrush x:Key="AppTextMuted"        Color="#94A3B8"/>
+                    <SolidColorBrush x:Key="AppCard"             Color="#1E293B"/>
+                    <SolidColorBrush x:Key="AppCardInner"        Color="#334155"/>
+                    <SolidColorBrush x:Key="AppBorder"           Color="#475569"/>
+                    <SolidColorBrush x:Key="AppInputBackground"  Color="#0F172A"/>
+                    <SolidColorBrush x:Key="AppNavHover"         Color="#991B1B"/>
+                    <SolidColorBrush x:Key="AppNavSelected"      Color="#450A0A"/>
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
 
     <Application.Styles>
         <FluentTheme />
@@ -30,11 +60,11 @@
         </Style>
 
         <Style Selector="ListBox.nav-list > ListBoxItem:pointerover /template/ Border#ContainerBorder">
-            <Setter Property="Background" Value="#fe7575" />
+            <Setter Property="Background" Value="{DynamicResource AppNavHover}" />
         </Style>
 
         <Style Selector="ListBox.nav-list > ListBoxItem:selected /template/ Border#ContainerBorder">
-            <Setter Property="Background" Value="#fe7575" />
+            <Setter Property="Background" Value="{DynamicResource AppNavSelected}" />
         </Style>
     </Application.Styles>
 

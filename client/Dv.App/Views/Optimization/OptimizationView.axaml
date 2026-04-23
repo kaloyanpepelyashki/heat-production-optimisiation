@@ -10,37 +10,38 @@
 
       <!-- Stackpanel for upper rectangle -->
       <StackPanel Grid.Row="0" Grid.ColumnSpan="2" Margin="0">
-        <Border Background="#F0F4F8"
+        <Border Background="{DynamicResource AppCard}"
                 BoxShadow="0 4 10 0 #33000000"
                 CornerRadius="8"
                 Margin="10,0,10,10"
                 Padding="20">
-          <Grid VerticalAlignment="Top">
-            <TextBlock HorizontalAlignment="Left"
+          <Grid VerticalAlignment="Top" ColumnDefinitions="*, Auto" RowDefinitions="Auto, *">
+            <TextBlock Grid.Column="0" Grid.Row="0"
+                       HorizontalAlignment="Left"
                        VerticalAlignment="Center"
                        FontSize="28"
                        FontWeight="SemiBold"
-                       Foreground="#2C3E50"
+                       Foreground="{DynamicResource AppTextPrimary}"
                        Text="Optimization"
                        Margin="10" />
 
 
-            <StackPanel Orientation="Horizontal"
+            <WrapPanel Grid.Column="1" Grid.Row="0"
                         HorizontalAlignment="Right"
                         VerticalAlignment="Center"
                         Margin="10">
               <TextBlock VerticalAlignment="Center"
                          FontSize="14"
                          FontWeight="SemiBold"
-                         Foreground="#2C3E50"
+                         Foreground="{DynamicResource AppTextPrimary}"
                          Text="Choose Scenario: "
                          Margin="0,0,10,0" />
               <!-- Dropdown menu -->
-              <ComboBox x:Name="ScenarioComboBox" SelectedIndex="0" Width="150">
+              <ComboBox x:Name="ScenarioComboBox" SelectedIndex="0" MinWidth="120" MaxWidth="200">
                 <ComboBoxItem Content="Scenario 1" />
                 <ComboBoxItem Content="Scenario 2" />
               </ComboBox>
-            </StackPanel>
+            </WrapPanel>
           </Grid>
         </Border>
       </StackPanel>
@@ -52,104 +53,108 @@
           <!-- Scenario 1 View -->
           <StackPanel>
             <Border Padding="20">
-              <TextBlock Text="Scenario 1" FontSize="22" FontWeight="SemiBold" Foreground="#2C3E50" HorizontalAlignment="Center" />
+              <TextBlock Text="Scenario 1" FontSize="22" FontWeight="SemiBold" Foreground="{DynamicResource AppTextPrimary}" HorizontalAlignment="Center" />
             </Border>
 
-            <Border Background="#F0F4F8"
+            <Border Background="{DynamicResource AppCard}"
                     BoxShadow="0 4 10 0 #33000000"
                     CornerRadius="8"
                     Margin="10,0,10,10"
                     Padding="20">
 
 
-              <Grid VerticalAlignment="Top" RowDefinitions="Auto,Auto">
-                <TextBlock Grid.Row="0"
+              <Grid VerticalAlignment="Top" ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+                <TextBlock Grid.Row="0" Grid.Column="0"
                            HorizontalAlignment="Left"
                            VerticalAlignment="Center"
                            FontSize="18"
                            FontWeight="SemiBold"
-                           Foreground="#2C3E50"
+                           Foreground="{DynamicResource AppTextPrimary}"
                            Text="Optimization Period"
                            Margin="10" />
 
-                <StackPanel Grid.Row="0"
-                            Orientation="Horizontal"
+                <WrapPanel Grid.Row="0" Grid.Column="1"
                             HorizontalAlignment="Right"
                             VerticalAlignment="Center"
                             Margin="10">
                   <TextBlock VerticalAlignment="Center"
                              FontSize="14"
                              FontWeight="SemiBold"
-                             Foreground="#2C3E50"
+                             Foreground="{DynamicResource AppTextPrimary}"
                              Text="Choose Period: "
                              Margin="0,0,10,0" />
                   <!-- Dropdown menu periods-->
-                  <ComboBox x:Name="PeriodComboBox" SelectedIndex="0" Width="150">
+                  <ComboBox x:Name="PeriodComboBox" SelectedIndex="0" MinWidth="120" MaxWidth="200">
                     <ComboBoxItem Content="Summer" />
                     <ComboBoxItem Content="Winter" />
                   </ComboBox>
-                </StackPanel>
+                </WrapPanel>
 
 
                 <!-- Grid for two periods -->
-                <Carousel Grid.Row="1" SelectedIndex="{Binding #PeriodComboBox.SelectedIndex}" Margin="10,20,10,10">
+                <Carousel Grid.Row="1" Grid.ColumnSpan="2" SelectedIndex="{Binding #PeriodComboBox.SelectedIndex}" Margin="10,20,10,10">
                   <Carousel.Items>
 
 
                     <!-- Stackpanel for Summer view-->
                     <StackPanel Margin="10">
-                      <StackPanel Orientation="Horizontal" Spacing="40">
+                      <WrapPanel Margin="0,0,0,20">
 
                         <!-- Period Start Date -->
-                        <StackPanel Spacing="8">
-                          <TextBlock Text="Start Date" FontSize="14" Foreground="#2C3E50" FontWeight="SemiBold"/>
-                          <Border Background="#F9FAFB" BorderBrush="#E5E7EB" BorderThickness="2" CornerRadius="4" Padding="10,8" Width="200">
-                            <TextBlock Text="08/09/2025 - 00:00" Foreground="#2C3E50" VerticalAlignment="Center" />
+                        <StackPanel Spacing="8" Margin="0,0,20,20">
+                          <TextBlock Text="Start Date" FontSize="14" Foreground="{DynamicResource AppTextPrimary}" FontWeight="SemiBold"/>
+                          <Border Background="{DynamicResource AppInputBackground}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="2" CornerRadius="4" Padding="10,8" MaxWidth="250">
+                            <TextBlock Text="08/09/2025 - 00:00" Foreground="{DynamicResource AppTextPrimary}" VerticalAlignment="Center" />
                           </Border>
                         </StackPanel>
 
                         <!-- Period End Date -->
-                        <StackPanel Spacing="8">
-                          <TextBlock Text="End Date" FontSize="14" Foreground="#2C3E50" FontWeight="SemiBold"/>
-                          <Border Background="#F9FAFB" BorderBrush="#E5E7EB" BorderThickness="2" CornerRadius="4" Padding="10,8" Width="200">
-                            <TextBlock Text="21/09/2025 - 23:59" Foreground="#2C3E50" VerticalAlignment="Center" />
+                        <StackPanel Spacing="8" Margin="0,0,20,20">
+                          <TextBlock Text="End Date" FontSize="14" Foreground="{DynamicResource AppTextPrimary}" FontWeight="SemiBold"/>
+                          <Border Background="{DynamicResource AppInputBackground}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="2" CornerRadius="4" Padding="10,8" MaxWidth="250">
+                            <TextBlock Text="21/09/2025 - 23:59" Foreground="{DynamicResource AppTextPrimary}" VerticalAlignment="Center" />
 
                           </Border>
                         </StackPanel>
-                      </StackPanel>
+                      </WrapPanel>
 
                       <TextBlock VerticalAlignment="Bottom"
                                  FontSize="18"
                                  FontWeight="SemiBold"
-                                 Foreground="#2C3E50"
+                                 Foreground="{DynamicResource AppTextPrimary}"
                                  Text="Schedule Maintenance"
                                  Margin="0,20,10,0"/>
                       <TextBlock VerticalAlignment="Bottom"
                                  FontSize="14"
-                                 Foreground="#2C3E50"
+                                 Foreground="{DynamicResource AppTextPrimary}"
                                  TextWrapping="Wrap"
                                  Text="Click on a unit to mark it for maintenance. Select a time interval lasting 30-60 hours. The interval has to be during the Summer Period."
                                  Margin="0,0,10,10"/>
 
                       <!-- Selectable Table for Boilers using ListBox -->
-                      <Border Background="#FFFFFF" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="8" Padding="10">
+                      <Border Background="{DynamicResource AppCardInner}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="1" CornerRadius="8" Padding="10">
                         <StackPanel>
                           <!-- Table names -->
                           <Grid ColumnDefinitions="2*, 1*, 1*" Margin="10,5,10,10">
-                            <TextBlock Grid.Column="0" Text="Boiler ID" FontWeight="Bold" Foreground="#6B7280" />
-                            <TextBlock Grid.Column="1" Text="Fuel Type" FontWeight="Bold" Foreground="#6B7280" />
-                            <TextBlock Grid.Column="2" Text="Status" FontWeight="Bold" Foreground="#6B7280" />
+                            <TextBlock Grid.Column="0" Text="Boiler ID" FontWeight="Bold" Foreground="{DynamicResource AppTextMuted}" />
+                            <TextBlock Grid.Column="1" Text="Fuel Type" FontWeight="Bold" Foreground="{DynamicResource AppTextMuted}" />
+                            <TextBlock Grid.Column="2" Text="Status" FontWeight="Bold" Foreground="{DynamicResource AppTextMuted}" />
                           </Grid>
 
-                          <Separator Background="#E5E7EB" Height="1" Margin="0,0,0,5" />
+                          <Separator Background="{DynamicResource AppBorder}" Height="1" Margin="0,0,0,5" />
 
                           <!-- Selectable rows for maintenance -->
                           <ListBox x:Name="BoilersListBoxSummer" Background="Transparent" BorderThickness="0" CornerRadius="4">
+                            <ListBox.Styles>
+                              <Style Selector="ListBoxItem">
+                                <Setter Property="Padding" Value="0" />
+                              </Style>
+                            </ListBox.Styles>
                             <!-- GB1 -->
                             <ListBoxItem Padding="10" Tag="GB1">
                               <Grid ColumnDefinitions="2*, 1*, 1*">
-                                <TextBlock Grid.Column="0" Text="GB1" Foreground="#2C3E50" FontWeight="SemiBold" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Column="1" Text="Gas" Foreground="#2C3E50" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="0" Text="GB1" Foreground="{DynamicResource AppTextPrimary}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="1" Text="Gas" Foreground="{DynamicResource AppTextPrimary}" VerticalAlignment="Center"/>
                                 <TextBlock Grid.Column="2" Text="Active" Foreground="#10B981" VerticalAlignment="Center"/>
                               </Grid>
                             </ListBoxItem>
@@ -157,8 +162,8 @@
                             <!-- GB2 -->
                             <ListBoxItem Padding="10" Tag="GB2">
                               <Grid ColumnDefinitions="2*, 1*, 1*">
-                                <TextBlock Grid.Column="0" Text="GB2" Foreground="#2C3E50" FontWeight="SemiBold" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Column="1" Text="Gas" Foreground="#2C3E50" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="0" Text="GB2" Foreground="{DynamicResource AppTextPrimary}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="1" Text="Gas" Foreground="{DynamicResource AppTextPrimary}" VerticalAlignment="Center"/>
                                 <TextBlock Grid.Column="2" Text="Active" Foreground="#10B981" VerticalAlignment="Center"/>
                               </Grid>
                             </ListBoxItem>
@@ -166,8 +171,8 @@
                             <!-- GB3 -->
                             <ListBoxItem Padding="10" Tag="GB3">
                               <Grid ColumnDefinitions="2*, 1*, 1*">
-                                <TextBlock Grid.Column="0" Text="GB3" Foreground="#2C3E50" FontWeight="SemiBold" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Column="1" Text="Gas" Foreground="#2C3E50" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="0" Text="GB3" Foreground="{DynamicResource AppTextPrimary}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="1" Text="Gas" Foreground="{DynamicResource AppTextPrimary}" VerticalAlignment="Center"/>
                                 <TextBlock Grid.Column="2" Text="Active" Foreground="#10B981" VerticalAlignment="Center"/>
                               </Grid>
                             </ListBoxItem>
@@ -175,8 +180,8 @@
                             <!-- OB1 -->
                             <ListBoxItem Padding="10" Tag="OB1">
                               <Grid ColumnDefinitions="2*, 1*, 1*">
-                                <TextBlock Grid.Column="0" Text="OB1" Foreground="#2C3E50" FontWeight="SemiBold" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Column="1" Text="Oil" Foreground="#2C3E50" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="0" Text="OB1" Foreground="{DynamicResource AppTextPrimary}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="1" Text="Oil" Foreground="{DynamicResource AppTextPrimary}" VerticalAlignment="Center"/>
                                 <TextBlock Grid.Column="2" Text="Active" Foreground="#10B981" VerticalAlignment="Center"/>
                               </Grid>
                             </ListBoxItem>
@@ -185,34 +190,34 @@
                       </Border>
 
                       <!-- Maintenance Date choosing -->
-                      <Grid ColumnDefinitions="Auto, Auto, *" Margin="0,20,0,0">
+                      <WrapPanel Margin="0,20,0,0">
                         <!-- Maintenance start time -->
-                        <StackPanel Grid.Column="0" Spacing="8" Margin="0,0,40,0">
-                          <TextBlock Text="Maintenance Start" FontSize="14" Foreground="#2C3E50" FontWeight="SemiBold"/>
-                          <StackPanel Orientation="Horizontal" Spacing="10">
-                            <CalendarDatePicker x:Name="MaintenanceStartDatePickerSummer" Width="140" Watermark="Select date" />
-                            <TimePicker x:Name="MaintenanceStartTimePickerSummer" />
-                          </StackPanel>
+                        <StackPanel Spacing="8" Margin="0,0,40,20">
+                          <TextBlock Text="Maintenance Start" FontSize="14" Foreground="{DynamicResource AppTextPrimary}" FontWeight="SemiBold"/>
+                          <WrapPanel Margin="0,0,0,-10">
+                            <CalendarDatePicker x:Name="MaintenanceStartDatePickerSummer" Width="140" Watermark="Select date" Margin="0,0,10,10"/>
+                            <TimePicker x:Name="MaintenanceStartTimePickerSummer" Margin="0,0,0,10"/>
+                          </WrapPanel>
                         </StackPanel>
 
                         <!-- Maintenance end time -->
-                        <StackPanel Grid.Column="1" Spacing="8">
-                          <TextBlock Text="Maintenance End" FontSize="14" Foreground="#2C3E50" FontWeight="SemiBold"/>
-                          <StackPanel Orientation="Horizontal" Spacing="10">
-                            <CalendarDatePicker x:Name="MaintenanceEndDatePickerSummer" Width="140" Watermark="Select date" />
-                            <TimePicker x:Name="MaintenanceEndTimePickerSummer" />
-                          </StackPanel>
+                        <StackPanel Spacing="8" Margin="0,0,20,20">
+                          <TextBlock Text="Maintenance End" FontSize="14" Foreground="{DynamicResource AppTextPrimary}" FontWeight="SemiBold"/>
+                          <WrapPanel Margin="0,0,0,-10">
+                            <CalendarDatePicker x:Name="MaintenanceEndDatePickerSummer" Width="140" Watermark="Select date" Margin="0,0,10,10"/>
+                            <TimePicker x:Name="MaintenanceEndTimePickerSummer" Margin="0,0,0,10"/>
+                          </WrapPanel>
                         </StackPanel>
 
                         <!-- Confirm Maintenance Button -->
-                        <Button Grid.Column="2" HorizontalAlignment="Right"
+                        <Button HorizontalAlignment="Right"
                                 Click="ConfirmMaintenanceSummer_Click"
                                 Content="Confirm Maintenance"
                                 FontWeight="SemiBold"
                                 CornerRadius="4"
                                 Padding="16,8"
                                 VerticalAlignment="Bottom"
-                                Margin="0,0,0,2">
+                                Margin="0,0,0,22">
                             <Button.Styles>
                               <!-- Default state -->
                               <Style Selector="Button">
@@ -226,64 +231,69 @@
                               </Style>
                             </Button.Styles>
                           </Button>
-                      </Grid>
+                      </WrapPanel>
 
                     </StackPanel>
 
                     <!-- Stackpanel for Winter view-->
                     <StackPanel Margin="10">
-                      <StackPanel Orientation="Horizontal" Spacing="40">
+                      <WrapPanel Margin="0,0,0,20">
 
                         <!-- Period Start Date -->
-                        <StackPanel Spacing="8">
-                          <TextBlock Text="Start Date" FontSize="14" Foreground="#2C3E50" FontWeight="SemiBold"/>
-                          <Border Background="#F9FAFB" BorderBrush="#E5E7EB" BorderThickness="2" CornerRadius="4" Padding="10,8" Width="200">
-                            <TextBlock Text="05/01/2026 - 00:00" Foreground="#2C3E50" VerticalAlignment="Center" />
+                        <StackPanel Spacing="8" Margin="0,0,20,20">
+                          <TextBlock Text="Start Date" FontSize="14" Foreground="{DynamicResource AppTextPrimary}" FontWeight="SemiBold"/>
+                          <Border Background="{DynamicResource AppInputBackground}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="2" CornerRadius="4" Padding="10,8" MaxWidth="250">
+                            <TextBlock Text="05/01/2026 - 00:00" Foreground="{DynamicResource AppTextPrimary}" VerticalAlignment="Center" />
                           </Border>
                         </StackPanel>
 
                         <!-- Period End Date -->
-                        <StackPanel Spacing="8">
-                          <TextBlock Text="End Date" FontSize="14" Foreground="#2C3E50" FontWeight="SemiBold"/>
-                          <Border Background="#F9FAFB" BorderBrush="#E5E7EB" BorderThickness="2" CornerRadius="4" Padding="10,8" Width="200">
-                            <TextBlock Text="18/01/2026 - 23:59" Foreground="#2C3E50" VerticalAlignment="Center" />
+                        <StackPanel Spacing="8" Margin="0,0,20,20">
+                          <TextBlock Text="End Date" FontSize="14" Foreground="{DynamicResource AppTextPrimary}" FontWeight="SemiBold"/>
+                          <Border Background="{DynamicResource AppInputBackground}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="2" CornerRadius="4" Padding="10,8" MaxWidth="250">
+                            <TextBlock Text="18/01/2026 - 23:59" Foreground="{DynamicResource AppTextPrimary}" VerticalAlignment="Center" />
 
                           </Border>
                         </StackPanel>
-                      </StackPanel>
+                      </WrapPanel>
 
                       <TextBlock VerticalAlignment="Bottom"
                                  FontSize="18"
                                  FontWeight="SemiBold"
-                                 Foreground="#2C3E50"
+                                 Foreground="{DynamicResource AppTextPrimary}"
                                  Text="Schedule Maintenance"
                                  Margin="0,20,10,0"/>
                       <TextBlock VerticalAlignment="Bottom"
                                  FontSize="14"
-                                 Foreground="#2C3E50"
+                                 Foreground="{DynamicResource AppTextPrimary}"
                                  TextWrapping="Wrap"
                                  Text="Click on a unit to mark it for maintenance. Select a time interval lasting 30-60 hours. The interval has to be during the Winter Period."
                                  Margin="0,0,10,10"/>
 
                       <!-- Selectable Table for Boilers using ListBox -->
-                      <Border Background="#FFFFFF" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="8" Padding="10">
+                      <Border Background="{DynamicResource AppCardInner}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="1" CornerRadius="8" Padding="10">
                         <StackPanel>
                           <!-- Table names -->
                           <Grid ColumnDefinitions="2*, 1*, 1*" Margin="10,5,10,10">
-                            <TextBlock Grid.Column="0" Text="Boiler ID" FontWeight="Bold" Foreground="#6B7280" />
-                            <TextBlock Grid.Column="1" Text="Fuel Type" FontWeight="Bold" Foreground="#6B7280" />
-                            <TextBlock Grid.Column="2" Text="Status" FontWeight="Bold" Foreground="#6B7280" />
+                            <TextBlock Grid.Column="0" Text="Boiler ID" FontWeight="Bold" Foreground="{DynamicResource AppTextMuted}" />
+                            <TextBlock Grid.Column="1" Text="Fuel Type" FontWeight="Bold" Foreground="{DynamicResource AppTextMuted}" />
+                            <TextBlock Grid.Column="2" Text="Status" FontWeight="Bold" Foreground="{DynamicResource AppTextMuted}" />
                           </Grid>
 
-                          <Separator Background="#E5E7EB" Height="1" Margin="0,0,0,5" />
+                          <Separator Background="{DynamicResource AppBorder}" Height="1" Margin="0,0,0,5" />
 
                           <!-- Selectable rows for maintenance -->
                           <ListBox x:Name="BoilersListBoxWinter" Background="Transparent" BorderThickness="0" CornerRadius="4">
+                            <ListBox.Styles>
+                              <Style Selector="ListBoxItem">
+                                <Setter Property="Padding" Value="0" />
+                              </Style>
+                            </ListBox.Styles>
                             <!-- GB1 -->
                             <ListBoxItem Padding="10" Tag="GB1">
                               <Grid ColumnDefinitions="2*, 1*, 1*">
-                                <TextBlock Grid.Column="0" Text="GB1" Foreground="#2C3E50" FontWeight="SemiBold" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Column="1" Text="Gas" Foreground="#2C3E50" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="0" Text="GB1" Foreground="{DynamicResource AppTextPrimary}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="1" Text="Gas" Foreground="{DynamicResource AppTextPrimary}" VerticalAlignment="Center"/>
                                 <TextBlock Grid.Column="2" Text="Active" Foreground="#10B981" VerticalAlignment="Center"/>
                               </Grid>
                             </ListBoxItem>
@@ -291,8 +301,8 @@
                             <!-- GB2 -->
                             <ListBoxItem Padding="10" Tag="GB2">
                               <Grid ColumnDefinitions="2*, 1*, 1*">
-                                <TextBlock Grid.Column="0" Text="GB2" Foreground="#2C3E50" FontWeight="SemiBold" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Column="1" Text="Gas" Foreground="#2C3E50" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="0" Text="GB2" Foreground="{DynamicResource AppTextPrimary}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="1" Text="Gas" Foreground="{DynamicResource AppTextPrimary}" VerticalAlignment="Center"/>
                                 <TextBlock Grid.Column="2" Text="Active" Foreground="#10B981" VerticalAlignment="Center"/>
                               </Grid>
                             </ListBoxItem>
@@ -300,8 +310,8 @@
                             <!-- GB3 -->
                             <ListBoxItem Padding="10" Tag="GB3">
                               <Grid ColumnDefinitions="2*, 1*, 1*">
-                                <TextBlock Grid.Column="0" Text="GB3" Foreground="#2C3E50" FontWeight="SemiBold" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Column="1" Text="Gas" Foreground="#2C3E50" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="0" Text="GB3" Foreground="{DynamicResource AppTextPrimary}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="1" Text="Gas" Foreground="{DynamicResource AppTextPrimary}" VerticalAlignment="Center"/>
                                 <TextBlock Grid.Column="2" Text="Active" Foreground="#10B981" VerticalAlignment="Center"/>
                               </Grid>
                             </ListBoxItem>
@@ -309,8 +319,8 @@
                             <!-- OB1 -->
                             <ListBoxItem Padding="10" Tag="OB1">
                               <Grid ColumnDefinitions="2*, 1*, 1*">
-                                <TextBlock Grid.Column="0" Text="OB1" Foreground="#2C3E50" FontWeight="SemiBold" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Column="1" Text="Oil" Foreground="#2C3E50" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="0" Text="OB1" Foreground="{DynamicResource AppTextPrimary}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="1" Text="Oil" Foreground="{DynamicResource AppTextPrimary}" VerticalAlignment="Center"/>
                                 <TextBlock Grid.Column="2" Text="Active" Foreground="#10B981" VerticalAlignment="Center"/>
                               </Grid>
                             </ListBoxItem>
@@ -319,34 +329,34 @@
                       </Border>
 
                       <!-- Maintenance Date choosing -->
-                      <Grid ColumnDefinitions="Auto, Auto, *" Margin="0,20,0,0">
+                      <WrapPanel Margin="0,20,0,0">
                         <!-- Maintenance start time -->
-                        <StackPanel Grid.Column="0" Spacing="8" Margin="0,0,40,0">
-                          <TextBlock Text="Maintenance Start" FontSize="14" Foreground="#2C3E50" FontWeight="SemiBold"/>
-                          <StackPanel Orientation="Horizontal" Spacing="10">
-                            <CalendarDatePicker x:Name="MaintenanceStartDatePickerWinter" Width="140" Watermark="Select date" />
-                            <TimePicker x:Name="MaintenanceStartTimePickerWinter" />
-                          </StackPanel>
+                        <StackPanel Spacing="8" Margin="0,0,40,20">
+                          <TextBlock Text="Maintenance Start" FontSize="14" Foreground="{DynamicResource AppTextPrimary}" FontWeight="SemiBold"/>
+                          <WrapPanel Margin="0,0,0,-10">
+                            <CalendarDatePicker x:Name="MaintenanceStartDatePickerWinter" Width="140" Watermark="Select date" Margin="0,0,10,10" />
+                            <TimePicker x:Name="MaintenanceStartTimePickerWinter" Margin="0,0,0,10" />
+                          </WrapPanel>
                         </StackPanel>
 
                         <!-- Maintenance end time -->
-                        <StackPanel Grid.Column="1" Spacing="8">
-                          <TextBlock Text="Maintenance End" FontSize="14" Foreground="#2C3E50" FontWeight="SemiBold"/>
-                          <StackPanel Orientation="Horizontal" Spacing="10">
-                            <CalendarDatePicker x:Name="MaintenanceEndDatePickerWinter" Width="140" Watermark="Select date" />
-                            <TimePicker x:Name="MaintenanceEndTimePickerWinter" />
-                          </StackPanel>
+                        <StackPanel Spacing="8" Margin="0,0,20,20">
+                          <TextBlock Text="Maintenance End" FontSize="14" Foreground="{DynamicResource AppTextPrimary}" FontWeight="SemiBold"/>
+                          <WrapPanel Margin="0,0,0,-10">
+                            <CalendarDatePicker x:Name="MaintenanceEndDatePickerWinter" Width="140" Watermark="Select date" Margin="0,0,10,10"/>
+                            <TimePicker x:Name="MaintenanceEndTimePickerWinter" Margin="0,0,0,10"/>
+                          </WrapPanel>
                         </StackPanel>
 
                         <!-- Confirm Maintenance Button -->
-                        <Button Grid.Column="2" HorizontalAlignment="Right"
+                        <Button HorizontalAlignment="Right"
                                 Click="ConfirmMaintenanceWinter_Click"
                                 Content="Confirm Maintenance"
                                 FontWeight="SemiBold"
                                 CornerRadius="4"
                                 Padding="16,8"
                                 VerticalAlignment="Bottom"
-                                Margin="0,0,0,2">
+                                Margin="0,0,0,22">
                           <Button.Styles>
                             <!-- Default state -->
                             <Style Selector="Button">
@@ -360,7 +370,7 @@
                             </Style>
                           </Button.Styles>
                         </Button>
-                      </Grid>
+                      </WrapPanel>
 
                     </StackPanel>
 
@@ -390,7 +400,7 @@
           <!-- Scenario 2 View -->
           <StackPanel>
             <Border Padding="20">
-              <TextBlock Text="Scenario 2" FontSize="22" FontWeight="SemiBold" Foreground="#2C3E50" HorizontalAlignment="Center" />
+              <TextBlock Text="Scenario 2" FontSize="22" FontWeight="SemiBold" Foreground="{DynamicResource AppTextPrimary}" HorizontalAlignment="Center" />
             </Border>
           </StackPanel>
         </Carousel.Items>
