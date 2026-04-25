@@ -1,6 +1,7 @@
 ﻿using Am.Api.Application.Interfaces;
 using Am.Api.Infrastructure.Presistence;
 using Am.Api.Model.DTOs;
+using Am.Api.Infrastructure.DTOs;
 using Am.Api.Domain.Models;
 
 namespace Am.Api.Application.Services;
@@ -65,5 +66,18 @@ public class ProductionUnitService: IProductionUnitService
     public async Task<List<GasMotor>> GetAllGasMotorsAsync()
     {
         return await  _gasMotorRepository.GetAllAsync();
+    }
+
+    public async Task<List<ProductionUnitMaintenance>> GetAllProductioUnitMaintenanceAsync()
+    {
+        try
+        {
+            return await _maintenanceRepository.GetAllProductionUnitMaintenanceAsync();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Error in ProductionUnitService.GetAllOilBoilersAsync: {e.Message}");
+            throw;
+        }
     }
 }

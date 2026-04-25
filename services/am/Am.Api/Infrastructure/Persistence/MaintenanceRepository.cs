@@ -1,5 +1,6 @@
 using Am.Api.Application.Interfaces;
 using Am.Api.Model.DTOs;
+using Am.Api.Domain.Models;
 using Supabase;
 using Supabase.Postgrest.Responses;
 
@@ -15,25 +16,7 @@ public sealed class MaintenanceRepository : IMaintenanceRepository
         _client = context.GetClient();
         _logger = logger;
     }
-
-    public async Task<List<MaintenancePeriodPersistence>> GetAllMaintenancePeriodsAsync()
-    {
-        try
-        {
-            ModeledResponse<MaintenancePeriodPersistence> result = await _client
-                .From<MaintenancePeriodPersistence>()
-                .Get();
-
-            return result.Models;
-        }
-        catch (Exception e)
-        {
-            _logger.LogError($"Error fetching all in MaintenanceRepository {e.GetType()} {e.Message}");
-            throw;
-        }
-    }
-
-    public async Task<List<ProductionUnitMaintenancePersistence>> GetAllProductionUnitMaintenanceAsync()
+    public async Task<List<ProductionUnitMaintenance>> GetAllProductionUnitMaintenanceAsync()
     {
         try
         {
@@ -41,7 +24,23 @@ public sealed class MaintenanceRepository : IMaintenanceRepository
                 .From<ProductionUnitMaintenancePersistence>()
                 .Get();
 
-            return result.Models;
+            List<ProductionUnitMaintenancePersistence> persistances = result.Models;
+
+            List<ProductionUnitMaintenance> productionUnitMaintenances = new List<ProductionUnitMaintenance>();
+
+            foreach (ProductionUnitMaintenancePersistence p in persistances)
+            {
+                productionUnitMaintenances.Add( new ProductionUnitMaintenance
+                {
+                    Id = p.Id,
+                    UnitTypeId = p.UnitTypeId,
+                    UnitId = p.UnitId,
+                    CreatedAt = p.CreatedAt,
+                    FromDate = p.FromDate,
+                    ToDate = p.ToDate,
+                });
+            }
+            return productionUnitMaintenances;
         }
         catch (Exception e)
         {

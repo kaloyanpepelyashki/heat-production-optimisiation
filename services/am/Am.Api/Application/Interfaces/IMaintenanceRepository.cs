@@ -1,9 +1,7 @@
-using Am.Api.Model.DTOs;
-
+using Am.Api.Domain.Models;
 namespace Am.Api.Application.Interfaces;
 
 public interface IMaintenanceRepository
 {
-    Task<List<MaintenancePeriodPersistence>> GetAllMaintenancePeriodsAsync();
-    Task<List<ProductionUnitMaintenancePersistence>> GetAllProductionUnitMaintenanceAsync();
+    Task<List<ProductionUnitMaintenance>> GetAllProductionUnitMaintenanceAsync();
 }

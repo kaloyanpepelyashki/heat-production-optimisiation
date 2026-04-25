@@ -13,9 +13,6 @@ public class ProductionUnitMaintenancePersistence : BaseModel
     [PrimaryKey("id", false)]
     public int Id { get; set; }
 
-    [Column("maintenance_period_id")]
-    public int MaintenancePeriodId { get; set; }
-
     [Column("unit_type_id")]
     public int UnitTypeId { get; set; }
 
@@ -24,4 +21,10 @@ public class ProductionUnitMaintenancePersistence : BaseModel
 
     [Column("created_at")]
     public DateTime CreatedAt { get; set; }
+
+    [Column("from_date")]
+    public DateTime FromDate { get; set; }
+    
+    [Column("to_date")]
+    public DateTime ToDate { get; set; }
 }

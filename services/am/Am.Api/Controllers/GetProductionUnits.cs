@@ -116,7 +116,7 @@ public class GetProductionUnits : Controller
                 Co2Emissions = gasMotor.Co2Emissions,
                 GasConsumption = gasMotor.GasConsumption
             }).ToList();
-            
+
             return Ok(gasMotorDtos);
         }
         catch (Exception e)
