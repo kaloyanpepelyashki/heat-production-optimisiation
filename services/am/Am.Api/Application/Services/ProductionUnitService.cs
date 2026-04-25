@@ -68,15 +68,23 @@ public class ProductionUnitService: IProductionUnitService
         return await  _gasMotorRepository.GetAllAsync();
     }
 
-    public async Task<List<ProductionUnitMaintenance>> GetAllProductioUnitMaintenanceAsync()
+    public async Task<ProductionUnitMaintenance> GetProductionUnitMaintenanceByIdAsync(int Id)
     {
         try
         {
-            return await _maintenanceRepository.GetAllProductionUnitMaintenanceAsync();
+            ProductionUnitMaintenance? maintenance = (await _maintenanceRepository.GetAllProductionUnitMaintenanceAsync())
+                .FirstOrDefault(p => p.Id == Id);
+
+            if (maintenance is null)
+            {
+                throw new KeyNotFoundException($"No ProductionUnitMaintenance found with Id {Id}.");
+            }
+
+            return maintenance;
         }
         catch (Exception e)
         {
-            Console.WriteLine($"Error in ProductionUnitService.GetAllOilBoilersAsync: {e.Message}");
+            Console.WriteLine($"Error in ProductionUnitService.GetProductionUnitMaintenanceByIdAsync: {e.Message}");
             throw;
         }
     }

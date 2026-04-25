@@ -125,4 +125,36 @@ public class GetProductionUnits : Controller
             return StatusCode(500, "Internal Server Error");
         }
     }
+
+    [HttpGet("productionUnitMaintenancesById/{id:int}")]
+    public async Task<IActionResult> GetProductionUnitMaintenanceById(int id)
+    {
+        try
+        {
+            ProductionUnitMaintenance result =
+                await _productionUnitService.GetProductionUnitMaintenanceByIdAsync(id);
+
+            ProductionUnitMaintenanceDTO productionUnitMaintenanceDto = new ProductionUnitMaintenanceDTO
+            {
+                Id = result.Id,
+                UnitTypeId = result.UnitTypeId,
+                UnitId = result.UnitId,
+                CreatedAt = result.CreatedAt,
+                FromDate = result.FromDate,
+                ToDate = result.ToDate,
+            };
+
+            return Ok(productionUnitMaintenanceDto);
+        }
+        catch (KeyNotFoundException e)
+        {
+            Console.WriteLine($"Exception in Controller/productionUnitMaintenancesById, {e.Message}, {e.GetType()}");
+            return NotFound(e.Message);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Exception in Controller/productionUnitMaintenancesById, {e.Message}, {e.GetType()}");
+            return StatusCode(500, "Internal Server Error");
+        }
+    }
 }
