@@ -24,6 +24,7 @@ builder.Services.AddScoped<IProductionUnitRepository<GasBoiler>, GasBoilerReposi
 builder.Services.AddScoped<IProductionUnitRepository<OilBoiler>, OilBoilerRepository>();
 builder.Services.AddScoped<IProductionUnitRepository<ElectricBoiler>, ElectricBoilerRepository>();
 builder.Services.AddScoped<IProductionUnitRepository<GasMotor>, GasMotorRepository>();
+builder.Services.AddScoped<IMaintenanceRepository, MaintenanceRepository>();
 //
 
 //Registers the ProductionUnitService as a scope service (important for the dependency injection container. 

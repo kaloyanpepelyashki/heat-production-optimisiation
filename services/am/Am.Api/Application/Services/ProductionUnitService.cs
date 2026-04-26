@@ -88,4 +88,19 @@ public class ProductionUnitService: IProductionUnitService
             throw;
         }
     }
+
+    public async Task<int> PostProductionUnitMaintenanceAsync(ProductionUnitMaintenance productionUnitMaintenance)
+    {
+        try
+        {
+            int Id = await _maintenanceRepository.PostProductionUnitMaintenanceAsync(productionUnitMaintenance);
+
+            return Id;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Error in ProductionUnitService.GetProductionUnitMaintenanceByIdAsync: {e.Message}");
+            throw;
+        }
+    }
 }

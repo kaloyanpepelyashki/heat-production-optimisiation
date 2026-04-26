@@ -157,4 +157,31 @@ public class GetProductionUnits : Controller
             return StatusCode(500, "Internal Server Error");
         }
     }
+
+    [HttpPost("productionUnitMaintenance")]
+    [Consumes("application/json")]
+    public async Task<IActionResult> PostProductionUnitMaintenance([FromBody] ProductionUnitMaintenanceDTO productionUnitMaintenance)
+    {
+        try
+        {
+            ProductionUnitMaintenance maintenance = new ProductionUnitMaintenance
+            {
+                UnitTypeId = productionUnitMaintenance.UnitTypeId,
+                UnitId = productionUnitMaintenance.UnitId,
+                CreatedAt = productionUnitMaintenance.CreatedAt,
+                FromDate = productionUnitMaintenance.FromDate,
+                ToDate = productionUnitMaintenance.ToDate,
+            };
+
+            int result =
+                await _productionUnitService.PostProductionUnitMaintenanceAsync(maintenance);
+
+            return Ok(result);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Exception in Controller/productionUnitMaintenance, {e.Message}, {e.GetType()}");
+            return StatusCode(500, "Internal Server Error");
+        }
+    }
 }

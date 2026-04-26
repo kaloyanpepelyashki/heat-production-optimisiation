@@ -139,45 +139,55 @@ public class ProductionUnitService_Test
     }
 
     [Fact]
-    public async Task GetActiveGasBoilersAsync_Filters_Units_In_Maintenance_At_StartPeriod()
+    public async Task GetProductionUnitMaintenanceByIdAsync_Returns_Maintenance()
     {
-        // Arrange
-        DateTime startPeriod = new DateTime(2026, 01, 01, 10, 00, 00, DateTimeKind.Utc);
-
-        repoGasBoiler.Setup(x => x.GetAllAsync()).ReturnsAsync(new List<GasBoiler>
+        //Arrange
+        repoMaintenance.Setup(x => x.GetAllProductionUnitMaintenanceAsync()).ReturnsAsync(new List<ProductionUnitMaintenance>
         {
-            new GasBoiler { Id = 1, Name = "GB1" },
-            new GasBoiler { Id = 2, Name = "GB2" },
-        });
-
-        repoMaintenance.Setup(x => x.GetAllMaintenancePeriodsAsync()).ReturnsAsync(new List<MaintenancePeriodPersistence>
-        {
-            new MaintenancePeriodPersistence
+            new ProductionUnitMaintenance
             {
-                Id = 10,
-                StartTime = startPeriod.AddHours(0),
-                EndTime = startPeriod.AddHours(1)
-            },
-        });
-
-        repoMaintenance.Setup(x => x.GetAllProductionUnitMaintenanceAsync()).ReturnsAsync(new List<ProductionUnitMaintenancePersistence>
-        {
-            new ProductionUnitMaintenancePersistence
-            {
-                Id = 100,
-                MaintenancePeriodId = 10,
+                Id = 42,
                 UnitTypeId = 1,
-                UnitId = 1
+                UnitId = 7,
+                CreatedAt = new DateTime(2026, 01, 01, 10, 00, 00, DateTimeKind.Utc),
+                FromDate = new DateTime(2026, 01, 02, 00, 00, 00, DateTimeKind.Utc),
+                ToDate = new DateTime(2026, 01, 03, 00, 00, 00, DateTimeKind.Utc),
             },
         });
 
-        var service = new ProductionUnitService(repoGasBoiler.Object, repoOilBoiler.Object,  repoElectricBoiler.Object, repoGasMotor.Object, repoMaintenance.Object);
+        var service = new ProductionUnitService(repoGasBoiler.Object, repoOilBoiler.Object, repoElectricBoiler.Object, repoGasMotor.Object, repoMaintenance.Object);
 
-        // Act
-        List<GasBoiler> result = await service.GetActiveGasBoilersAsync(startPeriod);
+        //Act
+        ProductionUnitMaintenance result = await service.GetProductionUnitMaintenanceByIdAsync(42);
 
-        // Assert
-        Assert.Single(result);
-        Assert.Equal(2, result[0].Id);
+        //Assert
+        Assert.Equal(42, result.Id);
+        Assert.Equal(1, result.UnitTypeId);
+        Assert.Equal(7, result.UnitId);
+    }
+
+    [Fact]
+    public async Task PostProductionUnitMaintenanceAsync_Returns_New_Id()
+    {
+        //Arrange
+        repoMaintenance
+            .Setup(x => x.PostProductionUnitMaintenanceAsync(It.IsAny<ProductionUnitMaintenance>()))
+            .ReturnsAsync(123);
+
+        var service = new ProductionUnitService(repoGasBoiler.Object, repoOilBoiler.Object, repoElectricBoiler.Object, repoGasMotor.Object, repoMaintenance.Object);
+
+        ProductionUnitMaintenance maintenanceToPost = new ProductionUnitMaintenance
+        {
+            UnitTypeId = 1,
+            UnitId = 7,
+            FromDate = new DateTime(2026, 02, 01, 00, 00, 00, DateTimeKind.Utc),
+            ToDate = new DateTime(2026, 02, 02, 00, 00, 00, DateTimeKind.Utc),
+        };
+
+        //Act
+        int result = await service.PostProductionUnitMaintenanceAsync(maintenanceToPost);
+
+        //Assert
+        Assert.Equal(123, result);
     }
 }
