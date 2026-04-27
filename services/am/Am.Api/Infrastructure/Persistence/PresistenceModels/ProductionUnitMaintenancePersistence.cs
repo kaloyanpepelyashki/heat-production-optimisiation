@@ -24,7 +24,13 @@ public class ProductionUnitMaintenancePersistence : BaseModel
 
     [Column("from_date")]
     public DateTime FromDate { get; set; }
-    
+
     [Column("to_date")]
     public DateTime ToDate { get; set; }
+
+    [Column("period_id")]
+    public int PeriodId { get; set; }
+
+    [Column("scenario_id")]
+    public int ScenarioId { get; set; }
 }

@@ -8,4 +8,7 @@ public class ProductionUnitMaintenance
     public DateTime CreatedAt;
     public DateTime FromDate;
     public DateTime ToDate;
+    public int PeriodId;
+    public int ScenarioId;
+
 }

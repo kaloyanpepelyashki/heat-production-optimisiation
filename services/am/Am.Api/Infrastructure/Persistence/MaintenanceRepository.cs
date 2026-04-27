@@ -39,6 +39,8 @@ public sealed class MaintenanceRepository : IMaintenanceRepository
                     CreatedAt = p.CreatedAt,
                     FromDate = p.FromDate,
                     ToDate = p.ToDate,
+                    PeriodId = p.PeriodId,
+                    ScenarioId = p.ScenarioId,
                 });
             }
             return productionUnitMaintenances;
@@ -66,6 +68,8 @@ public sealed class MaintenanceRepository : IMaintenanceRepository
                 CreatedAt = maintenance.CreatedAt == default ? DateTime.UtcNow : maintenance.CreatedAt,
                 FromDate = maintenance.FromDate,
                 ToDate = maintenance.ToDate,
+                PeriodId = maintenance.PeriodId,
+                ScenarioId = maintenance.ScenarioId,
             };
 
             ModeledResponse<ProductionUnitMaintenancePersistence> result = await _client

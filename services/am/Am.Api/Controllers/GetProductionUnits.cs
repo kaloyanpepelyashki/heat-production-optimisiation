@@ -142,6 +142,8 @@ public class GetProductionUnits : Controller
                 CreatedAt = result.CreatedAt,
                 FromDate = result.FromDate,
                 ToDate = result.ToDate,
+                PeriodId = result.ScenarioId,
+                ScenarioId = result.ScenarioId,
             };
 
             return Ok(productionUnitMaintenanceDto);
@@ -171,6 +173,8 @@ public class GetProductionUnits : Controller
                 CreatedAt = productionUnitMaintenance.CreatedAt,
                 FromDate = productionUnitMaintenance.FromDate,
                 ToDate = productionUnitMaintenance.ToDate,
+                PeriodId = productionUnitMaintenance.PeriodId,
+                ScenarioId = productionUnitMaintenance.ScenarioId,
             };
 
             int result =
