@@ -7,6 +7,8 @@ namespace Dv.App.Models;
 public class MaintenanceEvent
 {
     public string AssetName { get; set; } = string.Empty;
+    public int BoilerId { get; set; }
+    public string BoilerType { get; set; } = string.Empty;
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
     public string Period { get; set; } = string.Empty;

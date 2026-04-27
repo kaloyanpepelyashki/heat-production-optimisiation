@@ -4,6 +4,7 @@
 **/bin/
 **/obj/
 *.user
+.vscode/
 
 # Keep the base config file
 !appsettings.json
