@@ -1,6 +1,12 @@
 @Opt.Api_HostAddress = http://localhost:5042
 
-GET {{Opt.Api_HostAddress}}/weatherforecast/
-Accept: application/json
+POST {{Opt.Api_HostAddress}}/api/OptimizationResults/optimize?periodId=1
+Content-Type: application/json
+
+{
+	"includeMaintenanceSchedules": false,
+	"timeFrom": "2026-04-26T00:00:00Z",
+	"timeTo": "2026-04-26T23:59:59Z"
+}
 
 ###

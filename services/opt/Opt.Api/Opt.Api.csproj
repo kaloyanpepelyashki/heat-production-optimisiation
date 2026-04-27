@@ -15,4 +15,7 @@
     </PackageReference>
   </ItemGroup>
 
+<PropertyGroup>
+  <RunAnalyzers>false</RunAnalyzers>
+</PropertyGroup>
 </Project>
