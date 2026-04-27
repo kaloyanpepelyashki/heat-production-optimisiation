@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Text.RegularExpressions;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
@@ -25,6 +24,7 @@ namespace Dv.App.Views;
 public partial class OptimizationView : UserControl
 {
     private readonly IApiService apiService;
+    private readonly MaintenanceService maintenanceService;
     private readonly ObservableCollection<BoilerStatusViewModel> summerBoilers;
     private readonly ObservableCollection<BoilerStatusViewModel> winterBoilers;
 
@@ -32,6 +32,7 @@ public partial class OptimizationView : UserControl
     {
         this.InitializeComponent();
         this.apiService = new ApiService();
+        this.maintenanceService = new MaintenanceService();
         this.summerBoilers = this.CreateBoilerRows("Summer");
         this.winterBoilers = this.CreateBoilerRows("Winter");
         this.BoilersListBoxSummer.ItemsSource = this.summerBoilers;
@@ -82,7 +83,8 @@ public partial class OptimizationView : UserControl
 
             if (confirmed)
             {
-                CommitMaintenance(boilerId, startDateTime, endDateTime, "Summer");
+                var selectedScenario = this.GetSelectedScenario();
+                this.maintenanceService.SaveMaintenance(boilerId, startDateTime, endDateTime, "Summer", selectedScenario);
             }
         }
         else
@@ -130,7 +132,8 @@ public partial class OptimizationView : UserControl
 
             if (confirmed)
             {
-                CommitMaintenance(boilerId, startDateTime, endDateTime, "Winter");
+                var selectedScenario = this.GetSelectedScenario();
+                this.maintenanceService.SaveMaintenance(boilerId, startDateTime, endDateTime, "Winter", selectedScenario);
             }
         }
         else
@@ -139,24 +142,12 @@ public partial class OptimizationView : UserControl
         }
     }
 
-    private static void CommitMaintenance(string boilerId, DateTime startDateTime, DateTime endDateTime, string period)
+    private string GetSelectedScenario()
     {
-        var boilerMetadata = ParseBoilerMetadata(boilerId);
+        var selectedScenarioItem = this.ScenarioComboBox.SelectedItem as ComboBoxItem;
+        var selectedScenario = selectedScenarioItem?.Content?.ToString();
 
-        // Printing into debug console to test
-        System.Diagnostics.Debug.WriteLine($"BoilerId: {boilerMetadata.BoilerId}");
-        System.Diagnostics.Debug.WriteLine($"BoilerType: {boilerMetadata.BoilerType}");
-
-        MaintenanceStore.MaintenanceSchedules.Add(new MaintenanceEvent
-        {
-            AssetName = boilerId,
-            BoilerId = boilerMetadata.BoilerId,
-            BoilerType = boilerMetadata.BoilerType,
-            StartDate = startDateTime,
-            EndDate = endDateTime,
-            Period = period,
-            Scenario = "1"
-        });
+        return string.IsNullOrWhiteSpace(selectedScenario) ? "Scenario 1" : selectedScenario;
     }
 
     private void MaintenanceSchedules_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -185,8 +176,9 @@ public partial class OptimizationView : UserControl
     {
         foreach (var boiler in boilers)
         {
+            var boilerPeriodId = this.maintenanceService.GetPeriodId(boiler.Period);
             var isUnavailable = MaintenanceStore.MaintenanceSchedules.Any(schedule =>
-                schedule.Period == boiler.Period && schedule.AssetName == boiler.BoilerId);
+                schedule.Period == boilerPeriodId && schedule.AssetName == boiler.BoilerId);
 
             boiler.SetUnavailable(isUnavailable);
         }
@@ -206,23 +198,8 @@ public partial class OptimizationView : UserControl
 
     private bool HasMaintenanceForPeriod(string period)
     {
-        return MaintenanceStore.MaintenanceSchedules.Any(schedule => schedule.Period == period);
-    }
-
-    // Getting boilerId and boilerType from the users input
-    private static (int BoilerId, string BoilerType) ParseBoilerMetadata(string boilerName)
-    {
-        var trimmedName = boilerName.Trim();
-        var boilerType = trimmedName.StartsWith("GB", StringComparison.OrdinalIgnoreCase)
-            ? "Gas"
-            : trimmedName.StartsWith("OB", StringComparison.OrdinalIgnoreCase)
-                ? "Oil"
-                : string.Empty;
-
-        var boilerIdText = Regex.Match(trimmedName, @"\d+").Value;
-        _ = int.TryParse(boilerIdText, out var boilerId);
-
-        return (boilerId, boilerType);
+        var periodId = this.maintenanceService.GetPeriodId(period);
+        return MaintenanceStore.MaintenanceSchedules.Any(schedule => schedule.Period == periodId);
     }
 
     private async Task<bool> ShowMaintenanceConfirmationDialog(
@@ -497,15 +474,6 @@ public partial class OptimizationView : UserControl
         };
     }
 
-    // Getting the mode from the settingsview, so that the graphs also change based on the users preference
-    private SolidColorPaint GetAxisNamePaint()
-    {
-        var isDarkMode = Avalonia.Application.Current?.ActualThemeVariant == Avalonia.Styling.ThemeVariant.Dark;
-        var axisTitleColor = isDarkMode ? SKColor.Parse("#E2E8F0") : SKColor.Parse("#334155");
-
-        return new SolidColorPaint(axisTitleColor);
-    }
-
     // Error message that pops up when the user enters an invalid time interval
     // await does not work without async (makes the program wait for the user to close the window)
     private async Task ShowValidationDialog(string message)
@@ -554,6 +522,15 @@ public partial class OptimizationView : UserControl
         {
             dialog.Show();
         }
+    }
+
+    // Getting the mode from the settingsview, so that the graphs also change based on the users preference
+    private SolidColorPaint GetAxisNamePaint()
+    {
+        var isDarkMode = Avalonia.Application.Current?.ActualThemeVariant == Avalonia.Styling.ThemeVariant.Dark;
+        var axisTitleColor = isDarkMode ? SKColor.Parse("#E2E8F0") : SKColor.Parse("#334155");
+
+        return new SolidColorPaint(axisTitleColor);
     }
 
     private Avalonia.Styling.ThemeVariant GetCurrentThemeVariant()
