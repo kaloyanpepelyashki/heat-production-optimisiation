@@ -3,7 +3,7 @@ namespace Am.Api.Domain.Models;
 public class ProductionUnitMaintenance
 {
     public int Id;
-    public int UnitTypeId;
+    public string UnitType;
     public int UnitId;
     public DateTime CreatedAt;
     public DateTime FromDate;

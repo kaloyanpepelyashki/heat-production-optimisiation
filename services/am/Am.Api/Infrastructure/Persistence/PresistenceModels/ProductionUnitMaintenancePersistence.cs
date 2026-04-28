@@ -13,8 +13,8 @@ public class ProductionUnitMaintenancePersistence : BaseModel
     [PrimaryKey("id", false)]
     public int Id { get; set; }
 
-    [Column("unit_type_id")]
-    public int UnitTypeId { get; set; }
+    [Column("unit_type")]
+    public string UnitType { get; set; }
 
     [Column("unit_id")]
     public int UnitId { get; set; }

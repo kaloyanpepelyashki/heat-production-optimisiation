@@ -137,12 +137,12 @@ public class GetProductionUnits : Controller
             ProductionUnitMaintenanceDTO productionUnitMaintenanceDto = new ProductionUnitMaintenanceDTO
             {
                 Id = result.Id,
-                UnitTypeId = result.UnitTypeId,
+                UnitType = result.UnitType,
                 UnitId = result.UnitId,
                 CreatedAt = result.CreatedAt,
                 FromDate = result.FromDate,
                 ToDate = result.ToDate,
-                PeriodId = result.ScenarioId,
+                PeriodId = result.PeriodId,
                 ScenarioId = result.ScenarioId,
             };
 
@@ -168,7 +168,7 @@ public class GetProductionUnits : Controller
         {
             ProductionUnitMaintenance maintenance = new ProductionUnitMaintenance
             {
-                UnitTypeId = productionUnitMaintenance.UnitTypeId,
+                UnitType = productionUnitMaintenance.UnitType,
                 UnitId = productionUnitMaintenance.UnitId,
                 CreatedAt = productionUnitMaintenance.CreatedAt,
                 FromDate = productionUnitMaintenance.FromDate,

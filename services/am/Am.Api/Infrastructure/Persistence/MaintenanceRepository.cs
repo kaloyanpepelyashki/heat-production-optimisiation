@@ -34,7 +34,7 @@ public sealed class MaintenanceRepository : IMaintenanceRepository
                 productionUnitMaintenances.Add(new ProductionUnitMaintenance
                 {
                     Id = p.Id,
-                    UnitTypeId = p.UnitTypeId,
+                    UnitType = p.UnitType,
                     UnitId = p.UnitId,
                     CreatedAt = p.CreatedAt,
                     FromDate = p.FromDate,
@@ -63,7 +63,7 @@ public sealed class MaintenanceRepository : IMaintenanceRepository
 
             ProductionUnitMaintenancePersistence persistence = new ProductionUnitMaintenancePersistence
             {
-                UnitTypeId = maintenance.UnitTypeId,
+                UnitType = maintenance.UnitType,
                 UnitId = maintenance.UnitId,
                 CreatedAt = maintenance.CreatedAt == default ? DateTime.UtcNow : maintenance.CreatedAt,
                 FromDate = maintenance.FromDate,
