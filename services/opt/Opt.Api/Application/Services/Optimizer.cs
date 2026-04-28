@@ -146,7 +146,6 @@ public class Optimizer
         {
             Id = null,
             OptRunId = optRunId,
-            PeriodId = point.PeriodId,
             HeatProduction = point.HeatDemand,
             ElectricityConsumption = 0d,
             Expenses = CalculateHourlyExpenses(point.HeatDemand, availableBoilers),
