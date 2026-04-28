@@ -37,8 +37,12 @@ public sealed class AmDataProvider : IAssetDataProvider
             var gasMotorsTask = _httpClient.GetFromJsonAsync<List<AmGasMotorResponseDto>>(
                 _options.Am.GasMotorsEndpoint,
                 cancellationToken);
-
-            await Task.WhenAll(gasBoilersTask, oilBoilersTask, electricBoilersTask, gasMotorsTask);
+           /*
+            var maintenanceSchedulesTask = _httpClient.GetFromJsonAsync<List<AmMaintenanceScheduleResponseDto>>(
+                _options.Am.MaintenanceSchedulesEndpoint,
+                cancellationToken);
+            */
+            await Task.WhenAll(gasBoilersTask, oilBoilersTask, electricBoilersTask, gasMotorsTask); //, maintenanceSchedulesTask
 
             var gasBoilers = (await gasBoilersTask ?? []).Select(x => new GasBoiler
             {
@@ -79,6 +83,21 @@ public sealed class AmDataProvider : IAssetDataProvider
                 Co2Emissions = x.Co2Emissions,
                 GasConsumption = x.GasConsumption,
             }).ToList();
+/*
+            var maintenanceSchedules = (await maintenanceSchedulesTask ?? [])
+            .Select(x => new MaintenanceSchedule
+            {
+                Id = x.Id,
+                UnitType = x.UnitType,
+                UnitId = x.UnitId,
+                CreatedAt = x.CreatedAt,
+                FromDate = x.FromDate,
+                ToDate = x.ToDate,
+                PeriodId = x.PeriodId,
+                ScenarioId = x.ScenarioId,
+            })
+            .ToList();
+          */
 
             return new AssetDataBundle
             {
@@ -86,7 +105,7 @@ public sealed class AmDataProvider : IAssetDataProvider
                 OilBoilers = oilBoilers,
                 ElectricBoilers = electricBoilers,
                 GasMotors = gasMotors,
-                MaintenanceSchedules = [],
+                MaintenanceSchedules = [] //maintenanceSchedules
             };
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or NotSupportedException)

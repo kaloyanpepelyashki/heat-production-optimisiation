@@ -42,7 +42,12 @@ public sealed class AmGasMotorResponseDto
 
 public sealed class AmMaintenanceScheduleResponseDto
 {
+	public int Id { get; set; }
+	public string UnitType { get; set; } = string.Empty;
 	public int UnitId { get; set; }
-	public DateTime StartUtc { get; set; }
-	public DateTime EndUtc { get; set; }
+	public DateTime CreatedAt { get; set; }
+	public DateTime FromDate { get; set; }
+	public DateTime ToDate { get; set; }
+	public int PeriodId { get; set; }
+	public int ScenarioId { get; set; }
 }

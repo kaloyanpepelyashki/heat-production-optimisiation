@@ -51,9 +51,14 @@ public sealed class GasMotor
 
 public sealed class MaintenanceSchedule
 {
-    public int UnitId { get; init; }
-    public DateTime StartUtc { get; init; }
-    public DateTime EndUtc { get; init; }
+	public int Id { get; init; }
+	public string UnitType { get; init; } = string.Empty;
+	public int UnitId { get; init; }
+	public DateTime CreatedAt { get; init; }
+	public DateTime FromDate { get; init; }
+	public DateTime ToDate { get; init; }
+	public int PeriodId { get; init; }
+	public int ScenarioId { get; init; }
 }
 
 public sealed class SourceDataPoint

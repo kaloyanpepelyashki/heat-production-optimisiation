@@ -2,7 +2,6 @@ namespace Opt.Api.DTOs;
 
 public sealed class OptimizationRequestDto
 {
-    public bool IncludeMaintenanceSchedules { get; set; }
     public DateTime TimeFrom { get; set; }
     public DateTime TimeTo { get; set; }
 }
