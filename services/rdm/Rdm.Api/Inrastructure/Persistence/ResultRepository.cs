@@ -13,13 +13,13 @@ namespace Rdm.Api.Inrastructure.Persistence;
 public class ResultRepository : IResultRepository
 {
     private readonly Client _client;
-    private readonly DatabaseContext _databaseContext;
+    private readonly IDatabaseContext<Client> _databaseContext;
     
     private readonly ILogger<ResultRepository> _logger;
 
-    public ResultRepository(IDatabaseContext<Client> _databaseContext, ILogger<ResultRepository> logger)
+    public ResultRepository(IDatabaseContext<Client> databaseContext, ILogger<ResultRepository> logger)
     {
-        _databaseContext = _databaseContext;
+        _databaseContext = databaseContext;
         _client = _databaseContext.GetClient();
         _logger = logger;
     }
@@ -28,14 +28,16 @@ public class ResultRepository : IResultRepository
     /// Returns all optimisation results records.
     /// The method performs a join, joining each of the rows in optimisation_results table and the optimisation_production_units table rows belonging to the specific optimisation result. 
     /// </summary>
-    /// <returns> List of ResultPersistence, each counatining the optimisation result itself and the production units belonging to it </returns>
+    /// <returns> List of OptimisationRunPersistence, each counatining the optimisation result itself and the production units belonging to it </returns>
     /// <exception cref="DatabaseOperationException">Will throw an exception if the database query fails</exception>
-    public async Task<List<ResultPersistence>> GetAllOptimisationResults()
+    public async Task<List<OptimisationRunPersistence>> GetAllOptimisationResults()
     {
         try
         {
-            var databaseResponse = await _client.From<ResultPersistence>().Select("*, optimisation:optimisation_id(*, optimisation_production_units(*))").Get();
-            List<ResultPersistence> results = databaseResponse.Models;
+            var databaseResponse = await _client.From<OptimisationRunPersistence>()
+                .Select("*, optimisation_results_hourly(*, optimisation_production_units(*))")
+                .Get();
+            List<OptimisationRunPersistence> results = databaseResponse.Models;
 
             return results;
         }
@@ -53,19 +55,19 @@ public class ResultRepository : IResultRepository
     /// Joins the optimisation_result table with the optimisation_production_units table.
     /// </summary>
     /// <returns> ResultPersistence containing the optimisation result itself and the production units belonging to it</returns>
-    public async Task<ResultPersistence> GetLatestOptimisationResult()
+    public async Task<OptimisationRunPersistence> GetLatestOptimisationResult()
     {
         try
         {
             var currentDate = DateTime.Now;
-            var databaseResponse = await _client.From<ResultPersistence>()
-                                       .Filter("date_run", Constants.Operator.LessThanOrEqual, currentDate)
-                                       .Order("date_run", Constants.Ordering.Descending)
+            var databaseResponse = await _client.From<OptimisationRunPersistence>()
+                                       .Filter("created_at", Constants.Operator.LessThanOrEqual, currentDate)
+                                       .Order("created_at", Constants.Ordering.Descending)
                                        .Limit(1)
-                                       .Select("*, optimisation:optimisation_id(*, optimisation_production_units(*))")
+                                       .Select("*, optimisation_results_hourly(*, optimisation_production_units(*))")
                                        .Get();
 
-            ResultPersistence result = databaseResponse.Model;
+            OptimisationRunPersistence result = databaseResponse.Model;
             
             return result;
         }
@@ -77,21 +79,51 @@ public class ResultRepository : IResultRepository
     }
     
     
-    //TODO - Has to be changed, after the Database schema is updated. 
-    public async Task<ResultPersistence> SaveOptimisationResult(ResultPersistence result)
+    /// <summary>
+    /// Takes care of inserting an optimisation entry to the database. First writes the OptimisationRun entry, in case the write operation is a success, populates the Hourly schedule entry and the production units entry.
+    /// In case the first insert operation is a fail, throws an error. 
+    /// </summary>
+    /// <param name="result"></param>
+    /// <returns></returns>
+    /// <exception cref="DatabaseOperationException"></exception>
+    public async Task<bool> SaveOptimisationResult(OptimisationRunPersistence result)
     {
         try
         {
-            var inserionResult = await _client.From<ResultPersistence>().Insert(result);
-            var dataBaseResponse = inserionResult.Model;
+            var runInsertResponse = await _client
+                .From<OptimisationRunPersistence>()
+                .Insert(result);
 
-            if (dataBaseResponse != null)
+            var insertedRun = runInsertResponse.Models.First();
+
+            if (insertedRun != null)
             {
-                throw new DatabaseOperationException("Error inserting optimisation result. ");
+                throw new DatabaseOperationException("Error in ResultRepository. Failed to write optimisation run to database.");
             }
             
-            return dataBaseResponse;
             
+            // TODO Trnasaction security has to be implemented - if one insert fails, the whole trail has to be deleted. 
+            foreach (var hourly in result.OptimisationResultsHourly)
+            {
+                hourly.OptimisationRunId = insertedRun.Id;
+
+                var hourlyResponse = await _client
+                    .From<OptimisationResultsHourlyPersistence>()
+                    .Insert(hourly);
+
+                var insertedHourly = hourlyResponse.Models.First();
+                
+                foreach (var unit in hourly.ProductionUnits)
+                {
+                    unit.OptimisationRunHourlyId = insertedHourly.Id;
+
+                    await _client
+                        .From<OptimisationProductionUnitPersistence>()
+                        .Insert(unit);
+                }
+            }
+            
+            return true;
         }
         catch (Exception e)
         {
