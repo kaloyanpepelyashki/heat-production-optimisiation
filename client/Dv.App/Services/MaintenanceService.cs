@@ -3,19 +3,31 @@ namespace Dv.App.Services;
 using System;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using Avalonia.Threading;
 using Dv.App.Models;
+using Dv.App.Services;
 
 public sealed class MaintenanceService
 {
-    public void SaveMaintenance(string boilerId, DateTime startDateTime, DateTime endDateTime, string period, string scenario)
+    private readonly IApiService apiService =  new ApiService();
+    public async void SaveMaintenance(string boilerId, DateTime startDateTime, DateTime endDateTime, string period, string scenario)
     {
         var boilerMetadata = ParseBoilerMetadata(boilerId);
         var periodId = this.GetPeriodId(period);
         var scenarioId = GetScenarioId(scenario);
 
         // Print all selected maintenance input in one log line.
-        Debug.WriteLine(
-            $"Maintenance input -> Boiler: {boilerId}, BoilerId: {boilerMetadata.BoilerId}, BoilerType: {boilerMetadata.BoilerType}, Start: {startDateTime:yyyy-MM-dd HH:mm}, End: {endDateTime:yyyy-MM-dd HH:mm}, Period: {periodId}, Scenario: {scenarioId}");
+        ProductionUnitMaintenanceDTO productionUnitMaintenanceDTO = new ProductionUnitMaintenanceDTO
+        {
+            UnitId = boilerMetadata.BoilerId,
+            UnitType = boilerId.Substring(0,2),
+            CreatedAt = DateTime.UtcNow,
+            FromDate = startDateTime,
+            ToDate = endDateTime,
+            PeriodId = int.Parse(periodId),
+            ScenarioId = int.Parse(scenarioId),
+        };
+        int maintenanceId = await this.apiService.PostAsync<ProductionUnitMaintenanceDTO, int>(BackendService.Am, "api/GetProductionUnits/productionUnitMaintenance", productionUnitMaintenanceDTO);
 
         MaintenanceStore.MaintenanceSchedules.Add(new MaintenanceEvent
         {
