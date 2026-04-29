@@ -25,42 +25,53 @@ public partial class OptimizationView : UserControl
 {
     private readonly IApiService apiService;
     private readonly MaintenanceService maintenanceService;
-    private readonly ObservableCollection<BoilerStatusViewModel> summerBoilers;
-    private readonly ObservableCollection<BoilerStatusViewModel> winterBoilers;
+    private readonly ObservableCollection<BoilerStatusViewModel> summerBoilersScenario1;
+    private readonly ObservableCollection<BoilerStatusViewModel> winterBoilersScenario1;
+    private readonly ObservableCollection<BoilerStatusViewModel> summerBoilersScenario2;
+    private readonly ObservableCollection<BoilerStatusViewModel> winterBoilersScenario2;
 
     public OptimizationView()
     {
         this.InitializeComponent();
         this.apiService = new ApiService();
         this.maintenanceService = new MaintenanceService();
-        this.summerBoilers = this.CreateBoilerRows("Summer");
-        this.winterBoilers = this.CreateBoilerRows("Winter");
-        this.BoilersListBoxSummer.ItemsSource = this.summerBoilers;
-        this.BoilersListBoxWinter.ItemsSource = this.winterBoilers;
-        this.MaintenanceScheduleItemsControlSummer.ItemsSource = MaintenanceStore.MaintenanceSchedules;
-        this.MaintenanceScheduleItemsControlWinter.ItemsSource = MaintenanceStore.MaintenanceSchedules;
+        this.summerBoilersScenario1 = this.CreateBoilerRows("Summer");
+        this.winterBoilersScenario1 = this.CreateBoilerRows("Winter");
+        this.summerBoilersScenario2 = this.CreateBoilerRowsScenario2("Summer");
+        this.winterBoilersScenario2 = this.CreateBoilerRowsScenario2("Winter");
+        
+        this.BoilersListBoxSummerScenario1.ItemsSource = this.summerBoilersScenario1;
+        this.BoilersListBoxWinterScenario1.ItemsSource = this.winterBoilersScenario1;
+        
+        this.BoilersListBoxSummerScenario2.ItemsSource = this.summerBoilersScenario2;
+        this.BoilersListBoxWinterScenario2.ItemsSource = this.winterBoilersScenario2;
+        this.MaintenanceScheduleItemsControlSummerScenario2.ItemsSource = MaintenanceStore.MaintenanceSchedules;
+        this.MaintenanceScheduleItemsControlWinterScenario2.ItemsSource = MaintenanceStore.MaintenanceSchedules;
+        
+        this.MaintenanceScheduleItemsControlSummerScenario1.ItemsSource = MaintenanceStore.MaintenanceSchedules;
+        this.MaintenanceScheduleItemsControlWinterScenario1.ItemsSource = MaintenanceStore.MaintenanceSchedules;
         MaintenanceStore.MaintenanceSchedules.CollectionChanged += this.MaintenanceSchedules_CollectionChanged;
         this.UpdateBoilerStatuses();
         _ = this.LoadSeasonChartsAsync();
     }
 
-    private async void SelectMaintenanceSummer_Click(object? sender, RoutedEventArgs e)
+    private async void SelectMaintenanceSummerScenario1_Click(object? sender, RoutedEventArgs e)
     {
-        var selectedItem = this.BoilersListBoxSummer.SelectedItem as BoilerStatusViewModel;
+        var selectedItem = this.BoilersListBoxSummerScenario1.SelectedItem as BoilerStatusViewModel;
         string boilerId = selectedItem?.BoilerId ?? "No Boiler Selected";
 
-        if (!await this.EnsureMaintenanceCapacityAvailableAsync("Summer"))
+        if (!await this.EnsureMaintenanceCapacityAvailableAsync("Summer", "1"))
         {
             return;
         }
 
-        var startDate = MaintenanceStartDatePickerSummer.SelectedDate;
-        var startHour = MaintenanceStartHourSummer.Value;
+        var startDate = MaintenanceStartDatePickerSummerScenario1.SelectedDate;
+        var startHour = MaintenanceStartHourSummerScenario1.Value;
 
         if (startDate.HasValue && startHour.HasValue)
         {
             var startDateTime = startDate.Value.Date.AddHours((double)startHour.Value);
-            double durationHours = MaintenanceDurationSliderSummer.Value;
+            double durationHours = MaintenanceDurationSliderSummerScenario1.Value;
             var endDateTime = startDateTime.AddHours(durationHours);
 
             // YYYY/MM/DD + H/MM
@@ -93,26 +104,122 @@ public partial class OptimizationView : UserControl
         }
     }
 
-    private async void SelectMaintenanceWinter_Click(object? sender, RoutedEventArgs e)
+    private async void SelectMaintenanceWinterScenario1_Click(object? sender, RoutedEventArgs e)
     {
-        var selectedItem = this.BoilersListBoxWinter.SelectedItem as BoilerStatusViewModel;
+        var selectedItem = this.BoilersListBoxWinterScenario1.SelectedItem as BoilerStatusViewModel;
         string boilerId = selectedItem?.BoilerId ?? "No Boiler Selected";
 
-        if (!await this.EnsureMaintenanceCapacityAvailableAsync("Winter"))
+        if (!await this.EnsureMaintenanceCapacityAvailableAsync("Winter", "1"))
         {
             return;
         }
 
-        var startDate = MaintenanceStartDatePickerWinter.SelectedDate;
-        var startHour = MaintenanceStartHourWinter.Value;
+        var startDate = MaintenanceStartDatePickerWinterScenario1.SelectedDate;
+        var startHour = MaintenanceStartHourWinterScenario1.Value;
 
         if (startDate.HasValue && startHour.HasValue)
         {
             var startDateTime = startDate.Value.Date.AddHours((double)startHour.Value);
-            double durationHours = MaintenanceDurationSliderWinter.Value;
+            double durationHours = MaintenanceDurationSliderWinterScenario1.Value;
             var endDateTime = startDateTime.AddHours(durationHours);
 
             // YYYY/MM/DD + H/MM
+            var periodStart = new DateTime(2026, 1, 5, 0, 0, 0);
+            var periodEnd = new DateTime(2026, 1, 18, 23, 59, 59);
+
+            if (startDateTime < periodStart || endDateTime > periodEnd)
+            {
+                await ShowValidationDialog($"Maintenance interval must be within the Winter period:\n{periodStart:dd.MM.yyyy HH:mm} to {periodEnd:dd.MM.yyyy HH:mm}");
+                return;
+            }
+
+            var confirmed = await ShowMaintenanceConfirmationDialog(
+                "Winter",
+                boilerId,
+                startDateTime,
+                endDateTime,
+                periodStart,
+                periodEnd);
+
+            if (confirmed)
+            {
+                var selectedScenario = this.GetSelectedScenario();
+                this.maintenanceService.SaveMaintenance(boilerId, startDateTime, endDateTime, "Winter", selectedScenario);
+            }
+        }
+        else
+        {
+            await ShowValidationDialog("Please completely fill out the Date/Time fields.");
+        }
+    }
+
+    private async void SelectMaintenanceSummerScenario2_Click(object? sender, RoutedEventArgs e)
+    {
+        var selectedItem = this.BoilersListBoxSummerScenario2.SelectedItem as BoilerStatusViewModel;
+        string boilerId = selectedItem?.BoilerId ?? "No Boiler Selected";
+
+        if (!await this.EnsureMaintenanceCapacityAvailableAsync("Summer", "2"))
+        {
+            return;
+        }
+
+        var startDate = MaintenanceStartDatePickerSummerScenario2.SelectedDate;
+        var startHour = MaintenanceStartHourSummerScenario2.Value;
+
+        if (startDate.HasValue && startHour.HasValue && MaintenanceDurationSliderSummerScenario2 != null)
+        {
+            var startDateTime = startDate.Value.Date.AddHours((double)startHour.Value);
+            double durationHours = MaintenanceDurationSliderSummerScenario2.Value;
+            var endDateTime = startDateTime.AddHours(durationHours);
+
+            var periodStart = new DateTime(2025, 9, 8, 0, 0, 0);
+            var periodEnd = new DateTime(2025, 9, 21, 23, 59, 59);
+
+            if (startDateTime < periodStart || endDateTime > periodEnd)
+            {
+                await ShowValidationDialog($"Maintenance interval must be within the Summer period:\n{periodStart:dd.MM.yyyy HH:mm} to {periodEnd:dd.MM.yyyy HH:mm}");
+                return;
+            }
+
+            var confirmed = await ShowMaintenanceConfirmationDialog(
+                "Summer",
+                boilerId,
+                startDateTime,
+                endDateTime,
+                periodStart,
+                periodEnd);
+
+            if (confirmed)
+            {
+                var selectedScenario = this.GetSelectedScenario();
+                this.maintenanceService.SaveMaintenance(boilerId, startDateTime, endDateTime, "Summer", selectedScenario);
+            }
+        }
+        else
+        {
+            await ShowValidationDialog("Please completely fill out the Date/Time fields.");
+        }
+    }
+
+    private async void SelectMaintenanceWinterScenario2_Click(object? sender, RoutedEventArgs e)
+    {
+        var selectedItem = this.BoilersListBoxWinterScenario2.SelectedItem as BoilerStatusViewModel;
+        string boilerId = selectedItem?.BoilerId ?? "No Boiler Selected";
+
+        if (!await this.EnsureMaintenanceCapacityAvailableAsync("Winter", "2"))
+        {
+            return;
+        }
+
+        var startDate = MaintenanceStartDatePickerWinterScenario2.SelectedDate;
+        var startHour = MaintenanceStartHourWinterScenario2.Value;
+
+        if (startDate.HasValue && startHour.HasValue && MaintenanceDurationSliderSummerScenario2 != null)
+        {
+            var startDateTime = startDate.Value.Date.AddHours((double)startHour.Value);
+            double durationHours = MaintenanceDurationSliderSummerScenario2.Value;
+            var endDateTime = startDateTime.AddHours(durationHours);
+
             var periodStart = new DateTime(2026, 1, 5, 0, 0, 0);
             var periodEnd = new DateTime(2026, 1, 18, 23, 59, 59);
 
@@ -166,42 +273,57 @@ public partial class OptimizationView : UserControl
         };
     }
 
-    private void UpdateBoilerStatuses()
+    private ObservableCollection<BoilerStatusViewModel> CreateBoilerRowsScenario2(string period)
     {
-        this.UpdateBoilerStatuses(this.summerBoilers);
-        this.UpdateBoilerStatuses(this.winterBoilers);
+        return new ObservableCollection<BoilerStatusViewModel>
+        {
+            new BoilerStatusViewModel("GB1", "Gas", period),
+            new BoilerStatusViewModel("GB2", "Gas", period),
+            new BoilerStatusViewModel("GM1", "Gas", period),
+            new BoilerStatusViewModel("EB1", "Electric", period),
+        };
     }
 
-    private void UpdateBoilerStatuses(IEnumerable<BoilerStatusViewModel> boilers)
+    private void UpdateBoilerStatuses()
+    {
+        this.UpdateBoilerStatuses(this.summerBoilersScenario1, "1");
+        this.UpdateBoilerStatuses(this.winterBoilersScenario1, "1");
+        this.UpdateBoilerStatuses(this.summerBoilersScenario2, "2");
+        this.UpdateBoilerStatuses(this.winterBoilersScenario2, "2");
+    }
+
+    private void UpdateBoilerStatuses(IEnumerable<BoilerStatusViewModel> boilers, string scenario)
     {
         foreach (var boiler in boilers)
         {
             var boilerPeriodId = this.maintenanceService.GetPeriodId(boiler.Period);
             var isUnavailable = MaintenanceStore.MaintenanceSchedules.Any(schedule =>
-                schedule.Period == boilerPeriodId && schedule.AssetName == boiler.BoilerId);
+                schedule.Period == boilerPeriodId && schedule.AssetName == boiler.BoilerId && schedule.Scenario == scenario);
 
             boiler.SetUnavailable(isUnavailable);
         }
     }
 
-    // Makes it so only one maintenance can be reserved in a period (Case requirements, we dont need more)
-    private async Task<bool> EnsureMaintenanceCapacityAvailableAsync(string period)
+    // Makes it so only one maintenance can be reserved per period in each scenario
+    private async Task<bool> EnsureMaintenanceCapacityAvailableAsync(string period, string scenario)
     {
-        if (this.HasMaintenanceForPeriod(period))
+        if (this.HasMaintenanceForPeriod(period, scenario))
         {
-            await this.ShowValidationDialog($"The maximum amount of maintenances has been reached for the {period} period.");
+            await this.ShowValidationDialog($"The maximum amount of maintenances has been reached for the {period} period in Scenario {scenario}.");
             return false;
         }
 
         return true;
     }
 
-    private bool HasMaintenanceForPeriod(string period)
+    // checks if maintenance is already scheduled
+    private bool HasMaintenanceForPeriod(string period, string scenario)
     {
         var periodId = this.maintenanceService.GetPeriodId(period);
-        return MaintenanceStore.MaintenanceSchedules.Any(schedule => schedule.Period == periodId);
+        return MaintenanceStore.MaintenanceSchedules.Any(schedule => schedule.Period == periodId && schedule.Scenario == scenario);
     }
 
+    // window for confirming maintenance with all relevant details
     private async Task<bool> ShowMaintenanceConfirmationDialog(
         string period,
         string boilerId,
@@ -336,10 +458,10 @@ public partial class OptimizationView : UserControl
     // Summer and winter period charts
     private async Task LoadSeasonChartsAsync()
     {
-        var summerHeatDemandChart = this.FindControl<CartesianChart>("SummerHeatDemandChart");
-        var summerElectricityPriceChart = this.FindControl<CartesianChart>("SummerElectricityPriceChart");
-        var winterHeatDemandChart = this.FindControl<CartesianChart>("WinterHeatDemandChart");
-        var winterElectricityPriceChart = this.FindControl<CartesianChart>("WinterElectricityPriceChart");
+        var summerHeatDemandChart = this.FindControl<CartesianChart>("SummerHeatDemandChartScenario1");
+        var summerElectricityPriceChart = this.FindControl<CartesianChart>("SummerElectricityPriceChartScenario1");
+        var winterHeatDemandChart = this.FindControl<CartesianChart>("WinterHeatDemandChartScenario1");
+        var winterElectricityPriceChart = this.FindControl<CartesianChart>("WinterElectricityPriceChartScenario1");
         if (summerHeatDemandChart is null || summerElectricityPriceChart is null || winterHeatDemandChart is null || winterElectricityPriceChart is null)
         {
             return;
@@ -372,6 +494,35 @@ public partial class OptimizationView : UserControl
             2500,
             "#F59E0B",
             "#3B82F6");
+
+        var summerHeatDemandChartScenario2 = this.FindControl<CartesianChart>("SummerHeatDemandChartScenario2");
+        var summerElectricityPriceChartScenario2 = this.FindControl<CartesianChart>("SummerElectricityPriceChartScenario2");
+        var winterHeatDemandChartScenario2 = this.FindControl<CartesianChart>("WinterHeatDemandChartScenario2");
+        var winterElectricityPriceChartScenario2 = this.FindControl<CartesianChart>("WinterElectricityPriceChartScenario2");
+
+        if (summerHeatDemandChartScenario2 != null && summerElectricityPriceChartScenario2 != null)
+        {
+            this.ConfigureSeasonCharts(
+                sourceData.Where(item => item.PeriodId == 1).OrderBy(item => item.TimeFrom).ToList(),
+                summerHeatDemandChartScenario2,
+                summerElectricityPriceChartScenario2,
+                4.5,
+                3500,
+                "#F59E0B",
+                "#3B82F6");
+        }
+
+        if (winterHeatDemandChartScenario2 != null && winterElectricityPriceChartScenario2 != null)
+        {
+            this.ConfigureSeasonCharts(
+                sourceData.Where(item => item.PeriodId == 2).OrderBy(item => item.TimeFrom).ToList(),
+                winterHeatDemandChartScenario2,
+                winterElectricityPriceChartScenario2,
+                12,
+                2500,
+                "#F59E0B",
+                "#3B82F6");
+        }
     }
 
     private void ConfigureSeasonCharts(
