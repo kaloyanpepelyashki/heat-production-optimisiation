@@ -147,7 +147,7 @@ public class ProductionUnitService_Test
             new ProductionUnitMaintenance
             {
                 Id = 42,
-                UnitTypeId = 1,
+                UnitType = "gasBoiler",
                 UnitId = 7,
                 CreatedAt = new DateTime(2026, 01, 01, 10, 00, 00, DateTimeKind.Utc),
                 FromDate = new DateTime(2026, 01, 02, 00, 00, 00, DateTimeKind.Utc),
@@ -162,7 +162,7 @@ public class ProductionUnitService_Test
 
         //Assert
         Assert.Equal(42, result.Id);
-        Assert.Equal(1, result.UnitTypeId);
+        Assert.Equal("gasBoiler", result.UnitType);
         Assert.Equal(7, result.UnitId);
     }
 
@@ -178,7 +178,7 @@ public class ProductionUnitService_Test
 
         ProductionUnitMaintenance maintenanceToPost = new ProductionUnitMaintenance
         {
-            UnitTypeId = 1,
+            UnitType = "gasBoiler",
             UnitId = 7,
             FromDate = new DateTime(2026, 02, 01, 00, 00, 00, DateTimeKind.Utc),
             ToDate = new DateTime(2026, 02, 02, 00, 00, 00, DateTimeKind.Utc),
