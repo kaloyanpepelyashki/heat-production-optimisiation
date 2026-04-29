@@ -6,7 +6,7 @@
                VerticalAlignment="Center"
                FontSize="28"
                FontWeight="SemiBold"
-               Foreground="#2C3E50"
+               Foreground="{DynamicResource AppTextPrimary}"
                Text="Source Data View" />
   </Grid>
 </UserControl>
