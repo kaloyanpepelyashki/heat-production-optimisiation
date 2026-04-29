@@ -1,4 +1,4 @@
-﻿using Am.Api.Application.Exceptions;
+﻿﻿using Am.Api.Application.Exceptions;
 using Am.Api.Application.Interfaces;
 using Am.Api.Model.DTOs;
 using Am.Api.Domain.Models;
@@ -17,7 +17,7 @@ public class OilBoilerRepository : IProductionUnitRepository<OilBoiler>
     public OilBoilerRepository(DatabaseContext context, ILogger<OilBoilerRepository> logger)
     {
         _context = context;
-        _client = context.GetClient();
+        _client = _context.GetClient();
         _logger = logger;
     }
     
