@@ -116,12 +116,75 @@ public class GetProductionUnits : Controller
                 Co2Emissions = gasMotor.Co2Emissions,
                 GasConsumption = gasMotor.GasConsumption
             }).ToList();
-            
+
             return Ok(gasMotorDtos);
         }
         catch (Exception e)
         {
             Console.WriteLine($"Exception in Controller/allGasMotors, {e.Message}, {e.GetType()}");
+            return StatusCode(500, "Internal Server Error");
+        }
+    }
+
+    [HttpGet("productionUnitMaintenancesById/{id:int}")]
+    public async Task<IActionResult> GetProductionUnitMaintenanceById(int id)
+    {
+        try
+        {
+            ProductionUnitMaintenance result =
+                await _productionUnitService.GetProductionUnitMaintenanceByIdAsync(id);
+
+            ProductionUnitMaintenanceDTO productionUnitMaintenanceDto = new ProductionUnitMaintenanceDTO
+            {
+                Id = result.Id,
+                UnitType = result.UnitType,
+                UnitId = result.UnitId,
+                CreatedAt = result.CreatedAt,
+                FromDate = result.FromDate,
+                ToDate = result.ToDate,
+                PeriodId = result.PeriodId,
+                ScenarioId = result.ScenarioId,
+            };
+
+            return Ok(productionUnitMaintenanceDto);
+        }
+        catch (KeyNotFoundException e)
+        {
+            Console.WriteLine($"Exception in Controller/productionUnitMaintenancesById, {e.Message}, {e.GetType()}");
+            return NotFound(e.Message);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Exception in Controller/productionUnitMaintenancesById, {e.Message}, {e.GetType()}");
+            return StatusCode(500, "Internal Server Error");
+        }
+    }
+
+    [HttpPost("productionUnitMaintenance")]
+    [Consumes("application/json")]
+    public async Task<IActionResult> PostProductionUnitMaintenance([FromBody] ProductionUnitMaintenanceDTO productionUnitMaintenance)
+    {
+        try
+        {
+            ProductionUnitMaintenance maintenance = new ProductionUnitMaintenance
+            {
+                UnitType = productionUnitMaintenance.UnitType,
+                UnitId = productionUnitMaintenance.UnitId,
+                CreatedAt = productionUnitMaintenance.CreatedAt,
+                FromDate = productionUnitMaintenance.FromDate,
+                ToDate = productionUnitMaintenance.ToDate,
+                PeriodId = productionUnitMaintenance.PeriodId,
+                ScenarioId = productionUnitMaintenance.ScenarioId,
+            };
+
+            int result =
+                await _productionUnitService.PostProductionUnitMaintenanceAsync(maintenance);
+
+            return Ok(result);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Exception in Controller/productionUnitMaintenance, {e.Message}, {e.GetType()}");
             return StatusCode(500, "Internal Server Error");
         }
     }

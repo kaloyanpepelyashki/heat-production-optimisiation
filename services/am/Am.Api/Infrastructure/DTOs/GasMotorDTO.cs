@@ -9,4 +9,5 @@ public class GasMotorDTO
     public float ProductionCost { get; set; }
     public int Co2Emissions { get; set; }
     public float GasConsumption { get; set; }
+    public bool Active { get; set; } = true;
 }
