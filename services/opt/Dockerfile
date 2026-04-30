@@ -1,7 +1,7 @@
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
-COPY stylecop.json .
+COPY services/opt/stylecop.json .
 COPY Opt.Api/Opt.Api.csproj Opt.Api/
 RUN dotnet restore Opt.Api/Opt.Api.csproj
 
