@@ -32,7 +32,7 @@ public class DatabaseContext : IDatabaseContext<Client>
 
         var supabaseOptions = new SupabaseOptions
         {
-            Schema = "optimisation_result"
+            Schema = "result_data_manager"
         };
         
         _client = new Client(configuration.Url, configuration.ApiKey, supabaseOptions);

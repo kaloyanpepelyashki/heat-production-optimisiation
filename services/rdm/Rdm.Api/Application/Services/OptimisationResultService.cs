@@ -6,7 +6,10 @@ using Rdm.Api.Inrastructure.Persistence.PersistenceModels;
 
 namespace Rdm.Api.Application.Services;
 
-public class OptimisationResultService
+/// <summary>
+/// Provides all methods needed for working with the result object
+/// </summary>
+public class OptimisationResultService : IOptimisationResultService
 {
     private IResultRepository _resultRepository;
     private ILogger<OptimisationResultService> _logger;
@@ -19,42 +22,84 @@ public class OptimisationResultService
     
     /// <summary>
     /// Gets all the optimisation results present in the database and the production unit objects associated with them.
-    /// Calls the GetAllOptimisationResults method from the ResultRepository class. 
+    /// Calls the GetAllOptimisationResults method from the ResultRepository class.
+    /// Maps the persistence models coming from database to abase domain model. Nests the models in the OptimisationRun returned. Countains information about the hourly optimisation and the production units
+    /// used for each hour.
     /// </summary>
     /// <returns>A list of all optimisation results present</returns>
-    public async Task<List<OptimisationResult>> GetAllOptimisationResults()
+    public async Task<List<OptimisationRun>> GetAllOptimisationResults()
     {
         try
         {
-            List<ResultPersistence> persistenceModel = await _resultRepository.GetAllOptimisationResults();
-            List<OptimisationResult> optimisationResultsModels = persistenceModel.Select(obj =>
+            // Maps the persistence models coming from database to abase domain model
+            List<OptimisationRunPersistence> persistenceModel = await _resultRepository.GetAllOptimisationResults();
+            List<OptimisationRun> optimisationResultsModels = persistenceModel.Select(obj => new OptimisationRun
             {
-                List<ProductionUnit> productionUnits = obj.optimisationProductionUnits.Select(opu => new ProductionUnit
-                {
-                    Id = opu.Id,
-                    ProductionUnitId = opu.ProductionUnitId,
-                    ProductionUnitType = opu.ProductionUnitType
-                }).ToList();
+                Id = obj.Id,
+                TimeFrom = obj.TimeFrom,
+                TimeTo = obj.TimeTo,
+                Scenario = obj.Scenario,
+                PeriodType = obj.Type,
 
-                return new OptimisationResult
+                OptimisationResultsHourly = obj.OptimisationResultsHourly.Select(hourly => new OptimisationResultsHourly
                 {
-                    Id = obj.Id,
-                    HeatProduction = obj.HeatProduction,
-                    ElectricityConsumption = obj.ElectricityConsumption,
-                    Expenses = obj.Expenses,
-                    Profit = obj.Profit,
-                    ProducedCo2Emissions = obj.ProducedCo2Emissions,
-                    DateRun = obj.DateRun,
-                    ProductionUnits = productionUnits,
-                };
+                    Id = hourly.Id,
+                    HeatProduction = hourly.HeatProduction,
+                    ElectricityConsumption = hourly.ElectricityConsumption,
+                    Co2Emissions = hourly.Co2Emissions,
+                    Expenses = hourly.Expenses,
+                    TimeFrom = hourly.TimeFrom,
+                    TimeTo = hourly.TimeTo,
+
+                    ProductionUnits = hourly.ProductionUnits.Select(opu => new ProductionUnit
+                    {
+                        Id = opu.Id,
+                        ProductionUnitId = opu.ProductionUnitId,
+                        ProductionUnitType = opu.ProductionUnitType,
+                        Capacity = opu.Capacity
+                    }).ToList()
+                }).ToList()
             }).ToList();
 
             return optimisationResultsModels;
         }
         catch (DatabaseOperationException e)
         {
-            _logger.LogError($"Error in OptimisationResultService. Failed to get all optimisation results due to database born error : {e.Message}, {e.GetType()}");
-            throw; 
+            _logger.LogError(
+                $"Error in OptimisationResultService. Database operation error. Failed to get all optimisation results due to a database born error : {e.Message}, {e.GetType()}");
+            throw;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError($"Error in OptimisationResultService. Failed to get all optimisations Error: {e.Message}, {e.GetType()}");
+            throw;
+        }
+    }
+
+    
+    /// <summary>
+    /// In charge of creating a new optimisation run object. 
+    /// </summary>
+    /// <param name="optimisationRun"></param>
+    /// <returns></returns>
+    public async Task<bool> CreateOptimisationRun(OptimisationRun optimisationRun)
+    {
+        try
+        {
+            
+            
+            
+            return true; 
+        }
+        catch (DatabaseOperationException e)
+        {
+            _logger.LogError($"Error in OptimisationResultService. Database operation error. Failed to create a new optimisation run due to a database born error: {e.Message}, {e.GetType()}");
+            throw;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError($"Error in OptimisationResultService. Failed to get all optimisations Error: {e.Message}, {e.GetType()}");
+            throw;
         }
     }
 } 

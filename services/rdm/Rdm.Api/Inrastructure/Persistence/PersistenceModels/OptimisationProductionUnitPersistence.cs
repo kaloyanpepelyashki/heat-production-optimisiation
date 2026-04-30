@@ -15,5 +15,5 @@ public class OptimisationProductionUnitPersistence: BaseModel
     [Column("production_unit_type")]
     public string ProductionUnitType { get; set; }
     [Column("capacity")]
-    public int Capacity { get; set; }
+    public double Capacity { get; set; }
 }

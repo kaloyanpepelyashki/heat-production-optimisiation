@@ -94,32 +94,35 @@ public class ResultRepository : IResultRepository
                 .From<OptimisationRunPersistence>()
                 .Insert(result);
 
-            var insertedRun = runInsertResponse.Models.First();
+            OptimisationRunPersistence? insertedRun = runInsertResponse.Models.FirstOrDefault();
 
-            if (insertedRun != null)
+            if (insertedRun == null)
             {
                 throw new DatabaseOperationException("Error in ResultRepository. Failed to write optimisation run to database.");
             }
             
-            
-            // TODO Trnasaction security has to be implemented - if one insert fails, the whole trail has to be deleted. 
-            foreach (var hourly in result.OptimisationResultsHourly)
+            foreach (OptimisationResultsHourlyPersistence hourly in result.OptimisationResultsHourly)
             {
-                hourly.OptimisationRunId = insertedRun.Id;
-
-                var hourlyResponse = await _client
-                    .From<OptimisationResultsHourlyPersistence>()
-                    .Insert(hourly);
-
-                var insertedHourly = hourlyResponse.Models.First();
                 
-                foreach (var unit in hourly.ProductionUnits)
-                {
-                    unit.OptimisationRunHourlyId = insertedHourly.Id;
+                (bool Succeess, OptimisationResultsHourlyPersistence? Hourly) hourlyCreationResult = await CreateOptimisationHourlyEntry(hourly, insertedRun.Id);
 
-                    await _client
-                        .From<OptimisationProductionUnitPersistence>()
-                        .Insert(unit);
+                if (!hourlyCreationResult.Succeess || hourlyCreationResult.Hourly == null)
+                {
+                     await _client.From<OptimisationRunPersistence>().Where(x => x.Id == insertedRun.Id).Delete();
+                     return false;
+                }
+                
+                
+                foreach (OptimisationProductionUnitPersistence productionUnit in hourly.ProductionUnits)
+                {
+                    (bool, OptimisationProductionUnitPersistence?) productionUnitCreationResult = await CreateProductionUnitEntry(productionUnit, hourlyCreationResult.Item2.Id);
+
+                    if (!productionUnitCreationResult.Item1)
+                    {
+                        await _client.From<OptimisationRunPersistence>().Where(x => x.Id == insertedRun.Id).Delete();
+                        await _client.From<OptimisationResultsHourlyPersistence>().Where(x => x.Id == hourlyCreationResult.Item2.Id).Delete();
+                        return false;
+                    }
                 }
             }
             
@@ -130,5 +133,64 @@ public class ResultRepository : IResultRepository
             throw new DatabaseOperationException($"Error inserting optimisation result. {e.Message}", e);
         }
     }
+
+    private async Task<(bool Success, OptimisationResultsHourlyPersistence? Hourly)> CreateOptimisationHourlyEntry(OptimisationResultsHourlyPersistence hourlyResult, int optimisationRunId)
+    {
+        try
+        {
+            hourlyResult.OptimisationRunId = optimisationRunId;
+
+            var hourlyResponse = await _client
+                .From<OptimisationResultsHourlyPersistence>()
+                .Insert(hourlyResult);
+
+            OptimisationResultsHourlyPersistence? insertedHourly =
+                hourlyResponse.Models.FirstOrDefault();
+
+            if (insertedHourly == null)
+            {
+                throw new DatabaseOperationException(
+                    "Error in ResultRepository. Error creating result hourly entry. Failed to write optimisation hourly result to database.");
+            }
+
+            return (true, insertedHourly);
+        }
+        catch (DatabaseOperationException e)
+        {
+            _logger.LogError($"Error inserting optimisation result. {e.Message}");
+            Console.WriteLine(e);
+            
+            return (false, null);
+        }
+    }
+
+    private async Task<(bool, OptimisationProductionUnitPersistence)> CreateProductionUnitEntry(OptimisationProductionUnitPersistence productionUnit, int hourlyResultId)
+    {
+        try
+        {
+            productionUnit.OptimisationRunHourlyId = hourlyResultId;
+
+            var productionUnitResponse = await _client
+                .From<OptimisationProductionUnitPersistence>()
+                .Insert(productionUnit);
+            
+            OptimisationProductionUnitPersistence? insertedProductionUnit = productionUnitResponse.Models.FirstOrDefault();
+
+            if (insertedProductionUnit == null)
+            {
+                throw new DatabaseOperationException("Error in ResultRepository. Error creating result production unit.");
+            }
+            
+            return (true, insertedProductionUnit);
+        }
+        catch (DatabaseOperationException e)
+        {
+            _logger.LogError($"Error inserting optimisation result. {e.Message}");
+            Console.WriteLine(e);
+            
+            return (false, null);
+        }
+    }
+    
 
 }

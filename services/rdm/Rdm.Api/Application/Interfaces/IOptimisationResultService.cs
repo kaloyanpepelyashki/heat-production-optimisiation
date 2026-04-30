@@ -4,6 +4,6 @@ namespace Rdm.Api.Application.Interfaces;
 
 public interface IOptimisationResultService
 {
-    public Task<List<OptimisationResult>> GetAllOptimisationResults();
-    public Task<OptimisationResult> GetLatestOptimisationResult();
+    public Task<List<OptimisationRun>> GetAllOptimisationResults();
+    // public Task<OptimisationRun> GetLatestOptimisationResult();
 }   
