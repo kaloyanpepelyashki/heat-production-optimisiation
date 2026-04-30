@@ -8,4 +8,6 @@ public class GasBoilerDTO
         public float ProductionCost { get; set; }
         public int Co2Emissions { get; set; }
         public float GasConsumption { get; set; }
+        public float Consumption => GasConsumption;
+        public bool Active { get; set; } = true;
 }

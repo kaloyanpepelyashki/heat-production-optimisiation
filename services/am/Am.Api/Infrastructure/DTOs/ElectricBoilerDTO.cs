@@ -7,4 +7,5 @@ public class ElectricBoilerDTO
     public float  MaxHeat { get; set; }
     public float ProductionCost { get; set; }
     public float MaxElectricity { get; set; }
+    public bool Active { get; set; } = true;
 }
