@@ -18,7 +18,7 @@ public sealed class AmDataProvider : IAssetDataProvider
         _options = options.Value;
     }
 
-    public async Task<AssetDataBundle> GetAssetDataAsync(CancellationToken cancellationToken)
+    public async Task<AssetDataBundle> GetAssetDataAsync(int maintenanceId, CancellationToken cancellationToken)
     {
         try
         {
@@ -37,12 +37,12 @@ public sealed class AmDataProvider : IAssetDataProvider
             var gasMotorsTask = _httpClient.GetFromJsonAsync<List<AmGasMotorResponseDto>>(
                 _options.Am.GasMotorsEndpoint,
                 cancellationToken);
-           /*
-            var maintenanceSchedulesTask = _httpClient.GetFromJsonAsync<List<AmMaintenanceScheduleResponseDto>>(
-                _options.Am.MaintenanceSchedulesEndpoint,
+           
+            var maintenanceScheduleTask = _httpClient.GetFromJsonAsync<AmMaintenanceScheduleResponseDto>(
+                _options.Am.ResolveMaintenanceSchedulesEndpoint(maintenanceId),
                 cancellationToken);
-            */
-            await Task.WhenAll(gasBoilersTask, oilBoilersTask, electricBoilersTask, gasMotorsTask); //, maintenanceSchedulesTask
+            
+            await Task.WhenAll(gasBoilersTask, oilBoilersTask, electricBoilersTask, gasMotorsTask, maintenanceScheduleTask); 
 
             var gasBoilers = (await gasBoilersTask ?? []).Select(x => new GasBoiler
             {
@@ -83,21 +83,21 @@ public sealed class AmDataProvider : IAssetDataProvider
                 Co2Emissions = x.Co2Emissions,
                 GasConsumption = x.GasConsumption,
             }).ToList();
-/*
-            var maintenanceSchedules = (await maintenanceSchedulesTask ?? [])
-            .Select(x => new MaintenanceSchedule
+
+            var maintenanceSchedule = (await maintenanceScheduleTask) is { } schedule
+                ? new MaintenanceSchedule
             {
-                Id = x.Id,
-                UnitType = x.UnitType,
-                UnitId = x.UnitId,
-                CreatedAt = x.CreatedAt,
-                FromDate = x.FromDate,
-                ToDate = x.ToDate,
-                PeriodId = x.PeriodId,
-                ScenarioId = x.ScenarioId,
-            })
-            .ToList();
-          */
+                Id = schedule.Id,
+                UnitType = schedule.UnitType,
+                UnitId = schedule.UnitId,
+                CreatedAt = schedule.CreatedAt,
+                FromDate = schedule.FromDate,
+                ToDate = schedule.ToDate,
+                PeriodId = schedule.PeriodId,
+                ScenarioId = schedule.ScenarioId,
+            }
+                : null;
+          
 
             return new AssetDataBundle
             {
@@ -105,7 +105,7 @@ public sealed class AmDataProvider : IAssetDataProvider
                 OilBoilers = oilBoilers,
                 ElectricBoilers = electricBoilers,
                 GasMotors = gasMotors,
-                MaintenanceSchedules = [] //maintenanceSchedules
+                MaintenanceSchedule = maintenanceSchedule,
             };
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or NotSupportedException)

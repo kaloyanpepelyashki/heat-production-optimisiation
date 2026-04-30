@@ -20,14 +20,13 @@ public class OptimizationResults : Controller
     
     [HttpPost("optimize")]
     public async Task<IActionResult> Optimize(
-        [FromBody] OptimizationRequestDto request,  
-        [FromQuery] int periodId, //e.g. /api/OptimizationResults/optimize?periodId=2 when dealing with query of POST req
-        [FromQuery] int optRunId, //e.g. /api/OptimizationResults/optimize?periodId=1&optRunId=1 when dealing with query of POST req
+        [FromBody] OptimizationRequestDto request,
+          
         CancellationToken cancellationToken)
     {
         try
         {
-            var result = await _optimizer.OptimizeAsync(request, periodId, optRunId, cancellationToken);
+            var result = await _optimizer.OptimizeAsync(request, cancellationToken);
             return Ok(result);
         }
         catch (ArgumentException e)

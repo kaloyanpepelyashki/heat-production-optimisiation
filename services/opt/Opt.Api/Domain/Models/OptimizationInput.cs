@@ -6,7 +6,7 @@ public sealed class AssetDataBundle
     public IReadOnlyList<OilBoiler> OilBoilers { get; init; } = [];
     public IReadOnlyList<ElectricBoiler> ElectricBoilers { get; init; } = [];
     public IReadOnlyList<GasMotor> GasMotors { get; init; } = [];
-    public IReadOnlyList<MaintenanceSchedule> MaintenanceSchedules { get; init; } = [];
+    public MaintenanceSchedule? MaintenanceSchedule { get; init; }
 }
 
 public sealed class GasBoiler
@@ -69,11 +69,4 @@ public sealed class SourceDataPoint
     public DateTime TimeTo { get; init; }
     public double HeatDemand { get; init; }
     public double ElectricityPrice { get; init; }
-}
-
-public sealed class OptimizationInput
-{
-    public AssetDataBundle Assets { get; init; } = new();
-    public IReadOnlyList<SourceDataPoint> SourceData { get; init; } = [];
-    public bool IncludeMaintenanceSchedules { get; init; }
 }

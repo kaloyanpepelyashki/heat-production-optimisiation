@@ -4,5 +4,5 @@ namespace Opt.Api.Application.Interfaces;
 
 public interface IAssetDataProvider
 {
-	Task<AssetDataBundle> GetAssetDataAsync(CancellationToken cancellationToken);
+	Task<AssetDataBundle> GetAssetDataAsync(int maintenanceId, CancellationToken cancellationToken);
 }

@@ -2,7 +2,7 @@
 using Opt.Api.Application.Interfaces;
 using Opt.Api.DTOs;
 using Opt.Api.Domain.Models;
-
+using Opt.Api.Application.Exceptions;
 namespace Opt.Api.Application.Services;
 
 public class Optimizer
@@ -18,29 +18,27 @@ public class Optimizer
 
     public async Task<OptimizationResponseDto> OptimizeAsync(
         OptimizationRequestDto request,
-        int periodId,
-        int optRunId,
         CancellationToken cancellationToken)
     {
+        
 
-        var assetsTask = _assetDataProvider.GetAssetDataAsync(cancellationToken);
+        try {
+            
+        var assetsTask = _assetDataProvider.GetAssetDataAsync(request.MaintenanceId, cancellationToken);
         var sourceDataTask = _sourceDataProvider.GetSourceDataAsync(cancellationToken);
-
-        await Task.WhenAll(assetsTask, sourceDataTask);
 
         var assets = await assetsTask;
         var sourceData = (await sourceDataTask)
-            .Where(x => x.PeriodId == periodId)
+            .Where(x => x.PeriodId == request.PeriodId)
             .Where(x => x.TimeFrom >= request.TimeFrom && x.TimeTo <= request.TimeTo)
             .OrderBy(x => x.TimeFrom)
             .ToList();
 
         var sortedBoilers = BuildScenario1Boilers(assets);
         
-
         var createdAt = DateTime.UtcNow;
         var hourlyResults = sourceData
-            .Select(point => BuildHourlyResult(point, assets, sortedBoilers, optRunId, createdAt))
+            .Select(point => BuildHourlyResult(point, assets, sortedBoilers, createdAt))
             .ToList(); 
 
         var runFrom = sourceData.Count == 0 ? createdAt : sourceData.Min(x => x.TimeFrom);
@@ -48,16 +46,25 @@ public class Optimizer
 
         return new OptimizationResponseDto
         {
-            Status = "Boiler-only optimization completed for selected period.",
             OptRun = new OptRunDto
             {
-                Id = optRunId,
                 TimeFrom = runFrom,
                 TimeTo = runTo,
-                CreatedAt = createdAt,
+                Scenario = request.ScenarioId.ToString(),
+                PeriodType = request.PeriodId switch
+                {
+                    1 => "summer",
+                    2 => "winter",
+                    _ => request.PeriodId.ToString()
+                },
             },
             OptResultsHourly = hourlyResults,
         };
+        } 
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            throw new ExternalDataFetchException("Optimization failed.", ex);
+        }
     }
 
     private static List<DispatchBoiler> BuildScenario1Boilers(AssetDataBundle assets)
@@ -67,7 +74,7 @@ public class Optimizer
         boilers.AddRange(assets.GasBoilers
             .Select(x => new DispatchBoiler(
                 x.Id,
-                "GasBoiler",
+                "GB",
                 x.Name,
                 x.MaxHeat,
                 x.ProductionCost,
@@ -77,7 +84,7 @@ public class Optimizer
         boilers.AddRange(assets.OilBoilers
             .Select(x => new DispatchBoiler(
                 x.Id,
-                "OilBoiler",
+                "OB",
                 x.Name,
                 x.MaxHeat,
                 x.ProductionCost,
@@ -93,22 +100,17 @@ public class Optimizer
         SourceDataPoint point,
         AssetDataBundle assets,
         IReadOnlyList<DispatchBoiler> sortedBoilers,
-        int optRunId,
         DateTime createdAt)
     {
-        var relevantMaintenance = assets.MaintenanceSchedules
-            .Where(m =>
-                m.PeriodId == point.PeriodId &&
-                m.FromDate <= point.TimeFrom &&
-                m.ToDate >= point.TimeTo)
-            .ToList();
+        var maintenance = assets.MaintenanceSchedule;
         
         var availableBoilers = sortedBoilers
             .Where(
-            b => !relevantMaintenance.Any(m => m.UnitType == b.UnitType &&
-            m.UnitId == b.UnitId &&
-            m.FromDate <= point.TimeFrom &&
-            m.ToDate >= point.TimeTo))
+            b => maintenance is null ||
+            !(maintenance.UnitType == b.UnitType &&
+            maintenance.UnitId == b.UnitId &&
+            maintenance.FromDate <= point.TimeFrom &&
+            maintenance.ToDate >= point.TimeTo))
             .ToList();
 
         var remainingHeatDemand = Math.Max(0d, point.HeatDemand);
@@ -127,10 +129,8 @@ public class Optimizer
 
             unitRows.Add(new PUnitDto
             {
-                Id = null,
-                OptResultsHourlyId = null,
                 UnitType = boiler.UnitType,
-                UnitName = boiler.UnitName,
+                UnitId = boiler.UnitId,
                 CapacityOutput = loadRatio * 100d,
             });
 
@@ -144,8 +144,6 @@ public class Optimizer
 
         return new OptResultsHourlyDto
         {
-            Id = null,
-            OptRunId = optRunId,
             HeatProduction = point.HeatDemand,
             ElectricityConsumption = 0d,
             Expenses = CalculateHourlyExpenses(point.HeatDemand, availableBoilers),
