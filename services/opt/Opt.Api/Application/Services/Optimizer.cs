@@ -171,7 +171,7 @@ public class Optimizer
         var unitRows = new List<PUnitDto>();
         var expenses = 0d;
         var co2 = 0d;
-        var electricityConsumption = 0d;
+        var netElectricity = 0d;
 
         var isEbDispatched = false;
         var isGmDispatched = false;
@@ -201,12 +201,12 @@ public class Optimizer
             
             if (boiler.UnitType == "EB")
             {
-                electricityConsumption += boiler.MaxElectricity * loadRatio;
+                netElectricity += boiler.MaxElectricity * loadRatio;
                 isEbDispatched = true;
             }
             else if (boiler.UnitType == "GM")
             {
-                electricityConsumption -= boiler.MaxElectricity * loadRatio;
+                netElectricity += boiler.MaxElectricity * loadRatio;
                 isGmDispatched = true;
             }
 
@@ -228,7 +228,7 @@ public class Optimizer
         return new OptResultsHourlyDto
         {
             HeatProduction = point.HeatDemand,
-            ElectricityConsumption = electricityConsumption,
+            ElectricityConsumption = netElectricity,
             Expenses = expenses,
             Co2Emissions = co2,
             TimeFrom = point.TimeFrom,
@@ -250,7 +250,7 @@ public class Optimizer
         public double GetNetCostAtFull(double electricityPrice)
         {
             if (UnitType == "EB")
-                return ProductionCost + (MaxElectricity * electricityPrice);
+                return ProductionCost - (MaxElectricity * electricityPrice);
             if (UnitType == "GM")
                 return ProductionCost - (MaxElectricity * electricityPrice);
             return ProductionCost;
