@@ -4,7 +4,8 @@
              xmlns:system="using:System"
              xmlns:viewModels="using:Dv.App.ViewModels"
              xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.Avalonia;assembly=LiveChartsCore.SkiaSharpView.Avalonia"
-             x:Class="Dv.App.Views.OptimizationView">
+             x:Class="Dv.App.Views.OptimizationView"
+             x:DataType="viewModels:OptimizationViewModel">
 
 
   <ScrollViewer>

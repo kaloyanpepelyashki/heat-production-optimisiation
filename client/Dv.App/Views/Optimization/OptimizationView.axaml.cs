@@ -14,7 +14,6 @@ using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Avalonia;
 using LiveChartsCore.SkiaSharpView.Painting;
 using SkiaSharp;
-
 using Dv.App.Models;
 using Dv.App.Services;
 using Dv.App.ViewModels;
@@ -96,6 +95,7 @@ public partial class OptimizationView : UserControl
             {
                 var selectedScenario = this.GetSelectedScenario();
                 this.maintenanceService.SaveMaintenance(boilerId, startDateTime, endDateTime, "Summer", selectedScenario);
+            
             }
         }
         else

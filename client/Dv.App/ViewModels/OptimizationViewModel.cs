@@ -1,6 +1,8 @@
+using CommunityToolkit.Mvvm.Input;
+
 namespace Dv.App.ViewModels;
 
-public sealed class OptimizationViewModel : ViewModelBase
+public sealed partial class OptimizationViewModel : ViewModelBase
 {
-    //TODO: Implement optimization view model
+    
 }
