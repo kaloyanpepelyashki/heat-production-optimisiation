@@ -135,6 +135,17 @@ public class Optimizer
                 x.Co2Emissions,
                 x.MaxElectricity)));
 
+        boilers.AddRange(assets.OilBoilers
+            .Select(x => new DispatchBoiler(
+                x.Id,
+                "OB",
+                x.Name,
+                x.MaxHeat,
+                x.ProductionCost,
+                x.OilConsumption,
+                x.Co2Emissions,
+                0d)));
+
         return boilers;
     }
 
@@ -162,11 +173,23 @@ public class Optimizer
         var co2 = 0d;
         var electricityConsumption = 0d;
 
+        var isEbDispatched = false;
+        var isGmDispatched = false;
+
         foreach (var boiler in availableBoilers)
         {
             if (remainingHeatDemand <= 0d)
             {
                 break;
+            }
+
+            if (boiler.UnitType == "EB" && isGmDispatched)
+            {
+                continue;
+            }
+            if (boiler.UnitType == "GM" && isEbDispatched)
+            {
+                continue;
             }
 
             var dispatchedHeat = Math.Min(boiler.MaxHeat, remainingHeatDemand);
@@ -177,9 +200,15 @@ public class Optimizer
             co2 += boiler.FullLoadCo2 * loadRatio;
             
             if (boiler.UnitType == "EB")
+            {
                 electricityConsumption += boiler.MaxElectricity * loadRatio;
+                isEbDispatched = true;
+            }
             else if (boiler.UnitType == "GM")
+            {
                 electricityConsumption -= boiler.MaxElectricity * loadRatio;
+                isGmDispatched = true;
+            }
 
             unitRows.Add(new PUnitDto
             {
