@@ -1,6 +1,7 @@
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
+COPY stylecop.json .
 COPY Sdm.Api/Sdm.Api.csproj Sdm.Api/
 RUN dotnet restore Sdm.Api/Sdm.Api.csproj
 

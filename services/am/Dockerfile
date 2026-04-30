@@ -1,6 +1,7 @@
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
+COPY stylecop.json .
 COPY Am.Api/Am.Api.csproj Am.Api/
 RUN dotnet restore Am.Api/Am.Api.csproj
 
