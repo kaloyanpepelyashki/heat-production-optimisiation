@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Rdm.Api.Application.Interfaces;
+using Rdm.Api.Application.Model;
+using Rdm.Api.Application.Services.Helpers;
 using Rdm.Api.Inrastructure.DTOs;
 
 namespace Rdm.Api.Controllers;
@@ -25,7 +27,16 @@ public class CreateController : Controller
     {
         try
         {
+            //TODO Implement proper checks if the response is actually populated
             var response = await _optimiserService.RequestOptimisation(optimisationRequestDto);
+            
+            OptimisationRun optimisationDomainModel = OptimisationModelsMapper.ToDomain(response);
+            bool optimisationSaveResult = await _optimisationResultService.SaveOptimisationRun(optimisationDomainModel);
+
+            if (!optimisationSaveResult)
+            {
+                _logger.LogError("Error saving optimsisation result. Optimisation result not saved to database");
+            }
             
             return Ok(response);
         }

@@ -17,13 +17,13 @@ public class OptimisationResultsHourlyPersistence: BaseModel
     [Column("optimisation_run_id")]
     public int OptimisationRunId { get; set; }
     [Column("heat_production")]
-    public float HeatProduction { get; set; }
+    public double HeatProduction { get; set; }
     [Column("electricity_consumption")]
-    public float ElectricityConsumption { get; set; }
+    public double ElectricityConsumption { get; set; }
     [Column("co2_emissions")]
-    public float Co2Emissions { get; set; }
+    public double Co2Emissions { get; set; }
     [Column("expenses")]
-    public float Expenses { get; set; }
+    public double Expenses { get; set; }
     [Column("time_from")]
     public DateTime TimeFrom { get; set; }
     [Column("time_to")]

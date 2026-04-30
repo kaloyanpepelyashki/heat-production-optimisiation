@@ -1,6 +1,7 @@
 ﻿using Rdm.Api.Application.Exceptions;
 using Rdm.Api.Application.Interfaces;
 using Rdm.Api.Application.Model;
+using Rdm.Api.Application.Services.Helpers;
 using Rdm.Api.Inrastructure.Persistence;
 using Rdm.Api.Inrastructure.Persistence.PersistenceModels;
 
@@ -78,18 +79,19 @@ public class OptimisationResultService : IOptimisationResultService
 
     
     /// <summary>
-    /// In charge of creating a new optimisation run object. 
+    /// In charge of saving a new optimisation run object to the database.
+    /// Utilises the Result repository to handle the database entry creation
     /// </summary>
     /// <param name="optimisationRun"></param>
     /// <returns></returns>
-    public async Task<bool> CreateOptimisationRun(OptimisationRun optimisationRun)
+    public async Task<bool> SaveOptimisationRun(OptimisationRun optimisationRun)
     {
         try
         {
+            OptimisationRunPersistence optimisationRunPersistence = OptimisationModelsMapper.ToPersistence(optimisationRun);
+            var creationResult = await _resultRepository.SaveOptimisationResult(optimisationRunPersistence);
             
-            
-            
-            return true; 
+            return creationResult; 
         }
         catch (DatabaseOperationException e)
         {
