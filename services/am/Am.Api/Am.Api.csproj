@@ -20,8 +20,8 @@
     <Folder Include="Model\" />
   </ItemGroup>
 
-  <ItemGroup>
-    <AdditionalFiles Include="../stylecop.json" />
+  <ItemGroup Condition="'$(Configuration)' == 'Debug'">
+    <AdditionalFiles Include="../stylecop.json"  />
   </ItemGroup>
 
 </Project>
