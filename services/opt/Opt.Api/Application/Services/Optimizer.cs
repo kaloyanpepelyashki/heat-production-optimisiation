@@ -197,7 +197,7 @@ public class Optimizer
             var loadRatio = dispatchedHeat / boiler.MaxHeat;
             
             netCost += boiler.GetExpensesAtFull(point.ElectricityPrice) * loadRatio;
-            co2 += boiler.FullLoadCo2 * loadRatio;
+            co2 += boiler.FullLoadCo2 * dispatchedHeat;
             
             if (boiler.UnitType == "EB")
             {
