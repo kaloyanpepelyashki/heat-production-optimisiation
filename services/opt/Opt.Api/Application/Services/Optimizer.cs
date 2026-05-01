@@ -34,11 +34,13 @@ public class Optimizer
             .OrderBy(x => x.TimeFrom)
             .ToList();
 
-        var sortedBoilers = BuildScenario1Boilers(assets);
+        var boilers = request.ScenarioId == 2 
+            ? BuildScenario2Boilers(assets)
+            : BuildScenario1Boilers(assets);
         
         var createdAt = DateTime.UtcNow;
         var hourlyResults = sourceData
-            .Select(point => BuildHourlyResult(point, assets, sortedBoilers, createdAt))
+            .Select(point => BuildHourlyResult(point, assets, boilers, createdAt))
             .ToList(); 
 
         var runFrom = sourceData.Count == 0 ? createdAt : sourceData.Min(x => x.TimeFrom);
@@ -67,54 +69,101 @@ public class Optimizer
         }
     }
 
-    private static List<DispatchBoiler> BuildScenario1Boilers(AssetDataBundle assets)
+    private static List<DispatchUnit> BuildScenario1Boilers(AssetDataBundle assets)
     {
-        var boilers = new List<DispatchBoiler>();
+        var boilers = new List<DispatchUnit>();
 
         boilers.AddRange(assets.GasBoilers
-            .Select(x => new DispatchBoiler(
+            .Select(x => new DispatchUnit(
                 x.Id,
                 "GB",
                 x.Name,
                 x.MaxHeat,
                 x.ProductionCost,
                 x.GasConsumption,
-                x.Co2Emissions)));
+                x.Co2Emissions,
+                0d)));
 
         boilers.AddRange(assets.OilBoilers
-            .Select(x => new DispatchBoiler(
+            .Select(x => new DispatchUnit(
                 x.Id,
                 "OB",
                 x.Name,
                 x.MaxHeat,
                 x.ProductionCost,
                 x.OilConsumption,
-                x.Co2Emissions)));
+                x.Co2Emissions,
+                0d)));
 
-        return boilers
-            .OrderBy(x => x.CostPerHeat)
-            .ToList();
+        return boilers;
+    }
+
+    private static List<DispatchUnit> BuildScenario2Boilers(AssetDataBundle assets)
+    {
+        var boilers = new List<DispatchUnit>();
+
+        boilers.AddRange(assets.GasBoilers
+            .Select(x => new DispatchUnit(
+                x.Id,
+                "GB",
+                x.Name,
+                x.MaxHeat,
+                x.ProductionCost,
+                x.GasConsumption,
+                x.Co2Emissions,
+                0d)));
+
+        boilers.AddRange(assets.ElectricBoilers
+            .Select(x => new DispatchUnit(
+                x.Id,
+                "EB",
+                x.Name,
+                x.MaxHeat,
+                x.ProductionCost,
+                0d,
+                0d,
+                x.MaxElectricity)));
+
+        boilers.AddRange(assets.GasMotors
+            .Select(x => new DispatchUnit(
+                x.Id,
+                "GM",
+                x.Name,
+                x.MaxHeat,
+                x.ProductionCost,
+                x.GasConsumption,
+                x.Co2Emissions,
+                x.MaxElectricity)));
+
+        return boilers;
     }
 
     private static OptResultsHourlyDto BuildHourlyResult(
         SourceDataPoint point,
         AssetDataBundle assets,
-        IReadOnlyList<DispatchBoiler> sortedBoilers,
+        IReadOnlyList<DispatchUnit> boilers,
         DateTime createdAt)
     {
         var maintenance = assets.MaintenanceSchedule;
         
-        var availableBoilers = sortedBoilers
+        var availableBoilers = boilers
             .Where(
             b => maintenance is null ||
             !(maintenance.UnitType == b.UnitType &&
             maintenance.UnitId == b.UnitId &&
             maintenance.FromDate <= point.TimeFrom &&
             maintenance.ToDate >= point.TimeTo))
+            .OrderBy(b => b.GetCostPerHeat(point.ElectricityPrice))
             .ToList();
 
         var remainingHeatDemand = Math.Max(0d, point.HeatDemand);
         var unitRows = new List<PUnitDto>();
+        var netCost = 0d;
+        var co2 = 0d;
+        var netElectricity = 0d;
+
+        var isEbDispatched = false;
+        var isGmDispatched = false;
 
         foreach (var boiler in availableBoilers)
         {
@@ -123,15 +172,38 @@ public class Optimizer
                 break;
             }
 
+            if (boiler.UnitType == "EB" && isGmDispatched)
+            {
+                continue;
+            }
+            if (boiler.UnitType == "GM" && isEbDispatched)
+            {
+                continue;
+            }
+
             var dispatchedHeat = Math.Min(boiler.MaxHeat, remainingHeatDemand);
 
             var loadRatio = dispatchedHeat / boiler.MaxHeat;
+            
+            netCost += boiler.GetExpensesAtFull(point.ElectricityPrice) * loadRatio;
+            co2 += boiler.Co2PerMWh * dispatchedHeat;
+            
+            if (boiler.UnitType == "EB")
+            {
+                netElectricity -= boiler.MaxElectricity * loadRatio;
+                isEbDispatched = true;
+            }
+            else if (boiler.UnitType == "GM")
+            {
+                netElectricity -= boiler.MaxElectricity * loadRatio;
+                isGmDispatched = true;
+            }
 
             unitRows.Add(new PUnitDto
             {
                 UnitType = boiler.UnitType,
                 UnitId = boiler.UnitId,
-                CapacityOutput = loadRatio * 100d,
+                CapacityOutput = Math.Round(loadRatio * 100d, 2),
             });
 
             remainingHeatDemand -= dispatchedHeat;
@@ -144,70 +216,36 @@ public class Optimizer
 
         return new OptResultsHourlyDto
         {
-            HeatProduction = point.HeatDemand,
-            ElectricityConsumption = 0d,
-            Expenses = CalculateHourlyExpenses(point.HeatDemand, availableBoilers),
-            Co2Emissions = CalculateHourlyCo2(point.HeatDemand, availableBoilers),
+            HeatProduction = Math.Round(point.HeatDemand, 2),
+            ElectricityConsumption = Math.Round(netElectricity, 2),
+            Expenses = Math.Round(netCost, 2),
+            Co2Emissions = Math.Round(co2, 2),
             TimeFrom = point.TimeFrom,
             TimeTo = point.TimeTo,
             Units = unitRows,
         };
     }
 
-    private static double CalculateHourlyExpenses(double heatDemand, IReadOnlyList<DispatchBoiler> sortedBoilers)
-    {
-        var remainingHeatDemand = Math.Max(0d, heatDemand);
-        var expenses = 0d;
-
-        foreach (var boiler in sortedBoilers)
-        {
-            var dispatchedHeat = Math.Min(boiler.MaxHeat, remainingHeatDemand);
-            if (dispatchedHeat <= 0d)
-            {
-                continue;
-            }
-
-            var loadRatio = dispatchedHeat / boiler.MaxHeat;
-            expenses += boiler.ProductionCost * loadRatio;
-
-            remainingHeatDemand -= dispatchedHeat;
-        }
-
-        return expenses;
-    }
-
-    private static double CalculateHourlyCo2(double heatDemand, IReadOnlyList<DispatchBoiler> sortedBoilers)
-    {
-        var remainingHeatDemand = Math.Max(0d, heatDemand);
-        var co2 = 0d;
-
-        foreach (var boiler in sortedBoilers)
-        {
-            if (remainingHeatDemand <= 0d)
-            {
-                break;
-            }
-
-            var dispatchedHeat = Math.Min(boiler.MaxHeat, remainingHeatDemand);
-
-            var loadRatio = dispatchedHeat / boiler.MaxHeat;
-            co2 += boiler.FullLoadCo2 * loadRatio;
-            
-            remainingHeatDemand -= dispatchedHeat;
-        }
-
-        return co2;
-    }
-
-    private sealed record DispatchBoiler(
+    private sealed record DispatchUnit(
         int UnitId,
         string UnitType,
         string UnitName,
         double MaxHeat,
         double ProductionCost,
         double FuelConsumption,
-        double FullLoadCo2)
+        double Co2PerMWh,
+        double MaxElectricity)
     {
-        public double CostPerHeat => ProductionCost / MaxHeat;
+        public double GetExpensesAtFull(double electricityPrice)
+        {
+            double baseCost = ProductionCost * MaxHeat;
+            if (UnitType == "EB")
+                return baseCost - (MaxElectricity * electricityPrice);
+            if (UnitType == "GM")
+                return baseCost - (MaxElectricity * electricityPrice);
+            return baseCost;
+        }
+
+        public double GetCostPerHeat(double electricityPrice) => GetExpensesAtFull(electricityPrice) / MaxHeat;
     }
 }
