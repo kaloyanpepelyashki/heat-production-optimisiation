@@ -69,12 +69,12 @@ public class Optimizer
         }
     }
 
-    private static List<DispatchBoiler> BuildScenario1Boilers(AssetDataBundle assets)
+    private static List<DispatchUnit> BuildScenario1Boilers(AssetDataBundle assets)
     {
-        var boilers = new List<DispatchBoiler>();
+        var boilers = new List<DispatchUnit>();
 
         boilers.AddRange(assets.GasBoilers
-            .Select(x => new DispatchBoiler(
+            .Select(x => new DispatchUnit(
                 x.Id,
                 "GB",
                 x.Name,
@@ -85,7 +85,7 @@ public class Optimizer
                 0d)));
 
         boilers.AddRange(assets.OilBoilers
-            .Select(x => new DispatchBoiler(
+            .Select(x => new DispatchUnit(
                 x.Id,
                 "OB",
                 x.Name,
@@ -98,12 +98,12 @@ public class Optimizer
         return boilers;
     }
 
-    private static List<DispatchBoiler> BuildScenario2Boilers(AssetDataBundle assets)
+    private static List<DispatchUnit> BuildScenario2Boilers(AssetDataBundle assets)
     {
-        var boilers = new List<DispatchBoiler>();
+        var boilers = new List<DispatchUnit>();
 
         boilers.AddRange(assets.GasBoilers
-            .Select(x => new DispatchBoiler(
+            .Select(x => new DispatchUnit(
                 x.Id,
                 "GB",
                 x.Name,
@@ -114,7 +114,7 @@ public class Optimizer
                 0d)));
 
         boilers.AddRange(assets.ElectricBoilers
-            .Select(x => new DispatchBoiler(
+            .Select(x => new DispatchUnit(
                 x.Id,
                 "EB",
                 x.Name,
@@ -125,7 +125,7 @@ public class Optimizer
                 x.MaxElectricity)));
 
         boilers.AddRange(assets.GasMotors
-            .Select(x => new DispatchBoiler(
+            .Select(x => new DispatchUnit(
                 x.Id,
                 "GM",
                 x.Name,
@@ -136,7 +136,7 @@ public class Optimizer
                 x.MaxElectricity)));
 
         boilers.AddRange(assets.OilBoilers
-            .Select(x => new DispatchBoiler(
+            .Select(x => new DispatchUnit(
                 x.Id,
                 "OB",
                 x.Name,
@@ -152,7 +152,7 @@ public class Optimizer
     private static OptResultsHourlyDto BuildHourlyResult(
         SourceDataPoint point,
         AssetDataBundle assets,
-        IReadOnlyList<DispatchBoiler> boilers,
+        IReadOnlyList<DispatchUnit> boilers,
         DateTime createdAt)
     {
         var maintenance = assets.MaintenanceSchedule;
@@ -197,7 +197,7 @@ public class Optimizer
             var loadRatio = dispatchedHeat / boiler.MaxHeat;
             
             netCost += boiler.GetExpensesAtFull(point.ElectricityPrice) * loadRatio;
-            co2 += boiler.FullLoadCo2 * dispatchedHeat;
+            co2 += boiler.Co2PerMWh * dispatchedHeat;
             
             if (boiler.UnitType == "EB")
             {
@@ -214,7 +214,7 @@ public class Optimizer
             {
                 UnitType = boiler.UnitType,
                 UnitId = boiler.UnitId,
-                CapacityOutput = loadRatio * 100d,
+                CapacityOutput = Math.Round(loadRatio * 100d, 2),
             });
 
             remainingHeatDemand -= dispatchedHeat;
@@ -227,24 +227,24 @@ public class Optimizer
 
         return new OptResultsHourlyDto
         {
-            HeatProduction = point.HeatDemand,
-            ElectricityConsumption = netElectricity,
-            Expenses = netCost,
-            Co2Emissions = co2,
+            HeatProduction = Math.Round(point.HeatDemand, 2),
+            ElectricityConsumption = Math.Round(netElectricity, 2),
+            Expenses = Math.Round(netCost, 2),
+            Co2Emissions = Math.Round(co2, 2),
             TimeFrom = point.TimeFrom,
             TimeTo = point.TimeTo,
             Units = unitRows,
         };
     }
 
-    private sealed record DispatchBoiler(
+    private sealed record DispatchUnit(
         int UnitId,
         string UnitType,
         string UnitName,
         double MaxHeat,
         double ProductionCost,
         double FuelConsumption,
-        double FullLoadCo2,
+        double Co2PerMWh,
         double MaxElectricity)
     {
         public double GetExpensesAtFull(double electricityPrice)
