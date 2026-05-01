@@ -135,17 +135,6 @@ public class Optimizer
                 x.Co2Emissions,
                 x.MaxElectricity)));
 
-        boilers.AddRange(assets.OilBoilers
-            .Select(x => new DispatchUnit(
-                x.Id,
-                "OB",
-                x.Name,
-                x.MaxHeat,
-                x.ProductionCost,
-                x.OilConsumption,
-                x.Co2Emissions,
-                0d)));
-
         return boilers;
     }
 
