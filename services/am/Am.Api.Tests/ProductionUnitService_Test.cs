@@ -12,6 +12,7 @@ public class ProductionUnitService_Test
     Mock<IProductionUnitRepository<GasMotor>> repoGasMotor = new Mock<IProductionUnitRepository<GasMotor>>();
     Mock<IProductionUnitRepository<ElectricBoiler>> repoElectricBoiler = new Mock<IProductionUnitRepository<ElectricBoiler>>();
     Mock<IProductionUnitRepository<OilBoiler>> repoOilBoiler = new Mock<IProductionUnitRepository<OilBoiler>>();
+    Mock<IMaintenanceRepository> repoMaintenance = new Mock<IMaintenanceRepository>();
     
     [Fact]
     public async Task GetAllGasBoilersAsync_Returns_List_Of_Boilers()
@@ -39,7 +40,7 @@ public class ProductionUnitService_Test
             },
         });
         
-        var service = new ProductionUnitService(repoGasBoiler.Object, repoOilBoiler.Object, repoElectricBoiler.Object, repoGasMotor.Object);
+        var service = new ProductionUnitService(repoGasBoiler.Object, repoOilBoiler.Object, repoElectricBoiler.Object, repoGasMotor.Object, repoMaintenance.Object);
         
         //Act
         var result = await service.GetAllGasBoilersAsync();
@@ -69,7 +70,7 @@ public class ProductionUnitService_Test
             },
         });
         
-        var service = new ProductionUnitService(repoGasBoiler.Object, repoOilBoiler.Object, repoElectricBoiler.Object, repoGasMotor.Object);
+        var service = new ProductionUnitService(repoGasBoiler.Object, repoOilBoiler.Object, repoElectricBoiler.Object, repoGasMotor.Object, repoMaintenance.Object);
         
         //Act
         var result = await service.GetAllGasMotorsAsync();
@@ -97,7 +98,7 @@ public class ProductionUnitService_Test
             },
         });
         
-        var service = new ProductionUnitService(repoGasBoiler.Object, repoOilBoiler.Object, repoElectricBoiler.Object, repoGasMotor.Object );
+        var service = new ProductionUnitService(repoGasBoiler.Object, repoOilBoiler.Object, repoElectricBoiler.Object, repoGasMotor.Object, repoMaintenance.Object );
         
         //Act
         var result = await service.GetAllElectricBoilersAsync();
@@ -122,11 +123,11 @@ public class ProductionUnitService_Test
                 MaxHeat = 6.0f,
                 ProductionCost = 690,
                 Co2Emissions = 147,
-                OilConsumption = 1.05f
+                OilConsumption = 1.05f,
             },
         });
         
-        var service = new ProductionUnitService(repoGasBoiler.Object, repoOilBoiler.Object,  repoElectricBoiler.Object, repoGasMotor.Object);
+        var service = new ProductionUnitService(repoGasBoiler.Object, repoOilBoiler.Object,  repoElectricBoiler.Object, repoGasMotor.Object, repoMaintenance.Object);
         
         //Act
         var result = await service.GetAllOilBoilersAsync();
@@ -135,5 +136,58 @@ public class ProductionUnitService_Test
         Assert.NotEmpty(result);
         Assert.IsType<List<OilBoiler>>(result);
         Assert.Equal(1, result[0].Id);
+    }
+
+    [Fact]
+    public async Task GetProductionUnitMaintenanceByIdAsync_Returns_Maintenance()
+    {
+        //Arrange
+        repoMaintenance.Setup(x => x.GetAllProductionUnitMaintenanceAsync()).ReturnsAsync(new List<ProductionUnitMaintenance>
+        {
+            new ProductionUnitMaintenance
+            {
+                Id = 42,
+                UnitType = "gasBoiler",
+                UnitId = 7,
+                CreatedAt = new DateTime(2026, 01, 01, 10, 00, 00, DateTimeKind.Utc),
+                FromDate = new DateTime(2026, 01, 02, 00, 00, 00, DateTimeKind.Utc),
+                ToDate = new DateTime(2026, 01, 03, 00, 00, 00, DateTimeKind.Utc),
+            },
+        });
+
+        var service = new ProductionUnitService(repoGasBoiler.Object, repoOilBoiler.Object, repoElectricBoiler.Object, repoGasMotor.Object, repoMaintenance.Object);
+
+        //Act
+        ProductionUnitMaintenance result = await service.GetProductionUnitMaintenanceByIdAsync(42);
+
+        //Assert
+        Assert.Equal(42, result.Id);
+        Assert.Equal("gasBoiler", result.UnitType);
+        Assert.Equal(7, result.UnitId);
+    }
+
+    [Fact]
+    public async Task PostProductionUnitMaintenanceAsync_Returns_New_Id()
+    {
+        //Arrange
+        repoMaintenance
+            .Setup(x => x.PostProductionUnitMaintenanceAsync(It.IsAny<ProductionUnitMaintenance>()))
+            .ReturnsAsync(123);
+
+        var service = new ProductionUnitService(repoGasBoiler.Object, repoOilBoiler.Object, repoElectricBoiler.Object, repoGasMotor.Object, repoMaintenance.Object);
+
+        ProductionUnitMaintenance maintenanceToPost = new ProductionUnitMaintenance
+        {
+            UnitType = "gasBoiler",
+            UnitId = 7,
+            FromDate = new DateTime(2026, 02, 01, 00, 00, 00, DateTimeKind.Utc),
+            ToDate = new DateTime(2026, 02, 02, 00, 00, 00, DateTimeKind.Utc),
+        };
+
+        //Act
+        int result = await service.PostProductionUnitMaintenanceAsync(maintenanceToPost);
+
+        //Assert
+        Assert.Equal(123, result);
     }
 }

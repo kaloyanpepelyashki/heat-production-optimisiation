@@ -1,6 +1,7 @@
 ﻿using Am.Api.Application.Interfaces;
 using Am.Api.Infrastructure.Presistence;
 using Am.Api.Model.DTOs;
+using Am.Api.Infrastructure.DTOs;
 using Am.Api.Domain.Models;
 
 namespace Am.Api.Application.Services;
@@ -15,13 +16,20 @@ public class ProductionUnitService: IProductionUnitService
     private IProductionUnitRepository<OilBoiler> _oilBoilerRepository;
     private IProductionUnitRepository<ElectricBoiler> _electricBoilerRepository;
     private IProductionUnitRepository<GasMotor> _gasMotorRepository; 
+    private IMaintenanceRepository _maintenanceRepository;
     
-    public ProductionUnitService(IProductionUnitRepository<GasBoiler> gasBoilerRepository, IProductionUnitRepository<OilBoiler> oilBoilerRepository, IProductionUnitRepository<ElectricBoiler> electricBoilerRepository, IProductionUnitRepository<GasMotor> gasMotorRepository) 
+    public ProductionUnitService(
+        IProductionUnitRepository<GasBoiler> gasBoilerRepository,
+        IProductionUnitRepository<OilBoiler> oilBoilerRepository,
+        IProductionUnitRepository<ElectricBoiler> electricBoilerRepository,
+        IProductionUnitRepository<GasMotor> gasMotorRepository,
+        IMaintenanceRepository maintenanceRepository)
     {
         _gasBoilerRepository = gasBoilerRepository;
         _oilBoilerRepository = oilBoilerRepository;
         _electricBoilerRepository = electricBoilerRepository;
         _gasMotorRepository = gasMotorRepository;
+        _maintenanceRepository = maintenanceRepository;
     }
 
     public async Task<List<GasBoiler>> GetAllGasBoilersAsync()
@@ -58,5 +66,41 @@ public class ProductionUnitService: IProductionUnitService
     public async Task<List<GasMotor>> GetAllGasMotorsAsync()
     {
         return await  _gasMotorRepository.GetAllAsync();
+    }
+
+    public async Task<ProductionUnitMaintenance> GetProductionUnitMaintenanceByIdAsync(int Id)
+    {
+        try
+        {
+            ProductionUnitMaintenance? maintenance = (await _maintenanceRepository.GetAllProductionUnitMaintenanceAsync())
+                .FirstOrDefault(p => p.Id == Id);
+
+            if (maintenance is null)
+            {
+                throw new KeyNotFoundException($"No ProductionUnitMaintenance found with Id {Id}.");
+            }
+
+            return maintenance;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Error in ProductionUnitService.GetProductionUnitMaintenanceByIdAsync: {e.Message}");
+            throw;
+        }
+    }
+
+    public async Task<int> PostProductionUnitMaintenanceAsync(ProductionUnitMaintenance productionUnitMaintenance)
+    {
+        try
+        {
+            int Id = await _maintenanceRepository.PostProductionUnitMaintenanceAsync(productionUnitMaintenance);
+
+            return Id;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Error in ProductionUnitService.GetProductionUnitMaintenanceByIdAsync: {e.Message}");
+            throw;
+        }
     }
 }
