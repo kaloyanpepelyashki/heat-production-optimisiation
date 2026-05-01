@@ -196,17 +196,17 @@ public class Optimizer
 
             var loadRatio = dispatchedHeat / boiler.MaxHeat;
             
-            netCost += boiler.GetNetCostAtFull(point.ElectricityPrice) * loadRatio;
+            netCost += boiler.GetExpensesAtFull(point.ElectricityPrice) * loadRatio;
             co2 += boiler.FullLoadCo2 * loadRatio;
             
             if (boiler.UnitType == "EB")
             {
-                netElectricity += boiler.MaxElectricity * loadRatio;
+                netElectricity -= boiler.MaxElectricity * loadRatio;
                 isEbDispatched = true;
             }
             else if (boiler.UnitType == "GM")
             {
-                netElectricity += boiler.MaxElectricity * loadRatio;
+                netElectricity -= boiler.MaxElectricity * loadRatio;
                 isGmDispatched = true;
             }
 
@@ -229,7 +229,7 @@ public class Optimizer
         {
             HeatProduction = point.HeatDemand,
             ElectricityConsumption = netElectricity,
-            NetCost = netCost,
+            Expenses = netCost,
             Co2Emissions = co2,
             TimeFrom = point.TimeFrom,
             TimeTo = point.TimeTo,
@@ -247,7 +247,7 @@ public class Optimizer
         double FullLoadCo2,
         double MaxElectricity)
     {
-        public double GetNetCostAtFull(double electricityPrice)
+        public double GetExpensesAtFull(double electricityPrice)
         {
             double baseCost = ProductionCost * MaxHeat;
             if (UnitType == "EB")
@@ -257,6 +257,6 @@ public class Optimizer
             return baseCost;
         }
 
-        public double GetCostPerHeat(double electricityPrice) => GetNetCostAtFull(electricityPrice) / MaxHeat;
+        public double GetCostPerHeat(double electricityPrice) => GetExpensesAtFull(electricityPrice) / MaxHeat;
     }
 }
