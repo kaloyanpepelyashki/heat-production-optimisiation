@@ -30,7 +30,7 @@ public sealed class OptResultsHourlyDto
 {
     public double HeatProduction { get; set; }
     public double ElectricityConsumption { get; set; }
-    public double Expenses { get; set; }
+    public double NetCost { get; set; }
     public double Co2Emissions { get; set; }
     public DateTime TimeFrom { get; set; }
     public DateTime TimeTo { get; set; }
