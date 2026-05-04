@@ -26,17 +26,25 @@ public sealed class AmDataProvider : IAssetDataProvider
                 _options.Am.GasBoilersEndpoint,
                 cancellationToken);
 
+            await Task.Delay(1500, cancellationToken); // Rate limiting delay
+
             var oilBoilers = await _httpClient.GetFromJsonAsync<List<AmOilBoilerResponseDto>>(
                 _options.Am.OilBoilersEndpoint,
                 cancellationToken);
+
+            await Task.Delay(1500, cancellationToken); // Rate limiting delay
 
             var electricBoilers = await _httpClient.GetFromJsonAsync<List<AmElectricBoilerResponseDto>>(
                 _options.Am.ElectricBoilersEndpoint,
                 cancellationToken);
 
+            await Task.Delay(1500, cancellationToken); // Rate limiting delay
+
             var gasMotors = await _httpClient.GetFromJsonAsync<List<AmGasMotorResponseDto>>(
                 _options.Am.GasMotorsEndpoint,
                 cancellationToken);
+
+            await Task.Delay(1500, cancellationToken); // Rate limiting delay
            
             var schedule = await _httpClient.GetFromJsonAsync<AmMaintenanceScheduleResponseDto>(
                 _options.Am.ResolveMaintenanceSchedulesEndpoint(maintenanceId),
