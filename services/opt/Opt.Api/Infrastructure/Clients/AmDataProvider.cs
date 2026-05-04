@@ -22,29 +22,27 @@ public sealed class AmDataProvider : IAssetDataProvider
     {
         try
         {
-            var gasBoilersTask = _httpClient.GetFromJsonAsync<List<AmGasBoilerResponseDto>>(
+            var gasBoilers = await _httpClient.GetFromJsonAsync<List<AmGasBoilerResponseDto>>(
                 _options.Am.GasBoilersEndpoint,
                 cancellationToken);
 
-            var oilBoilersTask = _httpClient.GetFromJsonAsync<List<AmOilBoilerResponseDto>>(
+            var oilBoilers = await _httpClient.GetFromJsonAsync<List<AmOilBoilerResponseDto>>(
                 _options.Am.OilBoilersEndpoint,
                 cancellationToken);
 
-            var electricBoilersTask = _httpClient.GetFromJsonAsync<List<AmElectricBoilerResponseDto>>(
+            var electricBoilers = await _httpClient.GetFromJsonAsync<List<AmElectricBoilerResponseDto>>(
                 _options.Am.ElectricBoilersEndpoint,
                 cancellationToken);
 
-            var gasMotorsTask = _httpClient.GetFromJsonAsync<List<AmGasMotorResponseDto>>(
+            var gasMotors = await _httpClient.GetFromJsonAsync<List<AmGasMotorResponseDto>>(
                 _options.Am.GasMotorsEndpoint,
                 cancellationToken);
            
-            var maintenanceScheduleTask = _httpClient.GetFromJsonAsync<AmMaintenanceScheduleResponseDto>(
+            var schedule = await _httpClient.GetFromJsonAsync<AmMaintenanceScheduleResponseDto>(
                 _options.Am.ResolveMaintenanceSchedulesEndpoint(maintenanceId),
                 cancellationToken);
-            
-            await Task.WhenAll(gasBoilersTask, oilBoilersTask, electricBoilersTask, gasMotorsTask, maintenanceScheduleTask); 
 
-            var gasBoilers = (await gasBoilersTask ?? []).Select(x => new GasBoiler
+            var gasBoilersMapped = (gasBoilers ?? []).Select(x => new GasBoiler
             {
                 Id = x.Id,
                 Name = x.Name,
@@ -54,7 +52,7 @@ public sealed class AmDataProvider : IAssetDataProvider
                 GasConsumption = x.GasConsumption,
             }).ToList();
 
-            var oilBoilers = (await oilBoilersTask ?? []).Select(x => new OilBoiler
+            var oilBoilersMapped = (oilBoilers ?? []).Select(x => new OilBoiler
             {
                 Id = x.Id,
                 Name = x.Name,
@@ -64,7 +62,7 @@ public sealed class AmDataProvider : IAssetDataProvider
                 OilConsumption = x.OilConsumption,
             }).ToList();
 
-            var electricBoilers = (await electricBoilersTask ?? []).Select(x => new ElectricBoiler
+            var electricBoilersMapped = (electricBoilers ?? []).Select(x => new ElectricBoiler
             {
                 Id = x.Id,
                 Name = x.Name,
@@ -73,7 +71,7 @@ public sealed class AmDataProvider : IAssetDataProvider
                 MaxElectricity = x.MaxElectricity,
             }).ToList();
 
-            var gasMotors = (await gasMotorsTask ?? []).Select(x => new GasMotor
+            var gasMotorsMapped = (gasMotors ?? []).Select(x => new GasMotor
             {
                 Id = x.Id,
                 Name = x.Name,
@@ -84,7 +82,7 @@ public sealed class AmDataProvider : IAssetDataProvider
                 GasConsumption = x.GasConsumption,
             }).ToList();
 
-            var maintenanceSchedule = (await maintenanceScheduleTask) is { } schedule
+            var maintenanceSchedule = schedule is not null
                 ? new MaintenanceSchedule
             {
                 Id = schedule.Id,
@@ -101,10 +99,10 @@ public sealed class AmDataProvider : IAssetDataProvider
 
             return new AssetDataBundle
             {
-                GasBoilers = gasBoilers,
-                OilBoilers = oilBoilers,
-                ElectricBoilers = electricBoilers,
-                GasMotors = gasMotors,
+                GasBoilers = gasBoilersMapped,
+                OilBoilers = oilBoilersMapped,
+                ElectricBoilers = electricBoilersMapped,
+                GasMotors = gasMotorsMapped,
                 MaintenanceSchedule = maintenanceSchedule,
             };
         }
