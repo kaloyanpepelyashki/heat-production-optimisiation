@@ -1,3 +1,4 @@
+using System.Net;
 using System.Net.Http.Json;
 using Opt.Api.Application.Exceptions;
 using Opt.Api.Application.Interfaces;
@@ -22,31 +23,31 @@ public sealed class AmDataProvider : IAssetDataProvider
     {
         try
         {
-            var gasBoilers = await _httpClient.GetFromJsonAsync<List<AmGasBoilerResponseDto>>(
+            var gasBoilers = await this.GetWithRetryAsync<List<AmGasBoilerResponseDto>>(
                 _options.Am.GasBoilersEndpoint,
                 cancellationToken);
 
-            await Task.Delay(1500, cancellationToken); // Rate limiting delay
+            await Task.Delay(1000, cancellationToken);
 
-            var oilBoilers = await _httpClient.GetFromJsonAsync<List<AmOilBoilerResponseDto>>(
+            var oilBoilers = await this.GetWithRetryAsync<List<AmOilBoilerResponseDto>>(
                 _options.Am.OilBoilersEndpoint,
                 cancellationToken);
 
-            await Task.Delay(1500, cancellationToken); // Rate limiting delay
+            await Task.Delay(1000, cancellationToken);
 
-            var electricBoilers = await _httpClient.GetFromJsonAsync<List<AmElectricBoilerResponseDto>>(
+            var electricBoilers = await this.GetWithRetryAsync<List<AmElectricBoilerResponseDto>>(
                 _options.Am.ElectricBoilersEndpoint,
                 cancellationToken);
 
-            await Task.Delay(1500, cancellationToken); // Rate limiting delay
+            await Task.Delay(1000, cancellationToken);
 
-            var gasMotors = await _httpClient.GetFromJsonAsync<List<AmGasMotorResponseDto>>(
+            var gasMotors = await this.GetWithRetryAsync<List<AmGasMotorResponseDto>>(
                 _options.Am.GasMotorsEndpoint,
                 cancellationToken);
 
-            await Task.Delay(1500, cancellationToken); // Rate limiting delay
-           
-            var schedule = await _httpClient.GetFromJsonAsync<AmMaintenanceScheduleResponseDto>(
+            await Task.Delay(1000, cancellationToken);
+
+            var schedule = await this.GetWithRetryAsync<AmMaintenanceScheduleResponseDto>(
                 _options.Am.ResolveMaintenanceSchedulesEndpoint(maintenanceId),
                 cancellationToken);
 
@@ -103,7 +104,6 @@ public sealed class AmDataProvider : IAssetDataProvider
                 ScenarioId = schedule.ScenarioId,
             }
                 : null;
-          
 
             return new AssetDataBundle
             {
@@ -118,5 +118,33 @@ public sealed class AmDataProvider : IAssetDataProvider
         {
             throw new ExternalDataFetchException("Failed to fetch AM data.", ex);
         }
+    }
+
+    private async Task<T?> GetWithRetryAsync<T>(string url, CancellationToken cancellationToken)
+    {
+        int[] backoffMs = [2000, 5000, 10000];
+        for (int attempt = 0; attempt <= backoffMs.Length; attempt++)
+        {
+            var response = await _httpClient.GetAsync(url, cancellationToken);
+            if (response.StatusCode == HttpStatusCode.TooManyRequests)
+            {
+                if (attempt == backoffMs.Length)
+                {
+                    response.EnsureSuccessStatusCode();
+                }
+
+                var retryAfter = response.Headers.RetryAfter?.Delta;
+                var delay = retryAfter.HasValue
+                    ? (int)retryAfter.Value.TotalMilliseconds
+                    : backoffMs[attempt];
+                await Task.Delay(delay, cancellationToken);
+                continue;
+            }
+
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<T>(cancellationToken);
+        }
+
+        return default;
     }
 }
