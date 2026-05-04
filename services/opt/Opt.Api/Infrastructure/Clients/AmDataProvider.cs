@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
+using Microsoft.Extensions.Caching.Memory;
 using Opt.Api.Application.Exceptions;
 using Opt.Api.Application.Interfaces;
 using Opt.Api.Domain.Models;
@@ -10,16 +11,51 @@ namespace Opt.Api.Infrastructure.Clients;
 
 public sealed class AmDataProvider : IAssetDataProvider
 {
+    private static readonly SemaphoreSlim FetchLock = new(1, 1);
+    private static readonly TimeSpan CacheTtl = TimeSpan.FromMinutes(5);
+
     private readonly HttpClient _httpClient;
     private readonly ExternalApiOptions _options;
+    private readonly IMemoryCache _cache;
 
-    public AmDataProvider(HttpClient httpClient, Microsoft.Extensions.Options.IOptions<ExternalApiOptions> options)
+    public AmDataProvider(
+        HttpClient httpClient,
+        Microsoft.Extensions.Options.IOptions<ExternalApiOptions> options,
+        IMemoryCache cache)
     {
         _httpClient = httpClient;
         _options = options.Value;
+        _cache = cache;
     }
 
     public async Task<AssetDataBundle> GetAssetDataAsync(int maintenanceId, CancellationToken cancellationToken)
+    {
+        var cacheKey = $"am-assets-{maintenanceId}";
+
+        if (_cache.TryGetValue(cacheKey, out AssetDataBundle? cached))
+        {
+            return cached!;
+        }
+
+        await FetchLock.WaitAsync(cancellationToken);
+        try
+        {
+            if (_cache.TryGetValue(cacheKey, out cached))
+            {
+                return cached!;
+            }
+
+            var result = await FetchAllAsync(maintenanceId, cancellationToken);
+            _cache.Set(cacheKey, result, CacheTtl);
+            return result;
+        }
+        finally
+        {
+            FetchLock.Release();
+        }
+    }
+
+    private async Task<AssetDataBundle> FetchAllAsync(int maintenanceId, CancellationToken cancellationToken)
     {
         try
         {

@@ -5,7 +5,7 @@ namespace Opt.Api.Infrastructure.Clients;
 
 internal static class HttpRetryHelper
 {
-    private static readonly int[] BackoffMs = [1000, 3000, 10000, 30000, 60000];
+    private static readonly int[] BackoffMs = [1000, 5000, 30000, 60000];
 
     internal static async Task<T?> GetWithRetryAsync<T>(HttpClient httpClient, string url, CancellationToken cancellationToken)
     {
@@ -23,7 +23,8 @@ internal static class HttpRetryHelper
                     ? (int)delta.TotalMilliseconds
                     : 0;
                 var delay = Math.Max(retryAfterMs, BackoffMs[attempt]);
-                await Task.Delay(delay, cancellationToken);
+                var jitter = Random.Shared.Next(0, delay / 5);
+                await Task.Delay(delay + jitter, cancellationToken);
                 continue;
             }
 
