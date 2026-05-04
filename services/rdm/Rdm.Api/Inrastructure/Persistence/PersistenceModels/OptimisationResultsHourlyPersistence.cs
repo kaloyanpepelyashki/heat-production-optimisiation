@@ -29,5 +29,4 @@ public class OptimisationResultsHourlyPersistence: BaseModel
     [Column("time_to")]
     public DateTime TimeTo { get; set; }
     
-    public List<OptimisationProductionUnitPersistence> ProductionUnits { get; set; }
 }

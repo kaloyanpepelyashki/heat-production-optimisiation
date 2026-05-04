@@ -30,14 +30,14 @@ public class ResultRepository : IResultRepository
     /// </summary>
     /// <returns> List of OptimisationRunPersistence, each counatining the optimisation result itself and the production units belonging to it </returns>
     /// <exception cref="DatabaseOperationException">Will throw an exception if the database query fails</exception>
-    public async Task<List<OptimisationRunPersistence>> GetAllOptimisationResults()
+    public async Task<List<OptimisationRunWithHourlyResultsPersistence>> GetAllOptimisationResults()
     {
         try
         {
-            var databaseResponse = await _client.From<OptimisationRunPersistence>()
+            var databaseResponse = await _client.From<OptimisationRunWithHourlyResultsPersistence>()
                 .Select("*, optimisation_results_hourly(*, optimisation_production_units(*))")
                 .Get();
-            List<OptimisationRunPersistence> results = databaseResponse.Models;
+            List<OptimisationRunWithHourlyResultsPersistence> results = databaseResponse.Models;
 
             return results;
         }
@@ -86,13 +86,13 @@ public class ResultRepository : IResultRepository
     /// <param name="result"></param>
     /// <returns></returns>
     /// <exception cref="DatabaseOperationException"></exception>
-    public async Task<bool> SaveOptimisationResult(OptimisationRunPersistence result)
+    public async Task<bool> SaveOptimisationResult(OptimisationRunPersistenceWrapper result)
     {
         try
         {
             var runInsertResponse = await _client
                 .From<OptimisationRunPersistence>()
-                .Insert(result);
+                .Insert(result.OptimisationRunPersistence);
 
             OptimisationRunPersistence? insertedRun = runInsertResponse.Models.FirstOrDefault();
 
@@ -101,10 +101,10 @@ public class ResultRepository : IResultRepository
                 throw new DatabaseOperationException("Error in ResultRepository. Failed to write optimisation run to database.");
             }
             
-            foreach (OptimisationResultsHourlyPersistence hourly in result.OptimisationResultsHourly)
+            foreach (OptimisationResultsHourlyPersistenceWrapper hourly in result.OptimisationResultsHourlyPersistence)
             {
                 
-                (bool Succeess, OptimisationResultsHourlyPersistence? Hourly) hourlyCreationResult = await CreateOptimisationHourlyEntry(hourly, insertedRun.Id);
+                (bool Succeess, OptimisationResultsHourlyPersistence? Hourly) hourlyCreationResult = await CreateOptimisationHourlyEntry(hourly.HourlyResult, insertedRun.Id);
 
                 if (!hourlyCreationResult.Succeess || hourlyCreationResult.Hourly == null)
                 {
@@ -113,7 +113,7 @@ public class ResultRepository : IResultRepository
                 }
                 
                 
-                foreach (OptimisationProductionUnitPersistence productionUnit in hourly.ProductionUnits)
+                foreach (OptimisationProductionUnitPersistence productionUnit in hourly.ProductionUnitsPersistence)
                 {
                     (bool, OptimisationProductionUnitPersistence?) productionUnitCreationResult = await CreateProductionUnitEntry(productionUnit, hourlyCreationResult.Item2.Id);
 

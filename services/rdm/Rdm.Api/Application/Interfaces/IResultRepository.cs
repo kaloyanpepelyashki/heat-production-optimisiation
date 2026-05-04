@@ -4,7 +4,7 @@ namespace Rdm.Api.Application.Interfaces;
 
 public interface IResultRepository
 {
-    Task<List<OptimisationRunPersistence>> GetAllOptimisationResults();
+    Task<List<OptimisationRunWithHourlyResultsPersistence>> GetAllOptimisationResults();
     Task<OptimisationRunPersistence> GetLatestOptimisationResult();
-    Task<bool> SaveOptimisationResult(OptimisationRunPersistence result);
+    Task<bool> SaveOptimisationResult(OptimisationRunPersistenceWrapper result);
 }

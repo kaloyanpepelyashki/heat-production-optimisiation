@@ -33,7 +33,7 @@ public class OptimisationResultService : IOptimisationResultService
         try
         {
             // Maps the persistence models coming from database to abase domain model
-            List<OptimisationRunPersistence> persistenceModel = await _resultRepository.GetAllOptimisationResults();
+            List<OptimisationRunWithHourlyResultsPersistence> persistenceModel = await _resultRepository.GetAllOptimisationResults();
             List<OptimisationRun> optimisationResultsModels = persistenceModel.Select(obj => new OptimisationRun
             {
                 Id = obj.Id,
@@ -88,10 +88,16 @@ public class OptimisationResultService : IOptimisationResultService
     {
         try
         {
-            OptimisationRunPersistence optimisationRunPersistence = OptimisationModelsMapper.ToPersistence(optimisationRun);
+            OptimisationRunPersistenceWrapper optimisationRunPersistence =
+                OptimisationModelsMapper.ToPersistenceWrapper(optimisationRun);
             var creationResult = await _resultRepository.SaveOptimisationResult(optimisationRunPersistence);
-            
-            return creationResult; 
+
+            return creationResult;
+        }
+        catch (ArgumentException e)
+        {
+            _logger.LogError($"Error translating domain to persistence model: {e.Message} ");
+            throw e;
         }
         catch (DatabaseOperationException e)
         {

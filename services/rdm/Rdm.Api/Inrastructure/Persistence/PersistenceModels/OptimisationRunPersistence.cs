@@ -19,6 +19,4 @@ public class OptimisationRunPersistence: BaseModel
     public string Scenario { get; set; }
     [Column("period")]
     public string Type { get; set; }
-    
-    public List<OptimisationResultsHourlyPersistence> OptimisationResultsHourly { get; set; }
 }
