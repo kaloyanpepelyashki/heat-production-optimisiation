@@ -24,11 +24,10 @@ public class Optimizer
 
         try {
             
-        var assetsTask = _assetDataProvider.GetAssetDataAsync(request.MaintenanceId, cancellationToken);
-        var sourceDataTask = _sourceDataProvider.GetSourceDataAsync(cancellationToken);
+        var assets = await _assetDataProvider.GetAssetDataAsync(request.MaintenanceId, cancellationToken);
+        var sourceDataResponse = await _sourceDataProvider.GetSourceDataAsync(cancellationToken);
 
-        var assets = await assetsTask;
-        var sourceData = (await sourceDataTask)
+        var sourceData = sourceDataResponse
             .Where(x => x.PeriodId == request.PeriodId)
             .Where(x => x.TimeFrom >= request.TimeFrom && x.TimeTo <= request.TimeTo)
             .OrderBy(x => x.TimeFrom)
