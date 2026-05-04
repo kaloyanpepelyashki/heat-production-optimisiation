@@ -1,4 +1,3 @@
-using System.Net.Http.Json;
 using Opt.Api.Application.Exceptions;
 using Opt.Api.Application.Interfaces;
 using Opt.Api.Domain.Models;
@@ -22,7 +21,8 @@ public sealed class SdmDataProvider : ISourceDataProvider
     {
         try
         {
-            var sourceData = await _httpClient.GetFromJsonAsync<List<SdmSourceDataResponseDto>>(
+            var sourceData = await HttpRetryHelper.GetWithRetryAsync<List<SdmSourceDataResponseDto>>(
+                _httpClient,
                 _options.Sdm.SourceDataEndpoint,
                 cancellationToken) ?? [];
 

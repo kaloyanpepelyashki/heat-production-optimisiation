@@ -27,25 +27,17 @@ public sealed class AmDataProvider : IAssetDataProvider
                 _options.Am.GasBoilersEndpoint,
                 cancellationToken);
 
-            await Task.Delay(1000, cancellationToken);
-
             var oilBoilers = await this.GetWithRetryAsync<List<AmOilBoilerResponseDto>>(
                 _options.Am.OilBoilersEndpoint,
                 cancellationToken);
-
-            await Task.Delay(1000, cancellationToken);
 
             var electricBoilers = await this.GetWithRetryAsync<List<AmElectricBoilerResponseDto>>(
                 _options.Am.ElectricBoilersEndpoint,
                 cancellationToken);
 
-            await Task.Delay(1000, cancellationToken);
-
             var gasMotors = await this.GetWithRetryAsync<List<AmGasMotorResponseDto>>(
                 _options.Am.GasMotorsEndpoint,
                 cancellationToken);
-
-            await Task.Delay(1000, cancellationToken);
 
             var schedule = await this.GetWithRetryAsync<AmMaintenanceScheduleResponseDto>(
                 _options.Am.ResolveMaintenanceSchedulesEndpoint(maintenanceId),
@@ -120,31 +112,6 @@ public sealed class AmDataProvider : IAssetDataProvider
         }
     }
 
-    private async Task<T?> GetWithRetryAsync<T>(string url, CancellationToken cancellationToken)
-    {
-        int[] backoffMs = [2000, 5000, 10000];
-        for (int attempt = 0; attempt <= backoffMs.Length; attempt++)
-        {
-            var response = await _httpClient.GetAsync(url, cancellationToken);
-            if (response.StatusCode == HttpStatusCode.TooManyRequests)
-            {
-                if (attempt == backoffMs.Length)
-                {
-                    response.EnsureSuccessStatusCode();
-                }
-
-                var retryAfter = response.Headers.RetryAfter?.Delta;
-                var delay = retryAfter.HasValue
-                    ? (int)retryAfter.Value.TotalMilliseconds
-                    : backoffMs[attempt];
-                await Task.Delay(delay, cancellationToken);
-                continue;
-            }
-
-            response.EnsureSuccessStatusCode();
-            return await response.Content.ReadFromJsonAsync<T>(cancellationToken);
-        }
-
-        return default;
-    }
+    private Task<T?> GetWithRetryAsync<T>(string url, CancellationToken cancellationToken) =>
+        HttpRetryHelper.GetWithRetryAsync<T>(_httpClient, url, cancellationToken);
 }
