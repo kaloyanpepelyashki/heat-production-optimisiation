@@ -41,4 +41,16 @@ public sealed class SdmDataProvider : ISourceDataProvider
             throw new ExternalDataFetchException("Failed to fetch SDM data.", ex);
         }
     }
+
+    public async Task PingAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            await _httpClient.GetAsync("health", cancellationToken);
+        }
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or NotSupportedException)
+        {
+            throw new ExternalDataFetchException("Failed to ping SDM service.", ex);
+        }
+    }
 }

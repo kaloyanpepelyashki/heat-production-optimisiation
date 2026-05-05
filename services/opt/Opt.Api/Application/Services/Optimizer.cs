@@ -22,6 +22,10 @@ public class Optimizer
     {
         try
         {
+            // Ping services to wake them up
+            await _assetDataProvider.PingAsync(cancellationToken);
+            await _sourceDataProvider.PingAsync(cancellationToken);
+
             var assetsTask = _assetDataProvider.GetAssetDataAsync(request.MaintenanceId, cancellationToken);
             var sourceDataTask = _sourceDataProvider.GetSourceDataAsync(cancellationToken);
 
