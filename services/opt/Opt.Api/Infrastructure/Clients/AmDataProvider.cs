@@ -63,21 +63,30 @@ public sealed class AmDataProvider : IAssetDataProvider
                 _options.Am.GasBoilersEndpoint,
                 cancellationToken);
 
+            await Task.Delay(100);
+
             var oilBoilers = await this.GetWithRetryAsync<List<AmOilBoilerResponseDto>>(
                 _options.Am.OilBoilersEndpoint,
                 cancellationToken);
 
+            await Task.Delay(100);
+            
             var electricBoilers = await this.GetWithRetryAsync<List<AmElectricBoilerResponseDto>>(
                 _options.Am.ElectricBoilersEndpoint,
                 cancellationToken);
+
+            await Task.Delay(100);
 
             var gasMotors = await this.GetWithRetryAsync<List<AmGasMotorResponseDto>>(
                 _options.Am.GasMotorsEndpoint,
                 cancellationToken);
 
+            await Task.Delay(100);
+
             var schedule = await this.GetWithRetryAsync<AmMaintenanceScheduleResponseDto>(
                 _options.Am.ResolveMaintenanceSchedulesEndpoint(maintenanceId),
                 cancellationToken);
+
 
             var gasBoilersMapped = (gasBoilers ?? []).Select(x => new GasBoiler
             {
