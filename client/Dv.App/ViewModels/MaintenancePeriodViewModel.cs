@@ -10,7 +10,7 @@ using Dv.App.Models;
 using Dv.App.Services;
 
 // holds the maintenance logic based on the period and scenario
-public partial class PeriodViewModel : ViewModelBase
+public partial class MaintenancePeriodViewModel : ViewModelBase
 {
     private readonly MaintenanceService maintenanceService;
     private readonly IDialogService dialogService;
@@ -43,7 +43,7 @@ public partial class PeriodViewModel : ViewModelBase
     private double maintenanceDuration = 30;
 
     // setting up the instance
-    public PeriodViewModel(MaintenanceService maintenanceService, IDialogService dialogService, string periodName, string scenario, DateTime start, DateTime end, ObservableCollection<BoilerStatusViewModel> initialBoilers)
+    public MaintenancePeriodViewModel(MaintenanceService maintenanceService, IDialogService dialogService, string periodName, string scenario, DateTime start, DateTime end, ObservableCollection<BoilerStatusViewModel> initialBoilers)
     {
         this.maintenanceService = maintenanceService;
         this.dialogService = dialogService;
@@ -59,7 +59,7 @@ public partial class PeriodViewModel : ViewModelBase
 
     // getting the selected boiler data here
     [RelayCommand]
-    private async Task SelectMaintenanceAsync()
+    private async Task ScheduleMaintenanceAsync()
     {
         string boilerId = this.SelectedBoiler?.BoilerId ?? "No Boiler Selected";
 

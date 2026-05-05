@@ -12,16 +12,16 @@ public sealed partial class OptimizationViewModel : ViewModelBase
     private readonly IDialogService dialogService;
 
     [ObservableProperty]
-    private PeriodViewModel summerScenario1;
+    private MaintenancePeriodViewModel summerScenario1;
 
     [ObservableProperty]
-    private PeriodViewModel winterScenario1;
+    private MaintenancePeriodViewModel winterScenario1;
 
     [ObservableProperty]
-    private PeriodViewModel summerScenario2;
+    private MaintenancePeriodViewModel summerScenario2;
 
     [ObservableProperty]
-    private PeriodViewModel winterScenario2;
+    private MaintenancePeriodViewModel winterScenario2;
 
     // building the four period panels/views exposing them to the view
     public OptimizationViewModel()
@@ -29,7 +29,7 @@ public sealed partial class OptimizationViewModel : ViewModelBase
         this.maintenanceService = new MaintenanceService();
         this.dialogService = new DialogService();
 
-        this.summerScenario1 = new PeriodViewModel(
+        this.summerScenario1 = new MaintenancePeriodViewModel(
             this.maintenanceService,
             this.dialogService,
             "Summer",
@@ -38,7 +38,7 @@ public sealed partial class OptimizationViewModel : ViewModelBase
             new DateTime(2025, 9, 21, 23, 59, 59),
             this.CreateBoilerRows("Summer"));
 
-        this.winterScenario1 = new PeriodViewModel(
+        this.winterScenario1 = new MaintenancePeriodViewModel(
             this.maintenanceService,
             this.dialogService,
             "Winter",
@@ -47,7 +47,7 @@ public sealed partial class OptimizationViewModel : ViewModelBase
             new DateTime(2026, 1, 18, 23, 59, 59),
             this.CreateBoilerRows("Winter"));
 
-        this.summerScenario2 = new PeriodViewModel(
+        this.summerScenario2 = new MaintenancePeriodViewModel(
             this.maintenanceService,
             this.dialogService,
             "Summer",
@@ -56,7 +56,7 @@ public sealed partial class OptimizationViewModel : ViewModelBase
             new DateTime(2025, 9, 21, 23, 59, 59),
             this.CreateBoilerRowsScenario2("Summer"));
 
-        this.winterScenario2 = new PeriodViewModel(
+        this.winterScenario2 = new MaintenancePeriodViewModel(
             this.maintenanceService,
             this.dialogService,
             "Winter",

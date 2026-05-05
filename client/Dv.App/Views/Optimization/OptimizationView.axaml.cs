@@ -48,7 +48,7 @@ public partial class OptimizationView : UserControl
     }
 
     // based on the view opened, this method selects the maintenance for the particular period/scenario
-    private void SelectMaintenance_Click(object? sender, RoutedEventArgs e)
+    private void ScheduleMaintenance_Click(object? sender, RoutedEventArgs e)
     {
         if (sender is Button button && button.Tag is string tag && this.DataContext is OptimizationViewModel viewModel)
         {
@@ -74,7 +74,7 @@ public partial class OptimizationView : UserControl
                 periodViewModel.MaintenanceStartDate = datePicker.SelectedDate;
                 periodViewModel.MaintenanceStartHour = (int)(startHour.Value ?? 12);
                 periodViewModel.MaintenanceDuration = durationSlider.Value;
-                periodViewModel.SelectMaintenanceCommand.Execute(null);
+                periodViewModel.ScheduleMaintenanceCommand.Execute(null);
             }
         }
     }
@@ -95,7 +95,7 @@ public partial class OptimizationView : UserControl
         var summerData = sourceData.Where(item => item.PeriodId == 1).OrderBy(item => item.TimeFrom).ToList();
         var winterData = sourceData.Where(item => item.PeriodId == 2).OrderBy(item => item.TimeFrom).ToList();
 
-        // in avalonia, we cannot have two instances of the same chart in existence, so, we have a chart for each scenario even tho they are the same
+        // We use separate chart instances for each scenario but they share the same summer/winter data and configuration
         this.ConfigureSeasonCharts(
             summerData,
             new[]
