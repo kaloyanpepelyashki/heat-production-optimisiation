@@ -14,7 +14,7 @@
     </PackageReference>
   </ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(Configuration)' == 'Debug'">
     <AdditionalFiles Include="../../../stylecop.json" />
   </ItemGroup>
 
