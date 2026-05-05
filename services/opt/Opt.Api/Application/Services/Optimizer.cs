@@ -26,11 +26,10 @@ public class Optimizer
             await _assetDataProvider.PingAsync(cancellationToken);
             await _sourceDataProvider.PingAsync(cancellationToken);
 
-            var assetsTask = _assetDataProvider.GetAssetDataAsync(request.MaintenanceId, cancellationToken);
-            var sourceDataTask = _sourceDataProvider.GetSourceDataAsync(cancellationToken);
-
-            var assets = await assetsTask;
-            var sourceData = (await sourceDataTask)
+            await Task.Delay(2000, cancellationToken);
+            
+            var assets = await _assetDataProvider.GetAssetDataAsync(request.MaintenanceId, cancellationToken);
+            var sourceData = (await _sourceDataProvider.GetSourceDataAsync(cancellationToken))
                 .Where(x => x.PeriodId == request.PeriodId)
                 .Where(x => x.TimeFrom >= request.TimeFrom && x.TimeTo <= request.TimeTo)
                 .OrderBy(x => x.TimeFrom)
