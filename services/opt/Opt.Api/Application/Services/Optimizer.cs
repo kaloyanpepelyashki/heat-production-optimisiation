@@ -24,6 +24,7 @@ public class Optimizer
         {
             using var client = new HttpClient();
             await client.GetAsync("https://heat-production-optimisiation.onrender.com/api/Health/wakeup", cancellationToken);
+            await client.GetAsync("https://sdm-api.onrender.com/api/Health/wakeup", cancellationToken);
         }
         catch (Exception)
          {
