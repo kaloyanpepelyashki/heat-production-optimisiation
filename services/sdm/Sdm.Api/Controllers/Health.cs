@@ -3,7 +3,7 @@
 namespace Sdm.Api.Controllers;
 
 
-[Microsoft.AspNetCore.Components.Route("api/[controller]")]
+[Route("api/[controller]")]
 [ApiController]
 public class Health : Controller
 {
