@@ -3,6 +3,7 @@ using Opt.Api.Application.Interfaces;
 using Opt.Api.DTOs;
 using Opt.Api.Domain.Models;
 using Opt.Api.Application.Exceptions;
+using Microsoft.Extensions.Logging;
 namespace Opt.Api.Application.Services;
 
 public class Optimizer
@@ -10,10 +11,13 @@ public class Optimizer
     private readonly IAssetDataProvider _assetDataProvider;
     private readonly ISourceDataProvider _sourceDataProvider;
 
-    public Optimizer(IAssetDataProvider assetDataProvider, ISourceDataProvider sourceDataProvider)
+    private readonly ILogger<Optimizer> _logger;
+
+    public Optimizer(IAssetDataProvider assetDataProvider, ISourceDataProvider sourceDataProvider, ILogger<Optimizer> logger)
     {
         _assetDataProvider = assetDataProvider;
         _sourceDataProvider = sourceDataProvider;
+        _logger = logger;
     }
 
     public async Task<OptimizationResponseDto> OptimizeAsync(
@@ -23,11 +27,25 @@ public class Optimizer
         try
         {
             using var client = new HttpClient();
+<<<<<<< HEAD
             await client.GetAsync("https://heat-production-optimisiation.onrender.com/api/Health/wakeup", cancellationToken);
             
+=======
+            var responseAm = await client.GetAsync("https://heat-production-optimisiation.onrender.com/api/Health/wakeup", cancellationToken);
+            await Task.Delay(1000, cancellationToken);
+            var responseSdm = await client.GetAsync("https://sdm-api.onrender.com/api/Health/wakeup", cancellationToken);
+
+            _logger.LogInformation("Response from am-api service: {StatusCode}, {Headers}, {ReasonPhrase}", responseAm.StatusCode,
+             responseAm.Headers.ToString(),
+              responseAm.ReasonPhrase);
+            _logger.LogInformation("Response from sdm-api service: {StatusCode}, {Headers}, {ReasonPhrase}", responseSdm.StatusCode,
+             responseSdm.Headers.ToString(), 
+             responseSdm.ReasonPhrase);
+>>>>>>> cd467cd017c6a68fa6f96261111462cc67ffcc87
         }
-        catch (Exception)
-         {
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to wakeup external services.");
              throw;
         }
 
