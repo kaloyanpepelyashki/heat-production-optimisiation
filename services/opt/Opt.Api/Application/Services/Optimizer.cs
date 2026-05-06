@@ -23,7 +23,7 @@ public class Optimizer
         try
         {
             using var client = new HttpClient();
-            await client.GetAsync("https://heat-production-optimisiation.onrender.com/api/wakeup", cancellationToken);
+            await client.GetAsync("https://heat-production-optimisiation.onrender.com/api/Health/wakeup", cancellationToken);
         }
         catch (Exception)
          {
