@@ -27,10 +27,6 @@ public class Optimizer
         try
         {
             using var client = new HttpClient();
-<<<<<<< HEAD
-            await client.GetAsync("https://heat-production-optimisiation.onrender.com/api/Health/wakeup", cancellationToken);
-            
-=======
             var responseAm = await client.GetAsync("https://heat-production-optimisiation.onrender.com/api/Health/wakeup", cancellationToken);
             await Task.Delay(1000, cancellationToken);
             var responseSdm = await client.GetAsync("https://sdm-api.onrender.com/api/Health/wakeup", cancellationToken);
@@ -41,7 +37,6 @@ public class Optimizer
             _logger.LogInformation("Response from sdm-api service: {StatusCode}, {Headers}, {ReasonPhrase}", responseSdm.StatusCode,
              responseSdm.Headers.ToString(), 
              responseSdm.ReasonPhrase);
->>>>>>> cd467cd017c6a68fa6f96261111462cc67ffcc87
         }
         catch (Exception ex)
         {

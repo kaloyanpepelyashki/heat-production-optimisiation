@@ -3,6 +3,7 @@ using Opt.Api.Application.Interfaces;
 using Opt.Api.Application.Services;
 using Opt.Api.Domain.Models;
 using Opt.Api.DTOs;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Opt.Api.Tests;
 
@@ -32,7 +33,7 @@ public class Optimizer_Test
                 new SourceDataPoint { PeriodId = 1, TimeFrom = new DateTime(2025, 1, 1, 11, 0, 0), TimeTo = new DateTime(2025, 1, 1, 12, 0, 0), HeatDemand = 5.0, ElectricityPrice = 500 }
             });
 
-        var optimizer = new Optimizer(assetProvider.Object, sourceProvider.Object);
+        var optimizer = new Optimizer(assetProvider.Object, sourceProvider.Object, NullLogger<Optimizer>.Instance);
         var request = new OptimizationRequestDto { ScenarioId = 1, PeriodId = 1, TimeFrom = new DateTime(2025, 1, 1), TimeTo = new DateTime(2025, 1, 2) };
 
         var result = await optimizer.OptimizeAsync(request, CancellationToken.None);
@@ -62,7 +63,7 @@ public class Optimizer_Test
                 new SourceDataPoint { PeriodId = 2, TimeFrom = new DateTime(2026, 1, 1, 11, 0, 0), TimeTo = new DateTime(2026, 1, 1, 12, 0, 0), HeatDemand = 10.0, ElectricityPrice = 100 }
             });
 
-        var optimizer = new Optimizer(assetProvider.Object, sourceProvider.Object);
+        var optimizer = new Optimizer(assetProvider.Object, sourceProvider.Object, NullLogger<Optimizer>.Instance);
         var request = new OptimizationRequestDto { ScenarioId = 2, PeriodId = 2, TimeFrom = new DateTime(2026, 1, 1), TimeTo = new DateTime(2026, 1, 2) };
 
         var result = await optimizer.OptimizeAsync(request, CancellationToken.None);
@@ -94,7 +95,7 @@ public class Optimizer_Test
                 new SourceDataPoint { PeriodId = 2, TimeFrom = new DateTime(2026, 1, 1, 11, 0, 0), TimeTo = new DateTime(2026, 1, 1, 12, 0, 0), HeatDemand = 8.0, ElectricityPrice = 100 }
             });
 
-        var optimizer = new Optimizer(assetProvider.Object, sourceProvider.Object);
+        var optimizer = new Optimizer(assetProvider.Object, sourceProvider.Object, NullLogger<Optimizer>.Instance);
         var request = new OptimizationRequestDto { ScenarioId = 2, PeriodId = 2, TimeFrom = new DateTime(2026, 1, 1), TimeTo = new DateTime(2026, 1, 2) };
 
         var result = await optimizer.OptimizeAsync(request, CancellationToken.None);
@@ -124,7 +125,7 @@ public class Optimizer_Test
                 new SourceDataPoint { PeriodId = 2, TimeFrom = new DateTime(2026, 1, 1, 10, 0, 0), TimeTo = new DateTime(2026, 1, 1, 11, 0, 0), HeatDemand = 15.0, ElectricityPrice = 500 }
             });
 
-        var optimizer = new Optimizer(assetProvider.Object, sourceProvider.Object);
+        var optimizer = new Optimizer(assetProvider.Object, sourceProvider.Object, NullLogger<Optimizer>.Instance);
         var request = new OptimizationRequestDto { ScenarioId = 2, PeriodId = 2, TimeFrom = new DateTime(2026, 1, 1), TimeTo = new DateTime(2026, 1, 2) };
 
         var result = await optimizer.OptimizeAsync(request, CancellationToken.None);
