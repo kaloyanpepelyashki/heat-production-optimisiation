@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Controls;
-using Avalonia.Interactivity;
 using LiveChartsCore;
 using LiveChartsCore.Defaults;
 using LiveChartsCore.Kernel.Sketches;
@@ -15,7 +14,6 @@ using LiveChartsCore.SkiaSharpView.Painting;
 using SkiaSharp;
 using Dv.App.Models;
 using Dv.App.Services;
-using Dv.App.ViewModels;
 
 public partial class OptimizationView : UserControl
 {
@@ -26,57 +24,6 @@ public partial class OptimizationView : UserControl
         this.InitializeComponent();
         this.apiService = new ApiService();
         _ = this.LoadSeasonChartsAsync();
-    }
-
-    // Updates the view when the user changes it (Summer -> Winter), updates bindings
-    protected override void OnDataContextChanged(EventArgs e)
-    {
-        base.OnDataContextChanged(e);
-
-        if (this.DataContext is OptimizationViewModel viewModel)
-        {
-            this.BoilersListBoxSummerScenario1.ItemsSource = viewModel.SummerScenario1.Boilers;
-            this.BoilersListBoxWinterScenario1.ItemsSource = viewModel.WinterScenario1.Boilers;
-            this.BoilersListBoxSummerScenario2.ItemsSource = viewModel.SummerScenario2.Boilers;
-            this.BoilersListBoxWinterScenario2.ItemsSource = viewModel.WinterScenario2.Boilers;
-
-            this.MaintenanceScheduleItemsControlSummerScenario1.ItemsSource = Models.MaintenanceStore.MaintenanceSchedules;
-            this.MaintenanceScheduleItemsControlWinterScenario1.ItemsSource = Models.MaintenanceStore.MaintenanceSchedules;
-            this.MaintenanceScheduleItemsControlSummerScenario2.ItemsSource = Models.MaintenanceStore.MaintenanceSchedules;
-            this.MaintenanceScheduleItemsControlWinterScenario2.ItemsSource = Models.MaintenanceStore.MaintenanceSchedules;
-        }
-    }
-
-    // based on the view opened, this method selects the maintenance for the particular period/scenario
-    private void ScheduleMaintenance_Click(object? sender, RoutedEventArgs e)
-    {
-        if (sender is Button button && button.Tag is string tag && this.DataContext is OptimizationViewModel viewModel)
-        {
-            var periodViewModel = tag switch
-            {
-                "SummerScenario1" => viewModel.SummerScenario1,
-                "WinterScenario1" => viewModel.WinterScenario1,
-                "SummerScenario2" => viewModel.SummerScenario2,
-                "WinterScenario2" => viewModel.WinterScenario2,
-                _ => null
-            };
-
-            if (periodViewModel == null) return;
-
-            var listBox = this.FindControl<ListBox>($"BoilersListBox{tag}");
-            var datePicker = this.FindControl<CalendarDatePicker>($"MaintenanceStartDatePicker{tag}");
-            var startHour = this.FindControl<NumericUpDown>($"MaintenanceStartHour{tag}");
-            var durationSlider = this.FindControl<Slider>($"MaintenanceDurationSlider{tag}");
-
-            if (listBox != null && datePicker != null && startHour != null && durationSlider != null)
-            {
-                periodViewModel.SelectedBoiler = listBox.SelectedItem as BoilerStatusViewModel;
-                periodViewModel.MaintenanceStartDate = datePicker.SelectedDate;
-                periodViewModel.MaintenanceStartHour = (int)(startHour.Value ?? 12);
-                periodViewModel.MaintenanceDuration = durationSlider.Value;
-                periodViewModel.ScheduleMaintenanceCommand.Execute(null);
-            }
-        }
     }
 
     // Summer and winter period charts

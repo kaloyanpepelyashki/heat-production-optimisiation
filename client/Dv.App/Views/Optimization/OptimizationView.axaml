@@ -5,7 +5,7 @@
              xmlns:viewModels="using:Dv.App.ViewModels"
              xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.Avalonia;assembly=LiveChartsCore.SkiaSharpView.Avalonia"
              x:Class="Dv.App.Views.OptimizationView"
-             x:DataType="viewModels:OptimizationViewModel">
+             x:CompileBindings="False">
 
 
   <ScrollViewer>
@@ -101,7 +101,7 @@
 
 
                     <!-- Stackpanel for Summer view-->
-                    <StackPanel Margin="10">
+                    <StackPanel Margin="10" DataContext="{Binding SummerScenario1}">
                       <Grid ColumnDefinitions="Auto,Auto,*" Margin="0,0,0,20">
 
                         <!-- Period Start date -->
@@ -170,7 +170,7 @@
                           <Separator Background="{DynamicResource AppBorder}" Height="1" Margin="0,0,0,5" />
 
                           <!-- Selectable rows for maintenance -->
-                          <ListBox x:Name="BoilersListBoxSummerScenario1" Background="Transparent" BorderThickness="0" CornerRadius="4">
+                          <ListBox ItemsSource="{Binding Boilers}" SelectedItem="{Binding SelectedBoiler, Mode=TwoWay}" Background="Transparent" BorderThickness="0" CornerRadius="4">
                             <ListBox.Styles>
                               <Style Selector="ListBoxItem">
                                 <Setter Property="Padding" Value="0" />
@@ -191,14 +191,14 @@
                       </Border>
 
                       <!-- Maintenance date choosing -->
-                      <Grid ColumnDefinitions="Auto, Auto, *" Margin="0,20,0,0" VerticalAlignment="Top" IsVisible="{Binding #BoilersListBoxSummerScenario1.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}">
+                      <Grid ColumnDefinitions="Auto, Auto, *" Margin="0,20,0,0" VerticalAlignment="Top" IsVisible="{Binding SelectedBoiler, Converter={x:Static ObjectConverters.IsNotNull}}">
                         <!-- Maintenance start time -->
                         <StackPanel Grid.Column="0" Spacing="8" Margin="0,0,40,20" VerticalAlignment="Top">
                           <TextBlock Text="Maintenance Start" FontSize="14" Foreground="{DynamicResource AppTextPrimary}" FontWeight="SemiBold"/>
                           <WrapPanel Margin="0">
-                            <CalendarDatePicker x:Name="MaintenanceStartDatePickerSummerScenario1" Width="140" Watermark="Select date" Margin="0,0,10,0"/>
-                            <NumericUpDown x:Name="MaintenanceStartHourSummerScenario1" Minimum="0" Maximum="23" Value="12" FormatString="00" Margin="0" VerticalAlignment="Center" Width="70" ShowButtonSpinner="True"/>
-                            <TextBlock Text="{Binding #MaintenanceStartHourSummerScenario1.Value, StringFormat={}{0:00}}" VerticalAlignment="Center" Margin="8,0,0,0" FontWeight="SemiBold" Foreground="{DynamicResource AppTextPrimary}"/>
+                            <CalendarDatePicker SelectedDate="{Binding MaintenanceStartDate, Mode=TwoWay}" Width="140" Watermark="Select date" Margin="0,0,10,0"/>
+                            <NumericUpDown Minimum="0" Maximum="23" Value="{Binding MaintenanceStartHour, Mode=TwoWay}" FormatString="00" Margin="0" VerticalAlignment="Center" Width="70" ShowButtonSpinner="True"/>
+                            <TextBlock Text="{Binding MaintenanceStartHour, StringFormat={}{0:00}}" VerticalAlignment="Center" Margin="8,0,0,0" FontWeight="SemiBold" Foreground="{DynamicResource AppTextPrimary}"/>
                             <TextBlock Text=": 00" VerticalAlignment="Center" Margin="5,0,0,0" FontWeight="SemiBold" Foreground="{DynamicResource AppTextPrimary}"/>
                           </WrapPanel>
                         </StackPanel>
@@ -207,16 +207,16 @@
                         <StackPanel Grid.Column="1" Spacing="8" Margin="0,0,20,20" VerticalAlignment="Top">
                           <TextBlock Text="Maintenance Duration" FontSize="14" Foreground="{DynamicResource AppTextPrimary}" FontWeight="SemiBold"/>
                           <Grid Margin="0" ColumnDefinitions="140,Auto,Auto" VerticalAlignment="Center">
-                            <Slider Grid.Column="0" x:Name="MaintenanceDurationSliderSummerScenario1" Minimum="30" Maximum="60" Value="30" TickFrequency="1" IsSnapToTickEnabled="True" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="1" Text="{Binding #MaintenanceDurationSliderSummerScenario1.Value}" VerticalAlignment="Center" Margin="10,0,0,0" FontWeight="SemiBold" Foreground="{DynamicResource AppTextPrimary}"/>
+                            <Slider Grid.Column="0" Minimum="30" Maximum="60" Value="{Binding MaintenanceDuration, Mode=TwoWay}" TickFrequency="1" IsSnapToTickEnabled="True" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="{Binding MaintenanceDuration}" VerticalAlignment="Center" Margin="10,0,0,0" FontWeight="SemiBold" Foreground="{DynamicResource AppTextPrimary}"/>
                             <TextBlock Grid.Column="2" Text="hours" VerticalAlignment="Center" Margin="8,0,0,0" Foreground="{DynamicResource AppTextMuted}"/>
                           </Grid>
                         </StackPanel>
 
                         <!-- Confirm Maintenance Button -->
                         <Button Grid.Column="2"
-                                HorizontalAlignment="Right"
-                          Click="ScheduleMaintenance_Click" Tag="SummerScenario1"
+                            HorizontalAlignment="Right"
+                          Command="{Binding ScheduleMaintenanceCommand}"
                           Content="Select"
                                 FontWeight="SemiBold"
                                 CornerRadius="4"
@@ -259,7 +259,7 @@
                             <!-- Line separating rows -->
                             <Rectangle Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="5" Height="1" Fill="{DynamicResource AppBorder}" VerticalAlignment="Bottom"/>
 
-                            <ItemsControl x:Name="MaintenanceScheduleItemsControlSummerScenario1" Grid.Row="2" Grid.ColumnSpan="5">
+                            <ItemsControl ItemsSource="{Binding Schedules}" Grid.Row="2" Grid.ColumnSpan="5">
                               <ItemsControl.ItemTemplate>
                               <DataTemplate x:CompileBindings="False">
                                   <Grid ColumnDefinitions="*,*,*,*,*">
@@ -331,7 +331,7 @@
                     </StackPanel>
 
                     <!-- Stackpanel for Winter view-->
-                    <StackPanel Margin="10">
+                    <StackPanel Margin="10" DataContext="{Binding WinterScenario1}">
                       <Grid ColumnDefinitions="Auto,Auto,*" Margin="0,0,0,20">
 
                         <!-- Period Start Date -->
@@ -401,7 +401,7 @@
                           <Separator Background="{DynamicResource AppBorder}" Height="1" Margin="0,0,0,5" />
 
                           <!-- Selectable rows for maintenance -->
-                          <ListBox x:Name="BoilersListBoxWinterScenario1" Background="Transparent" BorderThickness="0" CornerRadius="4">
+                          <ListBox ItemsSource="{Binding Boilers}" SelectedItem="{Binding SelectedBoiler, Mode=TwoWay}" Background="Transparent" BorderThickness="0" CornerRadius="4">
                             <ListBox.Styles>
                               <Style Selector="ListBoxItem">
                                 <Setter Property="Padding" Value="0" />
@@ -421,14 +421,14 @@
                       </Border>
 
                       <!-- Maintenance Date choosing -->
-                      <Grid ColumnDefinitions="Auto, Auto, *" Margin="0,20,0,0" VerticalAlignment="Top" IsVisible="{Binding #BoilersListBoxWinterScenario1.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}">
+                      <Grid ColumnDefinitions="Auto, Auto, *" Margin="0,20,0,0" VerticalAlignment="Top" IsVisible="{Binding SelectedBoiler, Converter={x:Static ObjectConverters.IsNotNull}}">
                         <!-- Maintenance start time -->
                         <StackPanel Grid.Column="0" Spacing="8" Margin="0,0,40,20" VerticalAlignment="Top">
                           <TextBlock Text="Maintenance Start" FontSize="14" Foreground="{DynamicResource AppTextPrimary}" FontWeight="SemiBold"/>
                           <WrapPanel Margin="0">
-                            <CalendarDatePicker x:Name="MaintenanceStartDatePickerWinterScenario1" Width="140" Watermark="Select date" Margin="0,0,10,0" />
-                            <NumericUpDown x:Name="MaintenanceStartHourWinterScenario1" Minimum="0" Maximum="23" Value="12" FormatString="00" Margin="0" VerticalAlignment="Center" Width="70" ShowButtonSpinner="True"/>
-                            <TextBlock Text="{Binding #MaintenanceStartHourWinterScenario1.Value, StringFormat={}{0:00}}" VerticalAlignment="Center" Margin="8,0,0,0" FontWeight="SemiBold" Foreground="{DynamicResource AppTextPrimary}"/>
+                            <CalendarDatePicker SelectedDate="{Binding MaintenanceStartDate, Mode=TwoWay}" Width="140" Watermark="Select date" Margin="0,0,10,0" />
+                            <NumericUpDown Minimum="0" Maximum="23" Value="{Binding MaintenanceStartHour, Mode=TwoWay}" FormatString="00" Margin="0" VerticalAlignment="Center" Width="70" ShowButtonSpinner="True"/>
+                            <TextBlock Text="{Binding MaintenanceStartHour, StringFormat={}{0:00}}" VerticalAlignment="Center" Margin="8,0,0,0" FontWeight="SemiBold" Foreground="{DynamicResource AppTextPrimary}"/>
                             <TextBlock Text=": 00" VerticalAlignment="Center" Margin="5,0,0,0" FontWeight="SemiBold" Foreground="{DynamicResource AppTextPrimary}"/>
                           </WrapPanel>
                         </StackPanel>
@@ -437,16 +437,16 @@
                         <StackPanel Grid.Column="1" Spacing="8" Margin="0,0,20,20" VerticalAlignment="Top">
                           <TextBlock Text="Maintenance Duration" FontSize="14" Foreground="{DynamicResource AppTextPrimary}" FontWeight="SemiBold"/>
                           <Grid Margin="0" ColumnDefinitions="140,Auto,Auto" VerticalAlignment="Center">
-                            <Slider Grid.Column="0" x:Name="MaintenanceDurationSliderWinterScenario1" Minimum="30" Maximum="60" Value="30" TickFrequency="1" IsSnapToTickEnabled="True" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="1" Text="{Binding #MaintenanceDurationSliderWinterScenario1.Value}" VerticalAlignment="Center" Margin="10,0,0,0" FontWeight="SemiBold" Foreground="{DynamicResource AppTextPrimary}"/>
+                            <Slider Grid.Column="0" Minimum="30" Maximum="60" Value="{Binding MaintenanceDuration, Mode=TwoWay}" TickFrequency="1" IsSnapToTickEnabled="True" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="{Binding MaintenanceDuration}" VerticalAlignment="Center" Margin="10,0,0,0" FontWeight="SemiBold" Foreground="{DynamicResource AppTextPrimary}"/>
                             <TextBlock Grid.Column="2" Text="hours" VerticalAlignment="Center" Margin="8,0,0,0" Foreground="{DynamicResource AppTextMuted}"/>
                           </Grid>
                         </StackPanel>
 
                         <!-- Confirm Maintenance Button -->
                         <Button Grid.Column="2"
-                                HorizontalAlignment="Right"
-                          Click="ScheduleMaintenance_Click" Tag="WinterScenario1"
+                            HorizontalAlignment="Right"
+                          Command="{Binding ScheduleMaintenanceCommand}"
                           Content="Select"
                                 FontWeight="SemiBold"
                                 CornerRadius="4"
@@ -489,7 +489,7 @@
                           <!-- Line separating rows -->
                           <Rectangle Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="5" Height="1" Fill="{DynamicResource AppBorder}" VerticalAlignment="Bottom"/>
 
-                            <ItemsControl x:Name="MaintenanceScheduleItemsControlWinterScenario1" Grid.Row="2" Grid.ColumnSpan="5">
+                            <ItemsControl ItemsSource="{Binding Schedules}" Grid.Row="2" Grid.ColumnSpan="5">
                             <ItemsControl.ItemTemplate>
                               <DataTemplate x:CompileBindings="False">
                                 <Grid ColumnDefinitions="*,*,*,*,*">
@@ -629,7 +629,7 @@
 
 
                     <!-- Stackpanel for Summer view-->
-                    <StackPanel Margin="10">
+                    <StackPanel Margin="10" DataContext="{Binding SummerScenario2}">
                       <Grid ColumnDefinitions="Auto,Auto,*" Margin="0,0,0,20">
 
                         <!-- Period Start date -->
@@ -698,7 +698,7 @@
                           <Separator Background="{DynamicResource AppBorder}" Height="1" Margin="0,0,0,5" />
 
                           <!-- Selectable rows for maintenance -->
-                          <ListBox x:Name="BoilersListBoxSummerScenario2" Background="Transparent" BorderThickness="0" CornerRadius="4">
+                          <ListBox ItemsSource="{Binding Boilers}" SelectedItem="{Binding SelectedBoiler, Mode=TwoWay}" Background="Transparent" BorderThickness="0" CornerRadius="4">
                             <ListBox.Styles>
                               <Style Selector="ListBoxItem">
                                 <Setter Property="Padding" Value="0" />
@@ -719,14 +719,14 @@
                       </Border>
 
                       <!-- Maintenance date choosing -->
-                      <Grid ColumnDefinitions="Auto, Auto, *" Margin="0,20,0,0" VerticalAlignment="Top" IsVisible="{Binding #BoilersListBoxSummerScenario2.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}">
+                      <Grid ColumnDefinitions="Auto, Auto, *" Margin="0,20,0,0" VerticalAlignment="Top" IsVisible="{Binding SelectedBoiler, Converter={x:Static ObjectConverters.IsNotNull}}">
                         <!-- Maintenance start time -->
                         <StackPanel Grid.Column="0" Spacing="8" Margin="0,0,40,20" VerticalAlignment="Top">
                           <TextBlock Text="Maintenance Start" FontSize="14" Foreground="{DynamicResource AppTextPrimary}" FontWeight="SemiBold"/>
                           <WrapPanel Margin="0">
-                            <CalendarDatePicker x:Name="MaintenanceStartDatePickerSummerScenario2" Width="140" Watermark="Select date" Margin="0,0,10,0"/>
-                            <NumericUpDown x:Name="MaintenanceStartHourSummerScenario2" Minimum="0" Maximum="23" Value="12" FormatString="00" Margin="0" VerticalAlignment="Center" Width="70" ShowButtonSpinner="True"/>
-                            <TextBlock Text="{Binding #MaintenanceStartHourSummerScenario2.Value, StringFormat={}{0:00}}" VerticalAlignment="Center" Margin="8,0,0,0" FontWeight="SemiBold" Foreground="{DynamicResource AppTextPrimary}"/>
+                            <CalendarDatePicker SelectedDate="{Binding MaintenanceStartDate, Mode=TwoWay}" Width="140" Watermark="Select date" Margin="0,0,10,0"/>
+                            <NumericUpDown Minimum="0" Maximum="23" Value="{Binding MaintenanceStartHour, Mode=TwoWay}" FormatString="00" Margin="0" VerticalAlignment="Center" Width="70" ShowButtonSpinner="True"/>
+                            <TextBlock Text="{Binding MaintenanceStartHour, StringFormat={}{0:00}}" VerticalAlignment="Center" Margin="8,0,0,0" FontWeight="SemiBold" Foreground="{DynamicResource AppTextPrimary}"/>
                             <TextBlock Text=": 00" VerticalAlignment="Center" Margin="5,0,0,0" FontWeight="SemiBold" Foreground="{DynamicResource AppTextPrimary}"/>
                           </WrapPanel>
                         </StackPanel>
@@ -735,16 +735,16 @@
                         <StackPanel Grid.Column="1" Spacing="8" Margin="0,0,20,20" VerticalAlignment="Top">
                           <TextBlock Text="Maintenance Duration" FontSize="14" Foreground="{DynamicResource AppTextPrimary}" FontWeight="SemiBold"/>
                           <Grid Margin="0" ColumnDefinitions="140,Auto,Auto" VerticalAlignment="Center">
-                            <Slider Grid.Column="0" x:Name="MaintenanceDurationSliderSummerScenario2" Minimum="30" Maximum="60" Value="30" TickFrequency="1" IsSnapToTickEnabled="True" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="1" Text="{Binding #MaintenanceDurationSliderSummerScenario2.Value}" VerticalAlignment="Center" Margin="10,0,0,0" FontWeight="SemiBold" Foreground="{DynamicResource AppTextPrimary}"/>
+                            <Slider Grid.Column="0" Minimum="30" Maximum="60" Value="{Binding MaintenanceDuration, Mode=TwoWay}" TickFrequency="1" IsSnapToTickEnabled="True" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="{Binding MaintenanceDuration}" VerticalAlignment="Center" Margin="10,0,0,0" FontWeight="SemiBold" Foreground="{DynamicResource AppTextPrimary}"/>
                             <TextBlock Grid.Column="2" Text="hours" VerticalAlignment="Center" Margin="8,0,0,0" Foreground="{DynamicResource AppTextMuted}"/>
                           </Grid>
                         </StackPanel>
 
                         <!-- Confirm Maintenance Button -->
                         <Button Grid.Column="2"
-                                HorizontalAlignment="Right"
-                          Click="ScheduleMaintenance_Click" Tag="SummerScenario2"
+                            HorizontalAlignment="Right"
+                          Command="{Binding ScheduleMaintenanceCommand}"
                           Content="Select"
                                 FontWeight="SemiBold"
                                 CornerRadius="4"
@@ -787,7 +787,7 @@
                             <!-- Line separating rows -->
                             <Rectangle Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="5" Height="1" Fill="{DynamicResource AppBorder}" VerticalAlignment="Bottom"/>
 
-                            <ItemsControl x:Name="MaintenanceScheduleItemsControlSummerScenario2" Grid.Row="2" Grid.ColumnSpan="5">
+                            <ItemsControl ItemsSource="{Binding Schedules}" Grid.Row="2" Grid.ColumnSpan="5">
                               <ItemsControl.ItemTemplate>
                               <DataTemplate x:CompileBindings="False">
                                   <Grid ColumnDefinitions="*,*,*,*,*">
@@ -859,7 +859,7 @@
                     </StackPanel>
 
                     <!-- Stackpanel for Winter view-->
-                    <StackPanel Margin="10">
+                    <StackPanel Margin="10" DataContext="{Binding WinterScenario2}">
                       <Grid ColumnDefinitions="Auto,Auto,*" Margin="0,0,0,20">
 
                         <!-- Period Start Date -->
@@ -929,7 +929,7 @@
                           <Separator Background="{DynamicResource AppBorder}" Height="1" Margin="0,0,0,5" />
 
                           <!-- Selectable rows for maintenance -->
-                          <ListBox x:Name="BoilersListBoxWinterScenario2" Background="Transparent" BorderThickness="0" CornerRadius="4">
+                          <ListBox ItemsSource="{Binding Boilers}" SelectedItem="{Binding SelectedBoiler, Mode=TwoWay}" Background="Transparent" BorderThickness="0" CornerRadius="4">
                             <ListBox.Styles>
                               <Style Selector="ListBoxItem">
                                 <Setter Property="Padding" Value="0" />
@@ -949,14 +949,14 @@
                       </Border>
 
                       <!-- Maintenance Date choosing -->
-                      <Grid ColumnDefinitions="Auto, Auto, *" Margin="0,20,0,0" VerticalAlignment="Top" IsVisible="{Binding #BoilersListBoxWinterScenario2.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}">
+                      <Grid ColumnDefinitions="Auto, Auto, *" Margin="0,20,0,0" VerticalAlignment="Top" IsVisible="{Binding SelectedBoiler, Converter={x:Static ObjectConverters.IsNotNull}}">
                         <!-- Maintenance start time -->
                         <StackPanel Grid.Column="0" Spacing="8" Margin="0,0,40,20" VerticalAlignment="Top">
                           <TextBlock Text="Maintenance Start" FontSize="14" Foreground="{DynamicResource AppTextPrimary}" FontWeight="SemiBold"/>
                           <WrapPanel Margin="0">
-                            <CalendarDatePicker x:Name="MaintenanceStartDatePickerWinterScenario2" Width="140" Watermark="Select date" Margin="0,0,10,0" />
-                            <NumericUpDown x:Name="MaintenanceStartHourWinterScenario2" Minimum="0" Maximum="23" Value="12" FormatString="00" Margin="0" VerticalAlignment="Center" Width="70" ShowButtonSpinner="True"/>
-                            <TextBlock Text="{Binding #MaintenanceStartHourWinterScenario2.Value, StringFormat={}{0:00}}" VerticalAlignment="Center" Margin="8,0,0,0" FontWeight="SemiBold" Foreground="{DynamicResource AppTextPrimary}"/>
+                            <CalendarDatePicker SelectedDate="{Binding MaintenanceStartDate, Mode=TwoWay}" Width="140" Watermark="Select date" Margin="0,0,10,0" />
+                            <NumericUpDown Minimum="0" Maximum="23" Value="{Binding MaintenanceStartHour, Mode=TwoWay}" FormatString="00" Margin="0" VerticalAlignment="Center" Width="70" ShowButtonSpinner="True"/>
+                            <TextBlock Text="{Binding MaintenanceStartHour, StringFormat={}{0:00}}" VerticalAlignment="Center" Margin="8,0,0,0" FontWeight="SemiBold" Foreground="{DynamicResource AppTextPrimary}"/>
                             <TextBlock Text=": 00" VerticalAlignment="Center" Margin="5,0,0,0" FontWeight="SemiBold" Foreground="{DynamicResource AppTextPrimary}"/>
                           </WrapPanel>
                         </StackPanel>
@@ -965,16 +965,16 @@
                         <StackPanel Grid.Column="1" Spacing="8" Margin="0,0,20,20" VerticalAlignment="Top">
                           <TextBlock Text="Maintenance Duration" FontSize="14" Foreground="{DynamicResource AppTextPrimary}" FontWeight="SemiBold"/>
                           <Grid Margin="0" ColumnDefinitions="140,Auto,Auto" VerticalAlignment="Center">
-                            <Slider Grid.Column="0" x:Name="MaintenanceDurationSliderWinterScenario2" Minimum="30" Maximum="60" Value="30" TickFrequency="1" IsSnapToTickEnabled="True" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="1" Text="{Binding #MaintenanceDurationSliderWinterScenario2.Value}" VerticalAlignment="Center" Margin="10,0,0,0" FontWeight="SemiBold" Foreground="{DynamicResource AppTextPrimary}"/>
+                            <Slider Grid.Column="0" Minimum="30" Maximum="60" Value="{Binding MaintenanceDuration, Mode=TwoWay}" TickFrequency="1" IsSnapToTickEnabled="True" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="{Binding MaintenanceDuration}" VerticalAlignment="Center" Margin="10,0,0,0" FontWeight="SemiBold" Foreground="{DynamicResource AppTextPrimary}"/>
                             <TextBlock Grid.Column="2" Text="hours" VerticalAlignment="Center" Margin="8,0,0,0" Foreground="{DynamicResource AppTextMuted}"/>
                           </Grid>
                         </StackPanel>
 
                         <!-- Confirm Maintenance Button -->
                         <Button Grid.Column="2"
-                                HorizontalAlignment="Right"
-                          Click="ScheduleMaintenance_Click" Tag="WinterScenario2"
+                            HorizontalAlignment="Right"
+                          Command="{Binding ScheduleMaintenanceCommand}"
                           Content="Select"
                                 FontWeight="SemiBold"
                                 CornerRadius="4"
@@ -1017,7 +1017,7 @@
                           <!-- Line separating rows -->
                           <Rectangle Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="5" Height="1" Fill="{DynamicResource AppBorder}" VerticalAlignment="Bottom"/>
 
-                            <ItemsControl x:Name="MaintenanceScheduleItemsControlWinterScenario2" Grid.Row="2" Grid.ColumnSpan="5">
+                            <ItemsControl ItemsSource="{Binding Schedules}" Grid.Row="2" Grid.ColumnSpan="5">
                             <ItemsControl.ItemTemplate>
                               <DataTemplate x:CompileBindings="False">
                                 <Grid ColumnDefinitions="*,*,*,*,*">

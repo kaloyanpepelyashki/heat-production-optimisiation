@@ -34,13 +34,16 @@ public partial class MaintenancePeriodViewModel : ViewModelBase
     private BoilerStatusViewModel? selectedBoiler;
 
     [ObservableProperty]
-    private DateTimeOffset? maintenanceStartDate;
+    private DateTime? maintenanceStartDate;
 
     [ObservableProperty]
     private int maintenanceStartHour = 12;
 
     [ObservableProperty]
     private double maintenanceDuration = 30;
+
+    // Exposes MaintenanceStore schedules for XAML binding
+    public ObservableCollection<MaintenanceEvent> Schedules => MaintenanceStore.MaintenanceSchedules;
 
     // setting up the instance
     public MaintenancePeriodViewModel(MaintenanceService maintenanceService, IDialogService dialogService, string periodName, string scenario, DateTime start, DateTime end, ObservableCollection<BoilerStatusViewModel> initialBoilers)
