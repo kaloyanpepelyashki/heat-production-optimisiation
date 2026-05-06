@@ -20,7 +20,15 @@ public class Optimizer
         OptimizationRequestDto request,
         CancellationToken cancellationToken)
     {
-        
+        try
+        {
+            using var client = new HttpClient();
+            await client.GetAsync("https://heat-production-optimisiation.onrender.com/api/wakeup", cancellationToken);
+        }
+        catch (Exception)
+         {
+             throw;
+        }
 
         try {
             
