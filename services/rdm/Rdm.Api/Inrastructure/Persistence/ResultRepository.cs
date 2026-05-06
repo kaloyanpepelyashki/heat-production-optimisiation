@@ -35,7 +35,7 @@ public class ResultRepository : IResultRepository
         try
         {
             var databaseResponse = await _client.From<OptimisationRunWithHourlyResultsPersistence>()
-                .Select("*, optimisation_results_hourly(*, optimisation_production_units(*))")
+                .Select("*, OptimisationResultsHourly:optimisation_results_hourly(*, ProductionUnits:optimisation_production_units(*))")
                 .Get();
             List<OptimisationRunWithHourlyResultsPersistence> results = databaseResponse.Models;
 
