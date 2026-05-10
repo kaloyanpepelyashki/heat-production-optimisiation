@@ -27,6 +27,9 @@ public class Optimizer
         try
         {
             using var client = new HttpClient();
+            client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124.0.0.0 Safari/537.36");
+            client.DefaultRequestHeaders.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+
             var responseAm = await WaitForServiceAsync(client, "https://heat-production-optimisiation.onrender.com/api/Health/wakeup", cancellationToken);
             var responseSdm = await WaitForServiceAsync(client, "https://sdm-api.onrender.com/api/Health/wakeup", cancellationToken);
 
