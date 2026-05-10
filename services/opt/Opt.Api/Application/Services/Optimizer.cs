@@ -272,7 +272,7 @@ public class Optimizer
 
     private async Task<HttpResponseMessage> WaitForServiceAsync(HttpClient client, string url, CancellationToken cancellationToken)
 {
-    using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(60));
+    using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(62));
     using var linked = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeout.Token);
 
     while (!linked.Token.IsCancellationRequested)
