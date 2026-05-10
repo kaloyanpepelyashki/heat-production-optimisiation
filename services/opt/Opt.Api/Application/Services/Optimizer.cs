@@ -27,8 +27,14 @@ public class Optimizer
         try
         {
             using var client = new HttpClient();
-            client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124.0.0.0 Safari/537.36");
-            client.DefaultRequestHeaders.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+            client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36");
+            client.DefaultRequestHeaders.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8");
+            client.DefaultRequestHeaders.Add("sec-fetch-dest", "document");
+            client.DefaultRequestHeaders.Add("sec-fetch-mode", "navigate");
+            client.DefaultRequestHeaders.Add("sec-fetch-site", "same-origin");
+            client.DefaultRequestHeaders.Add("sec-fetch-user", "?1");
+            client.DefaultRequestHeaders.Add("upgrade-insecure-requests", "1");
+            client.DefaultRequestHeaders.Add("cache-control", "max-age=0");
 
             var responseAm = await WaitForServiceAsync(client, "https://heat-production-optimisiation.onrender.com/api/Health/wakeup", cancellationToken);
             var responseSdm = await WaitForServiceAsync(client, "https://sdm-api.onrender.com/api/Health/wakeup", cancellationToken);
