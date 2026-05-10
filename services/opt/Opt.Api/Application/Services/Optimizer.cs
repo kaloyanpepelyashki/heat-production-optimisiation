@@ -27,9 +27,9 @@ public class Optimizer
         try
         {
             using var client = new HttpClient();
-            var responseAm = await client.GetAsync("https://heat-production-optimisiation.onrender.com/api/Health/wakeup", cancellationToken);
+            var responseAm = await WaitForServiceAsync(client, "https://heat-production-optimisiation.onrender.com/api/Health/wakeup", cancellationToken);
             await Task.Delay(1000, cancellationToken);
-            var responseSdm = await client.GetAsync("https://sdm-api.onrender.com/api/Health/wakeup", cancellationToken);
+            var responseSdm = await WaitForServiceAsync(client, "https://sdm-api.onrender.com/api/Health/wakeup", cancellationToken);
 
             _logger.LogInformation("Response from am-api service: {StatusCode}, {Headers}, {ReasonPhrase}", responseAm.StatusCode,
              responseAm.Headers.ToString(),
@@ -269,4 +269,29 @@ public class Optimizer
 
         public double GetCostPerHeat(double electricityPrice) => GetExpensesAtFull(electricityPrice) / MaxHeat;
     }
+
+
+    private async Task<HttpResponseMessage> WaitForServiceAsync(HttpClient client, string url, CancellationToken cancellationToken)
+{
+    using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(60));
+    using var linked = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeout.Token);
+
+    while (!linked.Token.IsCancellationRequested)
+    {
+        try
+        {
+            var response = await client.GetAsync(url, linked.Token);
+            _logger.LogInformation("Wake-up probe {Url}: {StatusCode}", url, response.StatusCode);
+            if (response.IsSuccessStatusCode) return response; // return it here
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Service not yet ready at {Url}, retrying in 3s...", url);
+        }
+
+        await Task.Delay(3000, linked.Token);
+    }
+
+    throw new ExternalDataFetchException($"Service did not wake up in time: {url}", null);
+}
 }
