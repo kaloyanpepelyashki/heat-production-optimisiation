@@ -36,8 +36,8 @@ public class Optimizer
             client.DefaultRequestHeaders.Add("upgrade-insecure-requests", "1");
             client.DefaultRequestHeaders.Add("cache-control", "max-age=0");
 
-            var responseAm = await WaitForServiceAsync(client, "https://heat-production-optimisiation.onrender.com/api/Health/wakeup", cancellationToken);
-            var responseSdm = await WaitForServiceAsync(client, "https://sdm-api.onrender.com/api/Health/wakeup", cancellationToken);
+            var responseAm = await WaitForServiceAsync(client, "https://heat-production-optimisiation.onrender.com/api/Health/wakeup");
+            var responseSdm = await WaitForServiceAsync(client, "https://sdm-api.onrender.com/api/Health/wakeup");
 
             _logger.LogInformation("Response from am-api service: {StatusCode}, {Headers}, {ReasonPhrase}", responseAm.StatusCode,
              responseAm.Headers.ToString(),
@@ -279,25 +279,24 @@ public class Optimizer
     }
 
 
-    private async Task<HttpResponseMessage> WaitForServiceAsync(HttpClient client, string url, CancellationToken cancellationToken)
+    private async Task<HttpResponseMessage> WaitForServiceAsync(HttpClient client, string url)
 {
-    using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(62));
-    using var linked = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeout.Token);
+    using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(120));
 
-    while (!linked.Token.IsCancellationRequested)
+    while (!timeout.Token.IsCancellationRequested)
     {
         try
         {
-            var response = await client.GetAsync(url, linked.Token);
+            var response = await client.GetAsync(url, timeout.Token);
             _logger.LogInformation("Wake-up probe {Url}: {StatusCode}", url, response.StatusCode);
-            if (response.IsSuccessStatusCode) return response; // return it here
+            if (response.IsSuccessStatusCode) return response;
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Service not yet ready at {Url}, retrying in 1m...", url);
+            _logger.LogWarning(ex, "Service not yet ready at {Url}, retrying...", url);
         }
 
-        await Task.Delay(60000, linked.Token);
+        await Task.Delay(5000, timeout.Token); // 5s between probes
     }
 
     throw new ExternalDataFetchException($"Service did not wake up in time: {url}", null);
