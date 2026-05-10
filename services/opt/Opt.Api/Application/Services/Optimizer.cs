@@ -28,7 +28,6 @@ public class Optimizer
         {
             using var client = new HttpClient();
             var responseAm = await WaitForServiceAsync(client, "https://heat-production-optimisiation.onrender.com/api/Health/wakeup", cancellationToken);
-            await Task.Delay(1000, cancellationToken);
             var responseSdm = await WaitForServiceAsync(client, "https://sdm-api.onrender.com/api/Health/wakeup", cancellationToken);
 
             _logger.LogInformation("Response from am-api service: {StatusCode}, {Headers}, {ReasonPhrase}", responseAm.StatusCode,
@@ -286,10 +285,10 @@ public class Optimizer
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Service not yet ready at {Url}, retrying in 3s...", url);
+            _logger.LogWarning(ex, "Service not yet ready at {Url}, retrying in 1m...", url);
         }
 
-        await Task.Delay(3000, linked.Token);
+        await Task.Delay(60000, linked.Token);
     }
 
     throw new ExternalDataFetchException($"Service did not wake up in time: {url}", null);
