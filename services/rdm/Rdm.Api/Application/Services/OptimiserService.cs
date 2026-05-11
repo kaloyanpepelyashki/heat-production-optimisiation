@@ -33,27 +33,36 @@ public class OptimiserService : IOptimiserService
     {
         try
         {
-            HttpClient client = new HttpClient();
+            bool wakeUpCallResponse = await WakeUpService();
+
+            if (!wakeUpCallResponse)
+            {
+                throw new Exception("Wake Up Failed");
+            }
             
+            HttpClient client = new HttpClient();
+
             var json = JsonSerializer.Serialize(optimisationRequestDto);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
-            
+
             var response = await client.PostAsync($"{OptimiserUrl}/api/OptimizationResults/optimize", content);
-            
+
             if (!response.IsSuccessStatusCode)
             {
                 _logger.LogError($"Optimiser responded with status code: {response.StatusCode}, {response.Content}, {response.ReasonPhrase}");
             }
-           
+
             response.EnsureSuccessStatusCode();
             var responseBody = await response.Content.ReadAsStringAsync();
             var result = JsonSerializer.Deserialize<OptimisationWrapperDto>(responseBody);
-            
+
             return result;
+            
         }
         catch (HttpRequestException e)
         {
-            _logger.LogError($"Error in OptimiserService. Connectivity error when requesting optimisation: {e.Message} {e.GetType()} Status Code: {e.StatusCode}, {e.HttpRequestError}");
+            _logger.LogError(
+                $"Error in OptimiserService. Connectivity error when requesting optimisation: {e.Message} {e.GetType()} Status Code: {e.StatusCode}, {e.HttpRequestError}");
             throw;
         }
         catch (TaskCanceledException e)
@@ -69,6 +78,44 @@ public class OptimiserService : IOptimiserService
         catch (Exception e)
         {
             _logger.LogError($"Error in OptimiserService: {e.Message} {e.GetType()}");
+            throw e;
+        }
+    }
+
+    /// <summary>
+    /// Send a GET request to the optimiser service, to wake it up. 
+    /// </summary>
+    /// <returns></returns>
+    /// <exception cref="Exception"></exception>
+    public async Task<bool> WakeUpService()
+    {
+        try
+        {
+            HttpClient client = new HttpClient();
+            
+            var response = await client.GetAsync($"{OptimiserUrl}/api/Health/wakeup");
+
+            if (response.IsSuccessStatusCode)
+            {
+                return true;
+            } 
+            
+            return false;
+            
+            
+        }  catch (HttpRequestException e)
+        {
+            _logger.LogError($"Error in OptimiserService. Connectivity error when waking up optimiser: {e.Message} {e.GetType()} Status Code: {e.StatusCode}, {e.HttpRequestError}");
+            throw;
+        }
+        catch (TaskCanceledException e)
+        {
+            _logger.LogError($"Error in OptimiserService when waking up optimiser service. Request timed out: {e.Message} {e.GetType()}");
+            return false;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError($"Error in OptimiserService in wake up call: {e.Message} {e.GetType()}");
             throw e;
         }
     }

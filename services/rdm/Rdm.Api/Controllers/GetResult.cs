@@ -2,6 +2,7 @@
 using Rdm.Api.Application.Interfaces;
 using Rdm.Api.Application.Model;
 using Rdm.Api.Application.Services;
+using Rdm.Api.Inrastructure.API;
 
 namespace Rdm.Api.Controllers;
 [Route("api/[controller]")]
@@ -18,18 +19,31 @@ public class GetResult : Controller
     }
     
     [HttpGet("/allOptimisationRuns")]
-    public async Task<IActionResult> Test()
+    public async Task<IActionResult> GetAllOptimisationRuns()
     {
         try
         {
             List<OptimisationRun> optimisationRuns = await _optimisationResultService.GetAllOptimisationResults();
+
+            if (optimisationRuns.Count != 0)
+            {
+                ApiResponseModel<List<OptimisationRun>> returnObject = new ApiResponseModel<List<OptimisationRun>>("Success", optimisationRuns, optimisationRuns.Count);
+                return Ok(returnObject);
+            }
+            else
+            {
+                ApiResponseModel<List<OptimisationRun>> returnObject = new ApiResponseModel<List<OptimisationRun>>("No data found", [], 0);
+                return Ok(returnObject);
+                
+            }
             
-            return Ok(optimisationRuns);
+            
         }
         catch (Exception e)
         {
             _logger.LogError($"Error in controller. Error getting all optimisation results: {e.Message}, {e.GetType()}");
-            return StatusCode(500);
+            ApiResponseModel<List<OptimisationRun>> returnObject = new ApiResponseModel<List<OptimisationRun>>("Internal Server error", [], 0, "Error in controller. Error getting all optimisation results"); 
+            return StatusCode(500, returnObject);
         }
         
     }

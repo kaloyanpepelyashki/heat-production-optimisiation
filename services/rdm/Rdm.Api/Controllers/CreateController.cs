@@ -2,6 +2,7 @@
 using Rdm.Api.Application.Interfaces;
 using Rdm.Api.Application.Model;
 using Rdm.Api.Application.Services.Helpers;
+using Rdm.Api.Inrastructure.API;
 using Rdm.Api.Inrastructure.DTOs;
 
 namespace Rdm.Api.Controllers;
@@ -27,8 +28,13 @@ public class CreateController : Controller
     {
         try
         {
-            //TODO Implement proper checks if the response is actually populated
             var response = await _optimiserService.RequestOptimisation(optimisationRequestDto);
+
+            if (response == null || response.OptimisationResultsHourly.Count == 0)
+            {
+                ApiResponseModel<OptimisationRun> returnObject = new ApiResponseModel<OptimisationRun>("No data found", null, 0);
+                return StatusCode(409);
+            }
             
             OptimisationRun optimisationDomainModel = OptimisationModelsMapper.ToDomain(response);
             bool optimisationSaveResult = await _optimisationResultService.SaveOptimisationRun(optimisationDomainModel);
@@ -36,14 +42,21 @@ public class CreateController : Controller
             if (!optimisationSaveResult)
             {
                 _logger.LogError("Error saving optimsisation result. Optimisation result not saved to database");
+                ApiResponseModel<OptimisationRun> returnObject = new ApiResponseModel<OptimisationRun>("Internal Server Error", null, 0, "Failed to save optimisation result to database.");
+                return StatusCode(500, returnObject);
+            }
+            else
+            {
+                ApiResponseModel<OptimisationRun> returnObject = new ApiResponseModel<OptimisationRun>("Success", optimisationDomainModel, 0, "OK");
+                return Ok(returnObject);
             }
             
-            return Ok(response);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, ex.Message);
-            return StatusCode(500);
+            ApiResponseModel<OptimisationRun> returnObject = new ApiResponseModel<OptimisationRun>("Internal Server Error", null, 0, "Error requesting optimisation.");
+            return StatusCode(500, returnObject);
         }
     }
 }

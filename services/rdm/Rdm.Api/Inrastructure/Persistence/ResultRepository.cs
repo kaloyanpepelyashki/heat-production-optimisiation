@@ -111,18 +111,15 @@ public class ResultRepository : IResultRepository
                      await _client.From<OptimisationRunPersistence>().Where(x => x.Id == insertedRun.Id).Delete();
                      return false;
                 }
-                
-                
-                foreach (OptimisationProductionUnitPersistence productionUnit in hourly.ProductionUnitsPersistence)
-                {
-                    (bool, OptimisationProductionUnitPersistence?) productionUnitCreationResult = await CreateProductionUnitEntry(productionUnit, hourlyCreationResult.Item2.Id);
 
-                    if (!productionUnitCreationResult.Item1)
-                    {
-                        await _client.From<OptimisationRunPersistence>().Where(x => x.Id == insertedRun.Id).Delete();
-                        await _client.From<OptimisationResultsHourlyPersistence>().Where(x => x.Id == hourlyCreationResult.Item2.Id).Delete();
-                        return false;
-                    }
+
+                (bool, OptimisationProductionUnitPersistence?) productionUnitCreationResult = await CreateProductionUnitEntry(hourly.ProductionUnitsPersistence, hourlyCreationResult.Item2.Id);
+
+                if (!productionUnitCreationResult.Item1)
+                {
+                    await _client.From<OptimisationRunPersistence>().Where(x => x.Id == insertedRun.Id).Delete();
+                    await _client.From<OptimisationResultsHourlyPersistence>().Where(x => x.Id == hourlyCreationResult.Item2.Id).Delete();
+                    return false;
                 }
             }
             
@@ -164,15 +161,19 @@ public class ResultRepository : IResultRepository
         }
     }
 
-    private async Task<(bool, OptimisationProductionUnitPersistence)> CreateProductionUnitEntry(OptimisationProductionUnitPersistence productionUnit, int hourlyResultId)
+    private async Task<(bool, OptimisationProductionUnitPersistence)> CreateProductionUnitEntry(List<OptimisationProductionUnitPersistence> productionUnits, int hourlyResultId)
     {
         try
         {
-            productionUnit.OptimisationRunHourlyId = hourlyResultId;
+            foreach (var productionUnit in productionUnits)
+            {
+                productionUnit.OptimisationRunHourlyId = hourlyResultId;
+            }
+
 
             var productionUnitResponse = await _client
                 .From<OptimisationProductionUnitPersistence>()
-                .Insert(productionUnit);
+                .Insert(productionUnits);
             
             OptimisationProductionUnitPersistence? insertedProductionUnit = productionUnitResponse.Models.FirstOrDefault();
 

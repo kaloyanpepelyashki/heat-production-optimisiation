@@ -8,7 +8,7 @@ public class OptimisationProductionUnitPersistence: BaseModel
 {
     [PrimaryKey("id")]
     public int Id { get; set; }
-    [Column("optimisation_run_hourly_id")]
+    [Column("optimisation_results_hourly_id")]
     public int OptimisationRunHourlyId { get; set; }
     [Column("production_unit_id")]
     public int ProductionUnitId { get; set; }
