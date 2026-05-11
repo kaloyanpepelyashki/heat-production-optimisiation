@@ -1,3 +1,6 @@
+using System.Linq;
+using System.Threading;
+
 namespace Dv.App.Services;
 
 using System;
@@ -64,4 +67,62 @@ public class ApiService : IApiService
 
         return $"{baseUrl.TrimEnd('/')}/{endpoint.TrimStart('/')}";
     }
+    
+    
+    /// <summary>
+    /// Used to wake up an API service based on a provided url from the BackendService enum.
+    /// Performs a GET request to the Health endpoint for wakeup.
+    /// Will fail if different than 200 status code is returned. 
+    /// </summary>
+    /// <param name="service">the url of the service taken from the BackendService enum</param>
+    /// <returns>true if wake up was successful (200 was returned from the request), false if it was not</returns>
+    public async Task<bool> WakeUpService(BackendService service, CancellationToken token)
+    {
+        var endpoint = this.BuildUrl(service, "api/Health/wakeup");
+        
+        try
+        {
+            var response = await SharedHttpClient.GetAsync(endpoint, token);
+
+            return response.IsSuccessStatusCode;
+        }
+        catch (OperationCanceledException) when (token.IsCancellationRequested)
+        {
+            Console.WriteLine($"Wake-up cancelled for service {service} at {endpoint}.");
+            throw;
+        }
+        catch (HttpRequestException e)
+        {
+            Console.WriteLine($"Error in APIService. Connectivity error when waking up service at: {endpoint}: {e.Message} {e.GetType()} Status Code: {e.StatusCode}, {e.HttpRequestError}");
+            throw;
+        }
+        catch (TaskCanceledException e)
+        {
+            Console.WriteLine($"Error in APIService when waking up service at: {endpoint}. Request timed out: {e.Message} {e.GetType()}");
+            throw;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Error waking up service at:  {endpoint}. {e.Message} {e.GetType()}");
+            throw; 
+        }
+    }
+
+    public async Task<bool> WakeUpAllServices(CancellationToken token = default)
+    {
+            List<Task<bool>> tasks = new List<Task<bool>>();
+        
+            
+            foreach (KeyValuePair<BackendService, string> pair in ServiceUrls)
+            { 
+                tasks.Add(WakeUpService(pair.Key, token));
+            }
+            
+            bool[] results = await Task.WhenAll(tasks);
+
+            return results.All(success => success);
+        
+    }
+    
+    
 }

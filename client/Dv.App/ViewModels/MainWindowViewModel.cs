@@ -9,6 +9,9 @@ public sealed class MainWindowViewModel : ViewModelBase
 	private readonly Dictionary<string, ViewModelBase> viewMap;
 	private ViewModelBase currentViewModel;
 	private NavigationItem? selectedNavigationItem;
+	
+	//TODO - Set up the logic for calling the method for waking up all services from the ApiService. 
+	//TODO - Set up a mechanism with a trackable state, if the services have woken up. 
 
 	public MainWindowViewModel()
 	{
