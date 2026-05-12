@@ -1,20 +1,40 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Dv.App.Models;
+using Dv.App.Services;
 
 namespace Dv.App.ViewModels;
 
-public sealed class MainWindowViewModel : ViewModelBase
+public sealed partial class MainWindowViewModel : ViewModelBase
 {
+	private readonly IApiService _apiService; 
+	
 	private readonly Dictionary<string, ViewModelBase> viewMap;
 	private ViewModelBase currentViewModel;
 	private NavigationItem? selectedNavigationItem;
 	
-	//TODO - Set up the logic for calling the method for waking up all services from the ApiService. 
-	//TODO - Set up a mechanism with a trackable state, if the services have woken up. 
+	private readonly CancellationTokenSource _startupCts = new CancellationTokenSource();
+	private readonly Task _wakeUpServicesTask;
+
+
+	[ObservableProperty] 
+	private bool _isWakingUp;
+	[ObservableProperty]
+	private bool _allServicesWokeUp;
+
+	[ObservableProperty] 
+	private string _startUpError;
 
 	public MainWindowViewModel()
 	{
+		_apiService = new ApiService();
+		_wakeUpServicesTask = WakeUpServices(_startupCts.Token);
+		 
 		this.NavigationItems = new ObservableCollection<NavigationItem>
 		{
 			new NavigationItem { Title = "Dashboard", ViewKey = "dashboard" },
@@ -35,6 +55,40 @@ public sealed class MainWindowViewModel : ViewModelBase
 
 		this.currentViewModel = this.viewMap["dashboard"];
 		this.selectedNavigationItem = this.NavigationItems[0];
+	}
+	
+	
+	//Calls the WakeUpAllServices from the ApiClient, to send a health check to all the services and wake them up
+	private async Task WakeUpServices(CancellationToken ct)
+	{
+		_isWakingUp = true;
+		try
+		{
+			var response = await _apiService.WakeUpAllServices(ct);
+
+			if (!response)
+			{
+				_allServicesWokeUp = false;
+				_isWakingUp = false;
+			}
+		}
+		catch (OperationCanceledException)
+		{
+			_allServicesWokeUp = false;
+			_startUpError = "Waking up services process cancelled";
+		}
+		catch (Exception e)
+		{
+			Debug.WriteLine($"Error waking up all services {e.Message}, {e.GetType()}: {e.StackTrace}");
+			_isWakingUp = false;
+			_startUpError = e.Message;
+		}
+		finally
+		{
+			_isWakingUp = false;
+			_allServicesWokeUp = true;
+			Debug.WriteLine("All services woke up");
+		}
 	}
 
 	public ObservableCollection<NavigationItem> NavigationItems { get; }

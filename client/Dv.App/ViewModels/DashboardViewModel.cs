@@ -1,3 +1,7 @@
+using System.Diagnostics;
+using System.Threading;
+using CommunityToolkit.Mvvm.ComponentModel;
+
 namespace Dv.App.ViewModels;
 
 using System;
@@ -7,16 +11,24 @@ using System.Threading.Tasks;
 using Dv.App.Models;
 using Dv.App.Services;
 
-public sealed class DashboardViewModel : ViewModelBase
+public sealed partial class DashboardViewModel : ViewModelBase
 {
     private readonly IApiService apiService;
     private string dashboardData = "Data will appear here once loaded...";
+    private CancellationToken _ct =  new CancellationToken();
 
     public Task InitializationTask { get; private set; }
+    private readonly Task _wakeUpServiceTask;
 
+    [ObservableProperty] 
+    private bool _isServiceWakingUp;
+    [ObservableProperty] 
+    private bool _serviceWokeUp;
+    
     public DashboardViewModel(IApiService apiService = null!)
     {
         this.apiService = apiService ?? new ApiService();
+        _wakeUpServiceTask = WakeUpService(_ct);
         this.InitializationTask = this.LoadDashboardDataAsync();
     }
 
@@ -26,10 +38,43 @@ public sealed class DashboardViewModel : ViewModelBase
         set => this.SetProperty(ref this.dashboardData, value);
     }
 
+    private async Task WakeUpService(CancellationToken token)
+    {
+        _isServiceWakingUp = true;
+        try
+        {
+            var response = await apiService.WakeUpService(BackendService.Sdm, token);
+
+            if (!response)
+            {
+                _isServiceWakingUp = false;
+                _serviceWokeUp = false;
+            }
+            
+        }
+        catch (OperationCanceledException)
+        {
+            _serviceWokeUp = false;
+            _isServiceWakingUp = false;
+            Debug.WriteLine("Error waking up service in DashboardViewModel. Process cancelled.");
+        }
+        catch (Exception e)
+        {
+            Debug.WriteLine("Error waking up service in DashboardViewModel");
+        }
+        finally
+        {
+            _isServiceWakingUp = false;
+            _serviceWokeUp = true;
+            Debug.WriteLine("Woke up service in DashboardViewModel successfully");
+        }
+    }
+
     private async Task LoadDashboardDataAsync()
     {
         try
         {
+            
             this.DashboardData = $"Pinging Render services...{Environment.NewLine}(Please wait, Render free tier can take up to 50s to wake up)";
 
             var sourceData = await this.apiService.GetAsync<List<SourceDataDto>>(BackendService.Sdm, "getAll");

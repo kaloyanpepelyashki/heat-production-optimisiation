@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 
@@ -20,6 +21,7 @@ public class ApiService : IApiService
         { BackendService.Rdm, "https://rdm-api.onrender.com/" },
         { BackendService.Sdm, "https://sdm-api.onrender.com/" },
         { BackendService.Am, "https://heat-production-optimisiation.onrender.com/" },
+        { BackendService.Opt, "https://opt-api-7dj4.onrender.com"}
     };
 
     public ApiService()
@@ -88,26 +90,33 @@ public class ApiService : IApiService
         }
         catch (OperationCanceledException) when (token.IsCancellationRequested)
         {
-            Console.WriteLine($"Wake-up cancelled for service {service} at {endpoint}.");
+            Debug.WriteLine($"Wake-up cancelled for service {service} at {endpoint}.");
             throw;
         }
         catch (HttpRequestException e)
         {
-            Console.WriteLine($"Error in APIService. Connectivity error when waking up service at: {endpoint}: {e.Message} {e.GetType()} Status Code: {e.StatusCode}, {e.HttpRequestError}");
+            Debug.WriteLine($"Error in APIService. Connectivity error when waking up service at: {endpoint}: {e.Message} {e.GetType()} Status Code: {e.StatusCode}, {e.HttpRequestError}");
             throw;
         }
         catch (TaskCanceledException e)
         {
-            Console.WriteLine($"Error in APIService when waking up service at: {endpoint}. Request timed out: {e.Message} {e.GetType()}");
+            Debug.WriteLine($"Error in APIService when waking up service at: {endpoint}. Request timed out: {e.Message} {e.GetType()}");
             throw;
         }
         catch (Exception e)
         {
-            Console.WriteLine($"Error waking up service at:  {endpoint}. {e.Message} {e.GetType()}");
+            Debug.WriteLine($"Error waking up service at:  {endpoint}. {e.Message} {e.GetType()}");
             throw; 
         }
     }
 
+    /// <summary>
+    /// Used to wake up all services at ones. Iterates over the ServiceUrls defined in the APIService.
+    /// For each service in the list schedules a task, calling the WakeUpService method - sends a request to the health/wakeup endpoint of each service
+    /// Expects all of them to respond with status code 200, to complete with a success. 
+    /// </summary>
+    /// <param name="token"></param>
+    /// <returns></returns>
     public async Task<bool> WakeUpAllServices(CancellationToken token = default)
     {
             List<Task<bool>> tasks = new List<Task<bool>>();
@@ -121,7 +130,6 @@ public class ApiService : IApiService
             bool[] results = await Task.WhenAll(tasks);
 
             return results.All(success => success);
-        
     }
     
     

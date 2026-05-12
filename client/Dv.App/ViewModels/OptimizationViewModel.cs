@@ -22,6 +22,9 @@ public sealed partial class OptimizationViewModel : ViewModelBase
 
     [ObservableProperty]
     private MaintenancePeriodViewModel winterScenario2;
+    
+    
+    
 
     // building the four period panels/views exposing them to the view
     public OptimizationViewModel()
