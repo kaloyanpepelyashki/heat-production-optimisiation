@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Logging;
+
 namespace Dv.App.ViewModels;
 
 using System;
@@ -8,6 +10,9 @@ using Dv.App.Services;
 // creates the four period view models / wires the optimization screen based on the period data
 public sealed partial class OptimizationViewModel : ViewModelBase
 {
+    private readonly IApiService _apiService;
+    private readonly ILogger<OptimizationViewModel> _logger;
+    
     private readonly MaintenanceService maintenanceService;
     private readonly IDialogService dialogService;
 
@@ -27,8 +32,12 @@ public sealed partial class OptimizationViewModel : ViewModelBase
     
 
     // building the four period panels/views exposing them to the view
-    public OptimizationViewModel()
+    public OptimizationViewModel(IApiService apiService, ILogger<OptimizationViewModel> logger)
     {
+        _logger = logger;
+        
+        _apiService = apiService;
+        
         this.maintenanceService = new MaintenanceService();
         this.dialogService = new DialogService();
 

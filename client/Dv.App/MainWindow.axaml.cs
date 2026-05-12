@@ -5,9 +5,9 @@ namespace Dv.App;
 
 public partial class MainWindow : Window
 {
-    public MainWindow()
+    public MainWindow(MainWindowViewModel viewModel)
     {
         this.InitializeComponent();
-        this.DataContext = new MainWindowViewModel();
+        this.DataContext = viewModel;
     }
 }

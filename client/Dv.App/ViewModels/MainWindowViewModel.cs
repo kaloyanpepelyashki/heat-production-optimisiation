@@ -7,11 +7,14 @@ using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Dv.App.Models;
 using Dv.App.Services;
+using Microsoft.Extensions.Logging;
 
 namespace Dv.App.ViewModels;
 
 public sealed partial class MainWindowViewModel : ViewModelBase
 {
+	private readonly ILogger<MainWindowViewModel> _logger;
+	
 	private readonly IApiService _apiService; 
 	
 	private readonly Dictionary<string, ViewModelBase> viewMap;
@@ -30,9 +33,16 @@ public sealed partial class MainWindowViewModel : ViewModelBase
 	[ObservableProperty] 
 	private string _startUpError;
 
-	public MainWindowViewModel()
+	public MainWindowViewModel(IApiService apiService, ILogger<MainWindowViewModel> logger, 
+		DashboardViewModel dashboardViewModel,
+		ProductionUnitsViewModel productionUnitsViewModel,
+		SourceDataViewModel sourceDataViewModel,
+		OptimizationViewModel optimizationViewModel,
+		SettingsViewModel settingsViewModel)
 	{
-		_apiService = new ApiService();
+		_logger = logger;
+		
+		_apiService = apiService;
 		_wakeUpServicesTask = WakeUpServices(_startupCts.Token);
 		 
 		this.NavigationItems = new ObservableCollection<NavigationItem>
@@ -46,11 +56,11 @@ public sealed partial class MainWindowViewModel : ViewModelBase
 
 		this.viewMap = new Dictionary<string, ViewModelBase>
 		{
-			["dashboard"] = new DashboardViewModel(),
-			["production-units"] = new ProductionUnitsViewModel(),
-			["source-data"] = new SourceDataViewModel(),
-			["optimization"] = new OptimizationViewModel(),
-			["settings"] = new SettingsViewModel(),
+			["dashboard"] = dashboardViewModel,
+			["production-units"] = productionUnitsViewModel,
+			["source-data"] = sourceDataViewModel,
+			["optimization"] = optimizationViewModel,
+			["settings"] = settingsViewModel,
 		};
 
 		this.currentViewModel = this.viewMap["dashboard"];
@@ -76,18 +86,21 @@ public sealed partial class MainWindowViewModel : ViewModelBase
 		{
 			_allServicesWokeUp = false;
 			_startUpError = "Waking up services process cancelled";
+			_logger.LogError("Failed to wake up all services in MainWindowViewModel. Waking up services process cancelled");
 		}
 		catch (Exception e)
 		{
-			Debug.WriteLine($"Error waking up all services {e.Message}, {e.GetType()}: {e.StackTrace}");
 			_isWakingUp = false;
 			_startUpError = e.Message;
+			Debug.WriteLine($"Error waking up all services {e.Message}, {e.GetType()}: {e.StackTrace}");
+			_logger.LogError($"Error waking up all services {e.Message}, {e.GetType()}: {e.StackTrace}");
 		}
 		finally
 		{
 			_isWakingUp = false;
 			_allServicesWokeUp = true;
-			Debug.WriteLine("All services woke up");
+			Debug.WriteLine("All services woke up successfully in MainWindowViewModel");
+			_logger.LogInformation("All services woke up successfully in MainWindowViewModel");
 		}
 	}
 

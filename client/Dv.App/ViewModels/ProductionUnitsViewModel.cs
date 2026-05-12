@@ -6,14 +6,20 @@ using System.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Dv.App.Models;
 using Dv.App.Services;
+using Microsoft.Extensions.Logging;
 
 namespace Dv.App.ViewModels;
 
 public sealed partial class ProductionUnitsViewModel : ViewModelBase
 {
+    private readonly ILogger<ProductionUnitsViewModel> _logger;
+    
     private readonly IApiService apiService;
-    private string productionData = "Data will appear here once loaded...";
     private readonly CancellationTokenSource _ct = new CancellationTokenSource();
+    
+    
+    private string productionData = "Data will appear here once loaded...";
+   
     
 
     public Task InitializationTask { get; private set; }
@@ -26,9 +32,11 @@ public sealed partial class ProductionUnitsViewModel : ViewModelBase
     // Gets data from MaintenanceStore.cs to make it visible in UI
     public ObservableCollection<MaintenanceEvent> MaintenanceSchedules => MaintenanceStore.MaintenanceSchedules;
 
-    public ProductionUnitsViewModel(IApiService apiService = null!)
+    public ProductionUnitsViewModel(IApiService apiService, ILogger<ProductionUnitsViewModel> logger)
     {
-        this.apiService = apiService ?? new ApiService();
+        _logger = logger;
+        
+        this.apiService = apiService;
         _wakingUpTask = WakeUpService(_ct.Token);
         this.InitializationTask = this.LoadProductionDataAsync();
     }
@@ -58,12 +66,14 @@ public sealed partial class ProductionUnitsViewModel : ViewModelBase
             _isServiceWakingUp = false;
             _serviceWokeUp = false;
             Debug.WriteLine("Waking up service in ProductionUnitsViewModel process cancelled");
+            _logger.LogError("Waking up service in ProductionUnitsViewModel process cancelled");
         }
         catch (Exception e)
         {
             _isServiceWakingUp = false;
             _serviceWokeUp = false;
             Debug.WriteLine("Error waking up service in ProductionUnitsViewModel");
+            _logger.LogError($"Error waking up service in ProductionUnitsViewModel: {e.Message}");
         }
         finally
         {

@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.Extensions.Logging;
 
 namespace Dv.App.ViewModels;
 
@@ -13,6 +14,8 @@ using Dv.App.Services;
 
 public sealed partial class DashboardViewModel : ViewModelBase
 {
+    private readonly ILogger<DashboardViewModel> _logger;
+    
     private readonly IApiService apiService;
     private string dashboardData = "Data will appear here once loaded...";
     private CancellationToken _ct =  new CancellationToken();
@@ -25,9 +28,11 @@ public sealed partial class DashboardViewModel : ViewModelBase
     [ObservableProperty] 
     private bool _serviceWokeUp;
     
-    public DashboardViewModel(IApiService apiService = null!)
-    {
-        this.apiService = apiService ?? new ApiService();
+    public DashboardViewModel(IApiService apiService, ILogger<DashboardViewModel> logger)
+    { 
+        _logger = logger;
+        
+        this.apiService = apiService;
         _wakeUpServiceTask = WakeUpService(_ct);
         this.InitializationTask = this.LoadDashboardDataAsync();
     }
@@ -57,9 +62,12 @@ public sealed partial class DashboardViewModel : ViewModelBase
             _serviceWokeUp = false;
             _isServiceWakingUp = false;
             Debug.WriteLine("Error waking up service in DashboardViewModel. Process cancelled.");
+            _logger.LogError("Error waking up service in DashboardViewModel. Process cancelled.");
         }
         catch (Exception e)
         {
+            _isServiceWakingUp = false;
+            _logger.LogError($"Error waking up service in DashboardViewModel: {e.Message}");
             Debug.WriteLine("Error waking up service in DashboardViewModel");
         }
         finally
@@ -67,6 +75,7 @@ public sealed partial class DashboardViewModel : ViewModelBase
             _isServiceWakingUp = false;
             _serviceWokeUp = true;
             Debug.WriteLine("Woke up service in DashboardViewModel successfully");
+            _logger.LogInformation("Woke up service in DashboardViewModel successfully");
         }
     }
 
