@@ -24,25 +24,6 @@ public class Optimizer
         OptimizationRequestDto request,
         CancellationToken cancellationToken)
     {
-        try
-        {
-            using var client = new HttpClient();
-            var responseAm = await client.GetAsync("https://heat-production-optimisiation.onrender.com/api/Health/wakeup", cancellationToken);
-            await Task.Delay(1000, cancellationToken);
-            var responseSdm = await client.GetAsync("https://sdm-api.onrender.com/api/Health/wakeup", cancellationToken);
-
-            _logger.LogInformation("Response from am-api service: {StatusCode}, {Headers}, {ReasonPhrase}", responseAm.StatusCode,
-             responseAm.Headers.ToString(),
-              responseAm.ReasonPhrase);
-            _logger.LogInformation("Response from sdm-api service: {StatusCode}, {Headers}, {ReasonPhrase}", responseSdm.StatusCode,
-             responseSdm.Headers.ToString(), 
-             responseSdm.ReasonPhrase);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to wakeup external services.");
-             throw;
-        }
 
         try {
             
@@ -224,6 +205,11 @@ public class Optimizer
             {
                 UnitType = boiler.UnitType,
                 UnitId = boiler.UnitId,
+                HeatProductionPerUnit = Math.Round(dispatchedHeat, 2),
+                ElectricityConsumptionPerUnit = Math.Round(
+                    (boiler.UnitType == "EB" || boiler.UnitType == "GM") ? boiler.MaxElectricity * loadRatio * -1 : 0d, 2),
+                ExpensesPerUnit = Math.Round(boiler.GetExpensesAtFull(point.ElectricityPrice) * loadRatio, 2),
+                Co2EmissionsPerUnit = Math.Round(boiler.Co2PerMWh * dispatchedHeat, 2),
                 CapacityOutput = Math.Round(loadRatio * 100d, 2),
             });
 
