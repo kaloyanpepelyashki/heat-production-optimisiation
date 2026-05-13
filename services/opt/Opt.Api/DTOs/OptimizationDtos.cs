@@ -41,5 +41,9 @@ public sealed class PUnitDto
 {
     public string UnitType { get; set; } = string.Empty;
     public int UnitId { get; set; } 
+    public double HeatProductionPerUnit { get; set; }
+    public double ElectricityConsumptionPerUnit { get; set; }
+    public double ExpensesPerUnit { get; set; }
+    public double Co2EmissionsPerUnit { get; set; } 
     public double CapacityOutput { get; set; }
 }
