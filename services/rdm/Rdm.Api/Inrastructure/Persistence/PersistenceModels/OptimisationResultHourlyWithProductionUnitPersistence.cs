@@ -1,8 +1,10 @@
-﻿using Rdm.Api.Application.Model;
+﻿using Supabase.Postgrest.Attributes;
 
 namespace Rdm.Api.Inrastructure.Persistence.PersistenceModels;
 
 public class OptimisationResultHourlyWithProductionUnitPersistence: OptimisationResultsHourlyPersistence
 {
-    public List<ProductionUnit> ProductionUnits { get; set; }
+    [Reference(typeof(OptimisationProductionUnitPersistence))]
+    [Column("ProductionUnits")]
+    public List<OptimisationProductionUnitPersistence> ProductionUnits { get; set; }
 }
