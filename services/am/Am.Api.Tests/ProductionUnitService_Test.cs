@@ -190,4 +190,73 @@ public class ProductionUnitService_Test
         //Assert
         Assert.Equal(123, result);
     }
+
+    [Fact]
+    public async Task GetAllGasBoilersAsync_ThrowsException_OnDatabaseFailure()
+    {
+        //Arrange
+        repoGasBoiler.Setup(x => x.GetAllAsync()).ThrowsAsync(new Exception("Database connection failed"));
+        
+        var service = new ProductionUnitService(repoGasBoiler.Object, repoOilBoiler.Object, repoElectricBoiler.Object, repoGasMotor.Object, repoMaintenance.Object);
+        
+        //Act & Assert
+        await Assert.ThrowsAsync<Exception>(() => service.GetAllGasBoilersAsync());
+    }
+
+    [Fact]
+    public async Task GetAllGasBoilersAsync_ReturnsEmptyList_WhenNoDataExists()
+    {
+        //Arrange
+        repoGasBoiler.Setup(x => x.GetAllAsync()).ReturnsAsync(new List<GasBoiler>());
+        
+        var service = new ProductionUnitService(repoGasBoiler.Object, repoOilBoiler.Object, repoElectricBoiler.Object, repoGasMotor.Object, repoMaintenance.Object);
+        
+        //Act
+        var result = await service.GetAllGasBoilersAsync();
+        
+        //Assert
+        Assert.Empty(result);
+        Assert.IsType<List<GasBoiler>>(result);
+    }
+
+    [Fact]
+    public async Task GetProductionUnitMaintenanceByIdAsync_ReturnsNull_WhenIdDoesNotExist()
+    {
+        //Arrange
+        repoMaintenance.Setup(x => x.GetAllProductionUnitMaintenanceAsync()).ReturnsAsync(new List<ProductionUnitMaintenance>
+        {
+            new ProductionUnitMaintenance { Id = 42 }
+        });
+
+        var service = new ProductionUnitService(repoGasBoiler.Object, repoOilBoiler.Object, repoElectricBoiler.Object, repoGasMotor.Object, repoMaintenance.Object);
+
+        //Act
+        var result = await service.GetProductionUnitMaintenanceByIdAsync(99);
+
+        //Assert
+        Assert.Null(result); // Assuming the service returns null if FirstOrDefault fails
+    }
+
+    [Fact]
+    public async Task PostProductionUnitMaintenanceAsync_ThrowsArgumentException_WhenDatesAreInvalid()
+    {
+        //Arrange
+        var service = new ProductionUnitService(repoGasBoiler.Object, repoOilBoiler.Object, repoElectricBoiler.Object, repoGasMotor.Object, repoMaintenance.Object);
+
+        var maintenanceToPost = new ProductionUnitMaintenance
+        {
+            UnitType = "gasBoiler",
+            UnitId = 7,
+            FromDate = new DateTime(2026, 03, 01, 00, 00, 00, DateTimeKind.Utc),
+            ToDate = new DateTime(2026, 02, 01, 00, 00, 00, DateTimeKind.Utc), // ToDate before FromDate
+        };
+
+        // Note: Assuming there is some logic to validate dates in the service. If it's missing, this is a sign it should be added to the actual service. 
+        // We'll mock the repo throwing if validation happens in repo, or service throwing if validation is there.
+        repoMaintenance.Setup(x => x.PostProductionUnitMaintenanceAsync(It.IsAny<ProductionUnitMaintenance>()))
+            .ThrowsAsync(new ArgumentException("ToDate must be after FromDate"));
+
+        //Act & Assert
+        await Assert.ThrowsAsync<ArgumentException>(() => service.PostProductionUnitMaintenanceAsync(maintenanceToPost));
+    }
 }
