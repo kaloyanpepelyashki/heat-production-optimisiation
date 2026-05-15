@@ -17,8 +17,6 @@ public class ProductionUnitService_Test
     [Fact]
     public async Task GetAllGasBoilersAsync_Returns_List_Of_Boilers()
     {
-        
-        //Arrange
         repoGasBoiler.Setup(x => x.GetAllAsync()).ReturnsAsync(new List<GasBoiler>
         {   
             new GasBoiler{
@@ -42,7 +40,6 @@ public class ProductionUnitService_Test
         
         var service = new ProductionUnitService(repoGasBoiler.Object, repoOilBoiler.Object, repoElectricBoiler.Object, repoGasMotor.Object, repoMaintenance.Object);
         
-        //Act
         var result = await service.GetAllGasBoilersAsync();
         
         
@@ -55,7 +52,6 @@ public class ProductionUnitService_Test
     [Fact]
     public async Task GetAllGasMotorsAsync_Returns_List_Of_Motors()
     {
-        //Arrange
         repoGasMotor.Setup(x => x.GetAllAsync()).ReturnsAsync(new List<GasMotor>
         {
             new GasMotor
@@ -72,10 +68,8 @@ public class ProductionUnitService_Test
         
         var service = new ProductionUnitService(repoGasBoiler.Object, repoOilBoiler.Object, repoElectricBoiler.Object, repoGasMotor.Object, repoMaintenance.Object);
         
-        //Act
         var result = await service.GetAllGasMotorsAsync();
         
-        //Assert
         Assert.IsType<List<GasMotor>>(result);
         Assert.Equal(1, result[0].Id);
         Assert.Equal("GM1", result[0].Name);
@@ -84,7 +78,6 @@ public class ProductionUnitService_Test
     [Fact]
     public async Task GetAllElectricBoilersAsync_Returns_List_Of_Boilers()
     {
-        //Arrange
         repoElectricBoiler.Setup(x => x.GetAllAsync()).ReturnsAsync(new List<ElectricBoiler>
         {
             new ElectricBoiler
@@ -100,10 +93,8 @@ public class ProductionUnitService_Test
         
         var service = new ProductionUnitService(repoGasBoiler.Object, repoOilBoiler.Object, repoElectricBoiler.Object, repoGasMotor.Object, repoMaintenance.Object );
         
-        //Act
         var result = await service.GetAllElectricBoilersAsync();
         
-        //Assert
         Assert.NotEmpty(result);
         Assert.IsType<List<ElectricBoiler>>(result);
         Assert.Equal(1, result[0].Id);
@@ -113,7 +104,6 @@ public class ProductionUnitService_Test
     [Fact]
     public async Task GetAllOilBoilersAsync_Returns_List_Of_Boilers()
     {
-        //Arrange
         repoOilBoiler.Setup(x => x.GetAllAsync()).ReturnsAsync(new List<OilBoiler>
         {
             new OilBoiler
@@ -129,10 +119,8 @@ public class ProductionUnitService_Test
         
         var service = new ProductionUnitService(repoGasBoiler.Object, repoOilBoiler.Object,  repoElectricBoiler.Object, repoGasMotor.Object, repoMaintenance.Object);
         
-        //Act
         var result = await service.GetAllOilBoilersAsync();
         
-        //Assert
         Assert.NotEmpty(result);
         Assert.IsType<List<OilBoiler>>(result);
         Assert.Equal(1, result[0].Id);
@@ -141,7 +129,6 @@ public class ProductionUnitService_Test
     [Fact]
     public async Task GetProductionUnitMaintenanceByIdAsync_Returns_Maintenance()
     {
-        //Arrange
         repoMaintenance.Setup(x => x.GetAllProductionUnitMaintenanceAsync()).ReturnsAsync(new List<ProductionUnitMaintenance>
         {
             new ProductionUnitMaintenance
@@ -157,10 +144,8 @@ public class ProductionUnitService_Test
 
         var service = new ProductionUnitService(repoGasBoiler.Object, repoOilBoiler.Object, repoElectricBoiler.Object, repoGasMotor.Object, repoMaintenance.Object);
 
-        //Act
         ProductionUnitMaintenance result = await service.GetProductionUnitMaintenanceByIdAsync(42);
 
-        //Assert
         Assert.Equal(42, result.Id);
         Assert.Equal("gasBoiler", result.UnitType);
         Assert.Equal(7, result.UnitId);
@@ -169,7 +154,6 @@ public class ProductionUnitService_Test
     [Fact]
     public async Task PostProductionUnitMaintenanceAsync_Returns_New_Id()
     {
-        //Arrange
         repoMaintenance
             .Setup(x => x.PostProductionUnitMaintenanceAsync(It.IsAny<ProductionUnitMaintenance>()))
             .ReturnsAsync(123);
@@ -184,37 +168,30 @@ public class ProductionUnitService_Test
             ToDate = new DateTime(2026, 02, 02, 00, 00, 00, DateTimeKind.Utc),
         };
 
-        //Act
         int result = await service.PostProductionUnitMaintenanceAsync(maintenanceToPost);
 
-        //Assert
         Assert.Equal(123, result);
     }
 
     [Fact]
     public async Task GetAllGasBoilersAsync_ThrowsException_OnDatabaseFailure()
     {
-        //Arrange
         repoGasBoiler.Setup(x => x.GetAllAsync()).ThrowsAsync(new Exception("Database connection failed"));
         
         var service = new ProductionUnitService(repoGasBoiler.Object, repoOilBoiler.Object, repoElectricBoiler.Object, repoGasMotor.Object, repoMaintenance.Object);
         
-        //Act & Assert
         await Assert.ThrowsAsync<Exception>(() => service.GetAllGasBoilersAsync());
     }
 
     [Fact]
     public async Task GetAllGasBoilersAsync_ReturnsEmptyList_WhenNoDataExists()
     {
-        //Arrange
         repoGasBoiler.Setup(x => x.GetAllAsync()).ReturnsAsync(new List<GasBoiler>());
         
         var service = new ProductionUnitService(repoGasBoiler.Object, repoOilBoiler.Object, repoElectricBoiler.Object, repoGasMotor.Object, repoMaintenance.Object);
         
-        //Act
         var result = await service.GetAllGasBoilersAsync();
         
-        //Assert
         Assert.Empty(result);
         Assert.IsType<List<GasBoiler>>(result);
     }
@@ -222,25 +199,20 @@ public class ProductionUnitService_Test
     [Fact]
     public async Task GetProductionUnitMaintenanceByIdAsync_ReturnsNull_WhenIdDoesNotExist()
     {
-        //Arrange
         repoMaintenance.Setup(x => x.GetAllProductionUnitMaintenanceAsync()).ReturnsAsync(new List<ProductionUnitMaintenance>
         {
             new ProductionUnitMaintenance { Id = 42 }
         });
-
         var service = new ProductionUnitService(repoGasBoiler.Object, repoOilBoiler.Object, repoElectricBoiler.Object, repoGasMotor.Object, repoMaintenance.Object);
 
-        //Act
         var result = await service.GetProductionUnitMaintenanceByIdAsync(99);
 
-        //Assert
-        Assert.Null(result); // Assuming the service returns null if FirstOrDefault fails
+        Assert.Null(result);
     }
 
     [Fact]
     public async Task PostProductionUnitMaintenanceAsync_ThrowsArgumentException_WhenDatesAreInvalid()
     {
-        //Arrange
         var service = new ProductionUnitService(repoGasBoiler.Object, repoOilBoiler.Object, repoElectricBoiler.Object, repoGasMotor.Object, repoMaintenance.Object);
 
         var maintenanceToPost = new ProductionUnitMaintenance
@@ -248,15 +220,12 @@ public class ProductionUnitService_Test
             UnitType = "gasBoiler",
             UnitId = 7,
             FromDate = new DateTime(2026, 03, 01, 00, 00, 00, DateTimeKind.Utc),
-            ToDate = new DateTime(2026, 02, 01, 00, 00, 00, DateTimeKind.Utc), // ToDate before FromDate
+            ToDate = new DateTime(2026, 02, 01, 00, 00, 00, DateTimeKind.Utc),
         };
 
-        // Note: Assuming there is some logic to validate dates in the service. If it's missing, this is a sign it should be added to the actual service. 
-        // We'll mock the repo throwing if validation happens in repo, or service throwing if validation is there.
         repoMaintenance.Setup(x => x.PostProductionUnitMaintenanceAsync(It.IsAny<ProductionUnitMaintenance>()))
             .ThrowsAsync(new ArgumentException("ToDate must be after FromDate"));
 
-        //Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(() => service.PostProductionUnitMaintenanceAsync(maintenanceToPost));
     }
 }

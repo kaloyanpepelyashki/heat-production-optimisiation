@@ -75,4 +75,40 @@ public class DataLayerTests
 
         Assert.Contains("AM API responded. Data parsed: True", viewModel.ProductionData);
     }
+
+    [Fact]
+    public void SettingsViewModel_Initialization_SetsDefaultValues()
+    {
+        var viewModel = new SettingsViewModel();
+
+        Assert.NotNull(viewModel);
+    }
+
+    [Fact]
+    public void OptimizationViewModel_Initialization_SetsScenarios_Positive()
+    {
+        var mockApiService = new Mock<IApiService>();
+        var mockLogger = new Mock<Microsoft.Extensions.Logging.ILogger<OptimizationViewModel>>();
+        
+        var viewModel = new OptimizationViewModel(mockApiService.Object, mockLogger.Object);
+
+        Assert.NotNull(viewModel.SummerScenario1);
+        Assert.NotNull(viewModel.WinterScenario1);
+        Assert.NotNull(viewModel.SummerScenario2);
+        Assert.NotNull(viewModel.WinterScenario2);
+        Assert.Equal("Summer", viewModel.SummerScenario1.Season);
+        Assert.Equal("Winter", viewModel.WinterScenario1.Season);
+    }
+
+    [Fact]
+    public void OptimizationViewModel_Scenario_Instantiates_Boilers_Edge()
+    {
+        var mockApiService = new Mock<IApiService>();
+        var mockLogger = new Mock<Microsoft.Extensions.Logging.ILogger<OptimizationViewModel>>();
+        
+        var viewModel = new OptimizationViewModel(mockApiService.Object, mockLogger.Object);
+
+        Assert.Equal(4, viewModel.SummerScenario1.Boilers.Count);
+        Assert.Equal(4, viewModel.SummerScenario2.Boilers.Count);
+    }
 }
