@@ -47,16 +47,16 @@ public class OptimizationResultsController_Test
     }
 
     [Fact]
-    public async Task Optimize_Returns500_OnGenericException()
+    public async Task Optimize_Returns502_WhenExternalDataFetchFails()
     {
         var request = new OptimizationRequestDto();
-        
+
         _mockAssetProvider.Setup(o => o.GetAssetDataAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
-                          .ThrowsAsync(new Exception("Generic Error"));
+                          .ThrowsAsync(new Exception("Provider unreachable"));
 
         var result = await _controller.Optimize(request, CancellationToken.None);
 
         var statusCodeResult = Assert.IsType<ObjectResult>(result);
-        Assert.Equal(500, statusCodeResult.StatusCode);
+        Assert.Equal(502, statusCodeResult.StatusCode);
     }
 }

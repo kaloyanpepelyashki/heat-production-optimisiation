@@ -1,3 +1,4 @@
+using Am.Api.Application.Exceptions;
 using Am.Api.Application.Interfaces;
 using Am.Api.Controllers;
 using Am.Api.Domain.Models;
@@ -55,5 +56,27 @@ public class GetProductionUnitsController_Test
         var result = await _controller.GetProductionUnitMaintenanceById(99);
 
         Assert.IsType<NotFoundObjectResult>(result);
+    }
+
+    [Fact]
+    public async Task GetGasBoilers_ReturnsNotFound_WhenNoAssetsFound()
+    {
+        _mockService.Setup(s => s.GetAllGasBoilersAsync())
+                    .ThrowsAsync(new NoAssetsFoundException("No gas boilers found"));
+
+        var result = await _controller.GetAllGasBoilers();
+
+        Assert.IsType<NotFoundObjectResult>(result);
+    }
+
+    [Fact]
+    public async Task PostProductionUnitMaintenance_ReturnsBadRequest_WhenArgumentNullException()
+    {
+        _mockService.Setup(s => s.PostProductionUnitMaintenanceAsync(It.IsAny<ProductionUnitMaintenance>()))
+                    .ThrowsAsync(new ArgumentNullException("maintenance"));
+
+        var result = await _controller.PostProductionUnitMaintenance(new ProductionUnitMaintenanceDTO());
+
+        Assert.IsType<BadRequestObjectResult>(result);
     }
 }

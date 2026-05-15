@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Xunit;
+using Rdm.Api.Application.Exceptions;
 using Rdm.Api.Controllers;
 using Rdm.Api.Application.Interfaces;
 using Rdm.Api.Application.Model;
@@ -57,6 +58,19 @@ public class GetResultControllerTests
     public async Task GetAllOptimisationRuns_Returns500_OnException_Negative()
     {
         _mockService.Setup(s => s.GetAllOptimisationResults()).ThrowsAsync(new Exception("DB Failure"));
+
+        var result = await _controller.GetAllOptimisationRuns();
+
+        var statusCodeResult = Assert.IsType<ObjectResult>(result);
+        Assert.Equal(500, statusCodeResult.StatusCode);
+        var apiResponse = Assert.IsType<ApiResponseModel<List<OptimisationRun>>>(statusCodeResult.Value);
+        Assert.Equal("Internal Server error", apiResponse.Message);
+    }
+
+    [Fact]
+    public async Task GetAllOptimisationRuns_Returns500_OnDatabaseOperationException_Negative()
+    {
+        _mockService.Setup(s => s.GetAllOptimisationResults()).ThrowsAsync(new DatabaseOperationException("DB operation failed"));
 
         var result = await _controller.GetAllOptimisationRuns();
 
