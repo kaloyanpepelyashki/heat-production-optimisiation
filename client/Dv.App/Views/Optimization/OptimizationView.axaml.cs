@@ -14,6 +14,7 @@ using LiveChartsCore.SkiaSharpView.Painting;
 using SkiaSharp;
 using Dv.App.Models;
 using Dv.App.Services;
+using Dv.App.Interfaces;
 
 public partial class OptimizationView : UserControl
 {

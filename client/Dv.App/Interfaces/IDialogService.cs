@@ -1,7 +1,8 @@
-namespace Dv.App.Services;
+namespace Dv.App.Interfaces;
 
 using System;
 using System.Threading.Tasks;
+
 
 public interface IDialogService
 {

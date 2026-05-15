@@ -1,7 +1,7 @@
+namespace Dv.App.Interfaces;
+
+using Dv.App.Services;
 using System.Threading;
-
-namespace Dv.App.Services;
-
 using System.Threading.Tasks;
 
 public interface IApiService

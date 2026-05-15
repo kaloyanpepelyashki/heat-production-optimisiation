@@ -12,6 +12,8 @@ using System.Threading.Tasks;
 using Dv.App.Models;
 using Dv.App.Services;
 
+using Dv.App.Interfaces;
+
 public sealed partial class DashboardViewModel : ViewModelBase
 {
     private readonly ILogger<DashboardViewModel> _logger;

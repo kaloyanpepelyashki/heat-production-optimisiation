@@ -1,7 +1,3 @@
-using System.Diagnostics;
-using System.Linq;
-using System.Threading;
-
 namespace Dv.App.Services;
 
 using System;
@@ -10,6 +6,12 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading;
+
+using Dv.App.Interfaces;
+
 
 public class ApiService : IApiService
 {

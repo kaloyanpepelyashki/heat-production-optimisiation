@@ -7,6 +7,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Dv.App.Models;
 using Dv.App.Services;
 using Microsoft.Extensions.Logging;
+using Dv.App.Interfaces;
 
 namespace Dv.App.ViewModels;
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Dv.App.Models;
 using Dv.App.Services;
+using Dv.App.Interfaces;
 using Dv.App.ViewModels;
 using Moq;
 using Xunit;

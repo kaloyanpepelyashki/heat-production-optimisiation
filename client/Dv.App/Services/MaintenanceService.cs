@@ -7,6 +7,8 @@ using Avalonia.Threading;
 using Dv.App.Models;
 using Dv.App.Services;
 
+using Dv.App.Interfaces;
+
 public sealed class MaintenanceService
 {
     private readonly IApiService apiService =  new ApiService();

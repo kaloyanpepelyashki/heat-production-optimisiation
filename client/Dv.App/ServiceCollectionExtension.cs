@@ -1,5 +1,6 @@
 ﻿using Dv.App.Services;
 using Dv.App.ViewModels;
+using Dv.App.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -23,7 +24,6 @@ public static class ServiceCollectionExtension
         services.AddSingleton<ProductionUnitsViewModel>();
         services.AddSingleton<DashboardViewModel>();
         services.AddSingleton<OptimizationViewModel>();
-        services.AddSingleton<SourceDataViewModel>();
         services.AddSingleton<SettingsViewModel>();
         
         services.AddSingleton<MainWindow>();

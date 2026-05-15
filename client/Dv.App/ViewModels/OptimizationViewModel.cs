@@ -6,6 +6,7 @@ using System;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Dv.App.Services;
+using Dv.App.Interfaces;
 
 // creates the four period view models / wires the optimization screen based on the period data
 public sealed partial class OptimizationViewModel : ViewModelBase
