@@ -15,4 +15,7 @@ public class ProductionUnitDto
 
     [JsonPropertyName("heatProduction")]
     public double HeatProduction { get; set; }
+
+    [JsonPropertyName("electricityConsumption")]
+    public double electricityConsumption { get; set; }
 }

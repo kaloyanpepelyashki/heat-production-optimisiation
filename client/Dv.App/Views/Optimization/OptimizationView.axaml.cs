@@ -55,6 +55,11 @@ public partial class OptimizationView : UserControl
             Console.WriteLine("Could not fetch optimisation runs: " + ex.Message);
         }
 
+        IReadOnlyCollection<OptimisationResultsHourlyDto> seasonData =
+                targetRun.optimisationResultsHourly
+                    .OrderBy(h => h.TimeFrom)
+                    .ToList();
+
         var summerData = sourceData.Where(item => item.PeriodId == 1).OrderBy(item => item.TimeFrom).ToList();
         var winterData = sourceData.Where(item => item.PeriodId == 2).OrderBy(item => item.TimeFrom).ToList();
 
@@ -109,14 +114,81 @@ public partial class OptimizationView : UserControl
             }
         }
 
-        this.ConfigureSingleSeasonChart(
-                electricityPriceChart,
-                seasonData,
-                item => item.ElectricityPrice,
-                "Electricity price",
-                string.Empty,
-                electricityPriceMaxLimit,
-                electricityPriceColorHex);
+        List<CartesianChart?> ElectricityConsumptionCharts = new List<CartesianChart?>
+        {
+            this.FindControl<CartesianChart>("ElectricityConsumptionSummerScenario2"),
+            this.FindControl<CartesianChart>("ElectricityConsumptionWinterScenario2"),
+        };
+
+        var electricityConsumption = seasonData
+            .Select(item => new DateTimePoint(
+                item.TimeFrom,
+                item.ElectricityConsumption))
+            .ToList();
+
+        foreach(CartesianChart chart in ElectricityConsumptionCharts)
+        {
+            this.ConfigureSingleChart(
+                chart,
+                electricityConsumption,
+                "Electricity consumption",
+                "MW",
+                7,
+                "#00FF00",
+                true);
+        }
+
+        List<CartesianChart?> CO2EmissinsCharts = new List<CartesianChart?>
+        {
+            this.FindControl<CartesianChart>("CO2EmissionsSummerScenario1"),
+            this.FindControl<CartesianChart>("CO2EmissionsWinterScenario1"),
+            this.FindControl<CartesianChart>("CO2EmissionsSummerScenario2"),
+            this.FindControl<CartesianChart>("CO2EmissionsWinterScenario2"),
+        };
+
+        var co2Emission = seasonData
+            .Select(item => new DateTimePoint(
+                item.TimeFrom,
+                item.Co2Emissions))
+            .ToList();
+
+        foreach(CartesianChart chart in CO2EmissinsCharts)
+        {
+            this.ConfigureSingleChart(
+                chart,
+                co2Emission,
+                "CO2 Emission",
+                "Kg/MWh",
+                2600,
+                "#FF0000",
+                false);
+        }
+
+        List<CartesianChart?> ExpensesCharts = new List<CartesianChart?>
+        {
+            this.FindControl<CartesianChart>("ExpensesSummerScenario1"),
+            this.FindControl<CartesianChart>("ExpensesWinterScenario1"),
+            this.FindControl<CartesianChart>("ExpensesSummerScenario2"),
+            this.FindControl<CartesianChart>("ExpensesWinterScenario2"),
+        };
+
+        var expenses = seasonData
+            .Select(item => new DateTimePoint(
+                item.TimeFrom,
+                item.Expenses))
+            .ToList();
+
+        foreach(CartesianChart chart in ExpensesCharts)
+        {
+            this.ConfigureSingleChart(
+                chart,
+                expenses,
+                "Expenses",
+                "DKK",
+                6000,
+                "#00ffc8",
+                true);
+        }
     }
 
     private void ConfigureSeasonCharts(
@@ -130,44 +202,51 @@ public partial class OptimizationView : UserControl
     {
         foreach (var heatDemandChart in heatDemandCharts.OfType<CartesianChart>())
         {
-            this.ConfigureSingleSeasonChart(
+
+            Func<SourceDataDto, double> valueSelector = item => item.HeatDemand;
+            var points = seasonData
+            .Select(item => new DateTimePoint(item.TimeFrom, valueSelector(item)))
+            .ToList();
+
+            this.ConfigureSingleChart(
                 heatDemandChart,
-                seasonData,
-                item => item.HeatDemand,
+                points,
                 "Heat demand",
                 "MWh",
                 heatDemandMaxLimit,
-                heatDemandColorHex);
+                heatDemandColorHex,
+                false);
         }
 
         foreach (var electricityPriceChart in electricityPriceCharts.OfType<CartesianChart>())
         {
-            this.ConfigureSingleSeasonChart(
-                electricityPriceChart,
-                seasonData,
-                item => item.ElectricityPrice,
-                "Electricity price",
-                string.Empty,
-                electricityPriceMaxLimit,
-                electricityPriceColorHex);
-        }
-    }
-
-    private void ConfigureSingleSeasonChart(
-        CartesianChart chart,
-        IReadOnlyCollection<SourceDataDto> seasonData,
-        Func<SourceDataDto, double> valueSelector,
-        string seriesName,
-        string axisName,
-        double maxLimit,
-        string colorHex)
-    {
-        var color = SKColor.Parse(colorHex);
-
-        var points = seasonData
+            Func<SourceDataDto, double> valueSelector = item => item.ElectricityPrice;
+            var points = seasonData
             .Select(item => new DateTimePoint(item.TimeFrom, valueSelector(item)))
             .ToList();
 
+            this.ConfigureSingleChart(
+                electricityPriceChart,
+                points,
+                "Electricity price",
+                string.Empty,
+                electricityPriceMaxLimit,
+                electricityPriceColorHex,
+                false);
+        }
+    }
+
+    private void ConfigureSingleChart(
+        CartesianChart chart,
+        List<DateTimePoint> points,
+        string seriesName,
+        string axisName,
+        double maxLimit,
+        string colorHex,
+        bool negative)
+    {
+        double minValue = negative ? maxLimit*(-1) : 0;
+        var color = SKColor.Parse(colorHex);
         chart.Series = new ISeries[]
         {
             new LineSeries<DateTimePoint>
@@ -197,7 +276,7 @@ public partial class OptimizationView : UserControl
         {
             new Axis
             {
-                MinLimit = 0,
+                MinLimit = minValue,
                 MaxLimit = maxLimit,
                 Name = axisName,
                 NamePaint = this.GetAxisNamePaint(),
@@ -294,27 +373,6 @@ public partial class OptimizationView : UserControl
             Fill = new SolidColorPaint(color.WithAlpha(150))
         });
     }
-
-    var heatDemandColor = SKColor.Parse("#0EA5E9");
-
-    var heatDemandPoints = hourly
-        .Select(h => new DateTimePoint(h.TimeFrom, h.HeatProduction))
-        .ToList();
-
-    seriesList.Add(new LineSeries<DateTimePoint>
-    {
-        Name = "Heat demand",
-        Values = heatDemandPoints,
-        LineSmoothness = 0.15,
-        GeometrySize = 6,
-        Stroke = new SolidColorPaint(heatDemandColor)
-        {
-            StrokeThickness = 3,
-        },
-        Fill = null,
-        GeometryFill = new SolidColorPaint(heatDemandColor),
-        GeometryStroke = new SolidColorPaint(heatDemandColor),
-    });
 
     chart.Series = seriesList.ToArray();
 

@@ -348,10 +348,50 @@
                                                   Margin="0">
                               </lvc:CartesianChart>
                             </Grid>
-                            <TextBlock Text="The Price is set in DKK per MWh(el)."
-                                       FontSize="14"
-                                       Foreground="{DynamicResource AppTextMuted}"
-                                       TextWrapping="Wrap" />
+                          </StackPanel>
+                        </Border>
+
+                        <Border Margin="0,16,0,0"
+                                Background="{DynamicResource AppCardInner}"
+                                BorderBrush="{DynamicResource AppBorder}"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="16">
+                          <StackPanel Spacing="12">
+                            <TextBlock Text="CO2 Emissions"
+                                       FontSize="18"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource AppTextPrimary}" />
+                            <Grid Height="260">
+                              <lvc:CartesianChart
+                                x:Name="CO2EmissionsSummerScenario1"
+                                Background="{DynamicResource AppBackground}"
+                                ZoomMode="None"
+                                Margin="0">
+                              </lvc:CartesianChart>
+                            </Grid>
+                          </StackPanel>
+                        </Border>
+
+                        <Border Margin="0,16,0,0"
+                                Background="{DynamicResource AppCardInner}"
+                                BorderBrush="{DynamicResource AppBorder}"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="16">
+                          <StackPanel Spacing="12">
+                            <TextBlock Text="Expenses"
+                                       FontSize="18"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource AppTextPrimary}" />
+                            <Grid Height="260">
+                              <lvc:CartesianChart
+                                x:Name="ExpensesSummerScenario1"
+                                Background="{DynamicResource AppBackground}"
+                                ZoomMode="None"
+                                Margin="0">
+                              </lvc:CartesianChart>
+                            </Grid>
                           </StackPanel>
                         </Border>
 
@@ -607,6 +647,50 @@
                                        FontSize="14"
                                        Foreground="{DynamicResource AppTextMuted}"
                                        TextWrapping="Wrap" />
+                          </StackPanel>
+                        </Border>
+
+                        <Border Margin="0,16,0,0"
+                                Background="{DynamicResource AppCardInner}"
+                                BorderBrush="{DynamicResource AppBorder}"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="16">
+                          <StackPanel Spacing="12">
+                            <TextBlock Text="CO2 Emissions"
+                                       FontSize="18"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource AppTextPrimary}" />
+                            <Grid Height="260">
+                              <lvc:CartesianChart
+                                                  x:Name="CO2EmissionsWinterScenario1"
+                                                  Background="{DynamicResource AppBackground}"
+                                                  ZoomMode="None"
+                                                  Margin="0">
+                              </lvc:CartesianChart>
+                            </Grid>
+                          </StackPanel>
+                        </Border>
+
+                        <Border Margin="0,16,0,0"
+                                Background="{DynamicResource AppCardInner}"
+                                BorderBrush="{DynamicResource AppBorder}"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="16">
+                          <StackPanel Spacing="12">
+                            <TextBlock Text="Expenses"
+                                       FontSize="18"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource AppTextPrimary}" />
+                            <Grid Height="260">
+                              <lvc:CartesianChart
+                                x:Name="ExpensesWinterScenario1"
+                                Background="{DynamicResource AppBackground}"
+                                ZoomMode="None"
+                                Margin="0">
+                              </lvc:CartesianChart>
+                            </Grid>
                           </StackPanel>
                         </Border>
                     </StackPanel>
@@ -911,10 +995,72 @@
                                                   Margin="0">
                               </lvc:CartesianChart>
                             </Grid>
-                            <TextBlock Text="The Price is set in DKK per MWh(el)."
-                                       FontSize="14"
-                                       Foreground="{DynamicResource AppTextMuted}"
-                                       TextWrapping="Wrap" />
+                          </StackPanel>
+                        </Border>
+                        <Border 
+                          Margin="0,16,0,0"
+                          Background="{DynamicResource AppCardInner}"
+                          BorderBrush="{DynamicResource AppBorder}"
+                          BorderThickness="1"
+                          CornerRadius="8"
+                          Padding="16">
+                          <StackPanel Spacing="12">
+                            <TextBlock Text="Electricity Consumption"
+                                       FontSize="18"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource AppTextPrimary}" />
+                            <Grid Height="260">
+                              <lvc:CartesianChart
+                                x:Name="ElectricityConsumptionSummerScenario2"
+                                Background="{DynamicResource AppBackground}"
+                                ZoomMode="None"
+                                Margin="0">
+                              </lvc:CartesianChart>
+                            </Grid>
+                          </StackPanel>
+                        </Border>
+
+                        <Border Margin="0,16,0,0"
+                                Background="{DynamicResource AppCardInner}"
+                                BorderBrush="{DynamicResource AppBorder}"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="16">
+                          <StackPanel Spacing="12">
+                            <TextBlock Text="CO2 Emissions"
+                                       FontSize="18"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource AppTextPrimary}" />
+                            <Grid Height="260">
+                              <lvc:CartesianChart
+                                                  x:Name="CO2EmissionsSummerScenario2"
+                                                  Background="{DynamicResource AppBackground}"
+                                                  ZoomMode="None"
+                                                  Margin="0">
+                              </lvc:CartesianChart>
+                            </Grid>
+                          </StackPanel>
+                        </Border>
+
+                        <Border Margin="0,16,0,0"
+                                Background="{DynamicResource AppCardInner}"
+                                BorderBrush="{DynamicResource AppBorder}"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="16">
+                          <StackPanel Spacing="12">
+                            <TextBlock Text="Expenses"
+                                       FontSize="18"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource AppTextPrimary}" />
+                            <Grid Height="260">
+                              <lvc:CartesianChart
+                                x:Name="ExpensesSummerScenario2"
+                                Background="{DynamicResource AppBackground}"
+                                ZoomMode="None"
+                                Margin="0">
+                              </lvc:CartesianChart>
+                            </Grid>
                           </StackPanel>
                         </Border>
                     </StackPanel>
@@ -1165,14 +1311,74 @@
                                                   Margin="0">
                               </lvc:CartesianChart>
                             </Grid>
-                            <TextBlock Text="The Price is set in DKK per MWh(el)."
-                                       FontSize="14"
-                                       Foreground="{DynamicResource AppTextMuted}"
-                                       TextWrapping="Wrap" />
+                          </StackPanel>
+                        </Border>
+                        <Border Margin="0,16,0,0"
+                                Background="{DynamicResource AppCardInner}"
+                                BorderBrush="{DynamicResource AppBorder}"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="16">
+                          <StackPanel Spacing="12">
+                            <TextBlock Text="Electricity Consumption"
+                                       FontSize="18"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource AppTextPrimary}" />
+                            <Grid Height="260">
+                              <lvc:CartesianChart
+                                x:Name="ElectricityConsumptionWinterScenario2"
+                                Background="{DynamicResource AppBackground}"
+                                ZoomMode="None"
+                                Margin="0">
+                              </lvc:CartesianChart>
+                            </Grid>
+                          </StackPanel>
+                        </Border>
+
+                        <Border Margin="0,16,0,0"
+                                Background="{DynamicResource AppCardInner}"
+                                BorderBrush="{DynamicResource AppBorder}"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="16">
+                          <StackPanel Spacing="12">
+                            <TextBlock Text="CO2 Emissions"
+                                       FontSize="18"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource AppTextPrimary}" />
+                            <Grid Height="260">
+                              <lvc:CartesianChart
+                                x:Name="CO2EmissionsWinterScenario2"
+                                Background="{DynamicResource AppBackground}"
+                                ZoomMode="None"
+                                Margin="0">
+                              </lvc:CartesianChart>
+                            </Grid>
+                          </StackPanel>
+                        </Border>
+
+                        <Border Margin="0,16,0,0"
+                                Background="{DynamicResource AppCardInner}"
+                                BorderBrush="{DynamicResource AppBorder}"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="16">
+                          <StackPanel Spacing="12">
+                            <TextBlock Text="Expenses"
+                                       FontSize="18"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource AppTextPrimary}" />
+                            <Grid Height="260">
+                              <lvc:CartesianChart
+                                                  x:Name="ExpensesWinterScenario2"
+                                                  Background="{DynamicResource AppBackground}"
+                                                  ZoomMode="None"
+                                                  Margin="0">
+                              </lvc:CartesianChart>
+                            </Grid>
                           </StackPanel>
                         </Border>
                     </StackPanel>
-
                   </Carousel.Items>
                 </Carousel>
               </Grid>
@@ -1181,9 +1387,7 @@
           
           </Carousel.Items>
       </Carousel>
-
     </Grid>
-
   </ScrollViewer>
 </UserControl>
 
