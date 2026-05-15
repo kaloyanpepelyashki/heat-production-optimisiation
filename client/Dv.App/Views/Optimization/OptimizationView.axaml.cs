@@ -93,11 +93,30 @@ public partial class OptimizationView : UserControl
             "#F59E0B",
             "#3B82F6");
 
-        var optChart = this.FindControl<CartesianChart>("SummerOptimizationResultsChartScenario2");
-        if (optChart != null && targetRun != null)
+        List<CartesianChart?> OptimizationResultsCharts = new List<CartesianChart?>
         {
-            this.ConfigureOptimizationResultsChart(optChart, targetRun);
+            this.FindControl<CartesianChart>("SummerOptimizationResultsChartScenario1"),
+            this.FindControl<CartesianChart>("WinterOptimizationResultsChartScenario1"),
+            this.FindControl<CartesianChart>("SummerOptimizationResultsChartScenario2"),
+            this.FindControl<CartesianChart>("WinterOptimizationResultsChartScenario2"),
+        };
+
+        foreach(CartesianChart chart in OptimizationResultsCharts)
+        {
+            if (chart != null && targetRun != null)
+            {
+                this.ConfigureOptimizationResultsChart(chart, targetRun);
+            }
         }
+
+        this.ConfigureSingleSeasonChart(
+                electricityPriceChart,
+                seasonData,
+                item => item.ElectricityPrice,
+                "Electricity price",
+                string.Empty,
+                electricityPriceMaxLimit,
+                electricityPriceColorHex);
     }
 
     private void ConfigureSeasonCharts(
@@ -213,24 +232,27 @@ public partial class OptimizationView : UserControl
         .GroupBy(u => new
         {
             u.ProductionUnitType,
-            u.ProductionUnitId
+            u.ProductionUnitId,
         })
         .Select(g => new
         {
             ProductionUnitType = g.Key.ProductionUnitType,
-            ProductionUnitId = g.Key.ProductionUnitId
+            ProductionUnitId = g.Key.ProductionUnitId,
+            MaxHeatProduction = g
+            .Where(u => u.Capacity > 0)
+            .Max(u => u.Capacity),
+
         })
-        .OrderBy(u => u.ProductionUnitId)
-        .ThenByDescending(u => u.ProductionUnitType)
+        .OrderByDescending(u => u.MaxHeatProduction)
         .ToList();
 
     var colors = new[]
     {
-        SKColor.Parse("#FDBA74"),
-        SKColor.Parse("#F59E0B"),
-        SKColor.Parse("#B45309"),
-        SKColor.Parse("#ffdc16"),
-        SKColor.Parse("#22C55E"),
+        SKColor.Parse("#FF0000"),
+        SKColor.Parse("#00FF00"),
+        SKColor.Parse("#0000FF"),
+        SKColor.Parse("#000000"),
+        SKColor.Parse("#ff0ff3"),
         SKColor.Parse("#A855F7")
     };
 
@@ -251,12 +273,12 @@ public partial class OptimizationView : UserControl
                     u.ProductionUnitId == unit.ProductionUnitId &&
                     u.ProductionUnitType == unit.ProductionUnitType);
 
-            if (currentUnit == null || currentUnit.HeatProduction <= 0 || h.HeatProduction > 0)
+            if (currentUnit == null || currentUnit.HeatProduction <= 0 || h.HeatProduction <= 0)
             {
                 return new DateTimePoint(h.TimeFrom, 0);
             }
 
-            return new DateTimePoint(h.TimeFrom, h.HeatProduction);
+            return new DateTimePoint(h.TimeFrom, currentUnit.HeatProduction);
         }).ToList();
 
         seriesList.Add(new StackedAreaSeries<DateTimePoint>
@@ -267,7 +289,7 @@ public partial class OptimizationView : UserControl
             GeometrySize = 0,
             Stroke = new SolidColorPaint(color)
             {
-                StrokeThickness = 1
+                StrokeThickness = 3
             },
             Fill = new SolidColorPaint(color.WithAlpha(150))
         });

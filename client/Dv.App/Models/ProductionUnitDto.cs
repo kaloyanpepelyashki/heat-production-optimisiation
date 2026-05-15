@@ -13,6 +13,6 @@ public class ProductionUnitDto
     [JsonPropertyName("capacity")]
     public double Capacity { get; set; }
 
-    [JsonPropertyName("heat_production")]
+    [JsonPropertyName("heatProduction")]
     public double HeatProduction { get; set; }
 }
