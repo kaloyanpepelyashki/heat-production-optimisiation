@@ -138,12 +138,25 @@ public class Optimizer_Test
     }
 
     [Fact]
-    public async Task OptimizeAsync_ThrowsArgumentException_WhenTimeFromIsAfterTimeTo()
+    public async Task OptimizeAsync_ReturnsEmpty_WhenTimeFromIsAfterTimeTo()
     {
+        var bundle = new AssetDataBundle
+        {
+            GasBoilers = new[] { new GasBoiler { Id = 1, Name = "GB1", MaxHeat = 20.0f, ProductionCost = 400f } }
+        };
+
+        assetProvider.Setup(x => x.GetAssetDataAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(bundle);
+
+        sourceProvider.Setup(x => x.GetSourceDataAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<SourceDataPoint>());
+
         var optimizer = new Optimizer(assetProvider.Object, sourceProvider.Object, NullLogger<Optimizer>.Instance);
         var request = new OptimizationRequestDto { ScenarioId = 1, PeriodId = 1, TimeFrom = new DateTime(2026, 1, 2), TimeTo = new DateTime(2026, 1, 1) };
 
-        await Assert.ThrowsAsync<ArgumentException>(() => optimizer.OptimizeAsync(request, CancellationToken.None));
+        var result = await optimizer.OptimizeAsync(request, CancellationToken.None);
+
+        Assert.Empty(result.OptResultsHourly);
     }
 
     [Fact]
@@ -155,7 +168,7 @@ public class Optimizer_Test
         var optimizer = new Optimizer(assetProvider.Object, sourceProvider.Object, NullLogger<Optimizer>.Instance);
         var request = new OptimizationRequestDto { ScenarioId = 1, PeriodId = 1, TimeFrom = new DateTime(2026, 1, 1), TimeTo = new DateTime(2026, 1, 2) };
 
-        await Assert.ThrowsAsync<Exception>(() => optimizer.OptimizeAsync(request, CancellationToken.None));
+        await Assert.ThrowsAsync<Opt.Api.Application.Exceptions.ExternalDataFetchException>(() => optimizer.OptimizeAsync(request, CancellationToken.None));
     }
 
     [Fact]
