@@ -1,6 +1,7 @@
 using Am.Api.Application.Interfaces;
 using Am.Api.Controllers;
 using Am.Api.Domain.Models;
+using Am.Api.Infrastructure.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -27,10 +28,10 @@ public class GetProductionUnitsController_Test
         };
         _mockService.Setup(s => s.GetAllGasBoilersAsync()).ReturnsAsync(mockData);
 
-        var result = await _controller.GetGasBoilers();
+        var result = await _controller.GetAllGasBoilers();
 
         var okResult = Assert.IsType<OkObjectResult>(result);
-        var returnedData = Assert.IsAssignableFrom<IEnumerable<GasBoiler>>(okResult.Value);
+        var returnedData = Assert.IsAssignableFrom<IEnumerable<GasBoilerDTO>>(okResult.Value);
         Assert.Single(returnedData);
     }
 
@@ -39,17 +40,20 @@ public class GetProductionUnitsController_Test
     {
         _mockService.Setup(s => s.GetAllGasBoilersAsync()).ThrowsAsync(new Exception("Database failed"));
 
-        await Assert.ThrowsAsync<Exception>(() => _controller.GetGasBoilers());
+        var result = await _controller.GetAllGasBoilers();
+
+        var statusResult = Assert.IsType<ObjectResult>(result);
+        Assert.Equal(500, statusResult.StatusCode);
     }
 
     [Fact]
-    public async Task GetProductionUnitMaintenanceById_ReturnsNotFound_WhenNull()
+    public async Task GetProductionUnitMaintenanceById_ReturnsNotFound_WhenNotFound()
     {
         _mockService.Setup(s => s.GetProductionUnitMaintenanceByIdAsync(It.IsAny<int>()))
-                    .ReturnsAsync((ProductionUnitMaintenance)null);
+                    .ThrowsAsync(new KeyNotFoundException("Not found"));
 
-        var result = await _controller.GetMaintenanceById(99);
+        var result = await _controller.GetProductionUnitMaintenanceById(99);
 
-        Assert.IsType<NotFoundResult>(result);
+        Assert.IsType<NotFoundObjectResult>(result);
     }
 }

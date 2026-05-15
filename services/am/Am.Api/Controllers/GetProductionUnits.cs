@@ -9,12 +9,14 @@ namespace Am.Api.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 public class GetProductionUnits : Controller
-{   
+{
     private readonly IProductionUnitService _productionUnitService;
-    
-    public GetProductionUnits(IProductionUnitService productionUnitService)
+    private readonly ILogger<GetProductionUnits> _logger;
+
+    public GetProductionUnits(IProductionUnitService productionUnitService, ILogger<GetProductionUnits> logger)
     {
         _productionUnitService = productionUnitService;
+        _logger = logger;
     }
     
     [HttpGet("allGasBoilers")]

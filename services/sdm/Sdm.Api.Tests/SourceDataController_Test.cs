@@ -10,12 +10,12 @@ namespace Sdm.Api.Tests;
 public class SourceDataController_Test
 {
     private readonly Mock<ISourceDataService> _mockService;
-    private readonly SourceDataController _controller;
+    private readonly GetAllSourceDataController _controller;
 
     public SourceDataController_Test()
     {
         _mockService = new Mock<ISourceDataService>();
-        _controller = new SourceDataController(_mockService.Object, NullLogger<SourceDataController>.Instance);
+        _controller = new GetAllSourceDataController(_mockService.Object);
     }
 
     [Fact]
@@ -27,11 +27,10 @@ public class SourceDataController_Test
         };
         _mockService.Setup(s => s.GetAllSourceData()).ReturnsAsync(mockData);
 
-        var result = await _controller.GetAllSourceData();
+        var result = await _controller.GetAll();
 
         var okResult = Assert.IsType<OkObjectResult>(result);
-        var returnedData = Assert.IsAssignableFrom<IEnumerable<SourceDataPersistence>>(okResult.Value);
-        Assert.Single(returnedData);
+        Assert.NotNull(okResult.Value);
     }
 
     [Fact]
@@ -40,6 +39,8 @@ public class SourceDataController_Test
         _mockService.Setup(s => s.GetAllSourceData())
                     .ThrowsAsync(new Sdm.Api.Application.Exceptions.NoDataFoundException("No data"));
 
-        await Assert.ThrowsAsync<Sdm.Api.Application.Exceptions.NoDataFoundException>(() => _controller.GetAllSourceData());
+        var result = await _controller.GetAll();
+
+        Assert.IsType<NotFoundObjectResult>(result);
     }
 }

@@ -197,7 +197,7 @@ public class ProductionUnitService_Test
     }
 
     [Fact]
-    public async Task GetProductionUnitMaintenanceByIdAsync_ReturnsNull_WhenIdDoesNotExist()
+    public async Task GetProductionUnitMaintenanceByIdAsync_ThrowsKeyNotFoundException_WhenIdDoesNotExist()
     {
         repoMaintenance.Setup(x => x.GetAllProductionUnitMaintenanceAsync()).ReturnsAsync(new List<ProductionUnitMaintenance>
         {
@@ -205,9 +205,7 @@ public class ProductionUnitService_Test
         });
         var service = new ProductionUnitService(repoGasBoiler.Object, repoOilBoiler.Object, repoElectricBoiler.Object, repoGasMotor.Object, repoMaintenance.Object);
 
-        var result = await service.GetProductionUnitMaintenanceByIdAsync(99);
-
-        Assert.Null(result);
+        await Assert.ThrowsAsync<KeyNotFoundException>(() => service.GetProductionUnitMaintenanceByIdAsync(99));
     }
 
     [Fact]

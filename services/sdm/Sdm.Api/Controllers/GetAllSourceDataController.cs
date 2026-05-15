@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Sdm.Api.Application.Exceptions;
 using Sdm.Api.Application.Interfaces;
 using Sdm.Api.Infrastructure.DTOs;
 using Sdm.Api.Infrastructure.Persistence.PersistenceModels;
@@ -37,7 +38,11 @@ public class GetAllSourceDataController : Controller
             
             return Ok(sourceDataDTOs);
         }
-        catch (Exception e)
+        catch (NoDataFoundException e)
+        {
+            return NotFound(e.Message);
+        }
+        catch (Exception)
         {
             return StatusCode(500, "Error Getting All SourceData");
         }
