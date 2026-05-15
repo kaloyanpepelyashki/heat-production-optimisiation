@@ -57,6 +57,10 @@ public class OptimisationResultService : IOptimisationResultService
                         Id = opu.Id,
                         ProductionUnitId = opu.ProductionUnitId,
                         ProductionUnitType = opu.ProductionUnitType,
+                        Expenses = opu.Expenses,
+                        Co2Emissions = opu.Co2Emissions,
+                        HeatProduction = opu.HeatProduction,
+                        ElectricityConsumption = opu.ElectricityConsumption,
                         Capacity = opu.Capacity
                     }).ToList()
                 }).ToList()
