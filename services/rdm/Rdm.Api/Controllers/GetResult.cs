@@ -18,7 +18,7 @@ public class GetResult : Controller
         _logger = logger;
     }
     
-    [HttpGet("allOptimisationRuns")]
+    [HttpGet("/allOptimisationRuns")]
     public async Task<IActionResult> GetAllOptimisationRuns()
     {
         try
