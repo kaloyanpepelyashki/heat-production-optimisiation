@@ -246,21 +246,17 @@ public partial class OptimizationView : UserControl
         {
             var unitsThisHour = h.ProductionUnits.ToList();
 
-            var totalCapacity = unitsThisHour.Sum(u => u.Capacity);
-
             var currentUnit = unitsThisHour
                 .FirstOrDefault(u =>
                     u.ProductionUnitId == unit.ProductionUnitId &&
                     u.ProductionUnitType == unit.ProductionUnitType);
 
-            if (currentUnit == null || currentUnit.Capacity <= 0 || totalCapacity <= 0)
+            if (currentUnit == null || currentUnit.HeatProduction <= 0 || h.HeatProduction > 0)
             {
                 return new DateTimePoint(h.TimeFrom, 0);
             }
 
-            var unitHeatProduction = h.HeatProduction * currentUnit.Capacity / totalCapacity;
-
-            return new DateTimePoint(h.TimeFrom, unitHeatProduction);
+            return new DateTimePoint(h.TimeFrom, h.HeatProduction);
         }).ToList();
 
         seriesList.Add(new StackedAreaSeries<DateTimePoint>
