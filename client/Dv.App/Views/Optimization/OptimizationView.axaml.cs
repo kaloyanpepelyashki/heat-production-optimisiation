@@ -11,9 +11,11 @@ using LiveChartsCore.Kernel.Sketches;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Avalonia;
 using LiveChartsCore.SkiaSharpView.Painting;
+using LiveChartsCore.Measure;
 using SkiaSharp;
 using Dv.App.Models;
 using Dv.App.Services;
+
 
 public partial class OptimizationView : UserControl
 {
@@ -37,6 +39,20 @@ public partial class OptimizationView : UserControl
         catch
         {
             sourceData = new List<SourceDataDto>();
+        }
+
+        OptimisationRunDto? targetRun = null;
+        try
+        {
+            var optRunsResponse = await this.apiService.GetAsync<ApiResponseModel<List<OptimisationRunDto>>>(BackendService.Rdm, "allOptimisationRuns");
+            if (optRunsResponse?.Data != null)
+            {
+                targetRun = optRunsResponse.Data.FirstOrDefault(r => r.Id == 18);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Could not fetch optimisation runs: " + ex.Message);
         }
 
         var summerData = sourceData.Where(item => item.PeriodId == 1).OrderBy(item => item.TimeFrom).ToList();
@@ -76,6 +92,12 @@ public partial class OptimizationView : UserControl
             2500,
             "#F59E0B",
             "#3B82F6");
+
+        var optChart = this.FindControl<CartesianChart>("SummerOptimizationResultsChartScenario2");
+        if (optChart != null && targetRun != null)
+        {
+            this.ConfigureOptimizationResultsChart(optChart, targetRun);
+        }
     }
 
     private void ConfigureSeasonCharts(
@@ -174,5 +196,149 @@ public partial class OptimizationView : UserControl
         var axisTitleColor = isDarkMode ? SKColor.Parse("#E2E8F0") : SKColor.Parse("#334155");
 
         return new SolidColorPaint(axisTitleColor);
+    }
+
+    private void ConfigureOptimizationResultsChart(CartesianChart chart, OptimisationRunDto run)
+{
+    var hourly = run.optimisationResultsHourly?
+        .OrderBy(h => h.TimeFrom)
+        .ToList() ?? new List<OptimisationResultsHourlyDto>();
+
+    if (!hourly.Any())
+    {
+        return;
+    }
+    var allUnits = hourly
+        .SelectMany(h => h.ProductionUnits)
+        .GroupBy(u => new
+        {
+            u.ProductionUnitType,
+            u.ProductionUnitId
+        })
+        .Select(g => new
+        {
+            ProductionUnitType = g.Key.ProductionUnitType,
+            ProductionUnitId = g.Key.ProductionUnitId
+        })
+        .OrderBy(u => u.ProductionUnitId)
+        .ThenByDescending(u => u.ProductionUnitType)
+        .ToList();
+
+    var colors = new[]
+    {
+        SKColor.Parse("#FDBA74"),
+        SKColor.Parse("#F59E0B"),
+        SKColor.Parse("#B45309"),
+        SKColor.Parse("#ffdc16"),
+        SKColor.Parse("#22C55E"),
+        SKColor.Parse("#A855F7")
+    };
+
+    var seriesList = new List<ISeries>();
+    var colorIdx = 0;
+
+    foreach (var unit in allUnits)
+    {
+        var color = colors[colorIdx % colors.Length];
+        colorIdx++;
+
+        var unitPoints = hourly.Select(h =>
+        {
+            var unitsThisHour = h.ProductionUnits.ToList();
+
+            var totalCapacity = unitsThisHour.Sum(u => u.Capacity);
+
+            var currentUnit = unitsThisHour
+                .FirstOrDefault(u =>
+                    u.ProductionUnitId == unit.ProductionUnitId &&
+                    u.ProductionUnitType == unit.ProductionUnitType);
+
+            if (currentUnit == null || currentUnit.Capacity <= 0 || totalCapacity <= 0)
+            {
+                return new DateTimePoint(h.TimeFrom, 0);
+            }
+
+            var unitHeatProduction = h.HeatProduction * currentUnit.Capacity / totalCapacity;
+
+            return new DateTimePoint(h.TimeFrom, unitHeatProduction);
+        }).ToList();
+
+        seriesList.Add(new StackedAreaSeries<DateTimePoint>
+        {
+            Name = $"{unit.ProductionUnitType} {unit.ProductionUnitId}",
+            Values = unitPoints,
+            LineSmoothness = 0.15,
+            GeometrySize = 0,
+            Stroke = new SolidColorPaint(color)
+            {
+                StrokeThickness = 1
+            },
+            Fill = new SolidColorPaint(color.WithAlpha(150))
+        });
+    }
+
+    var heatDemandColor = SKColor.Parse("#0EA5E9");
+
+    var heatDemandPoints = hourly
+        .Select(h => new DateTimePoint(h.TimeFrom, h.HeatProduction))
+        .ToList();
+
+    seriesList.Add(new LineSeries<DateTimePoint>
+    {
+        Name = "Heat demand",
+        Values = heatDemandPoints,
+        LineSmoothness = 0.15,
+        GeometrySize = 6,
+        Stroke = new SolidColorPaint(heatDemandColor)
+        {
+            StrokeThickness = 3,
+        },
+        Fill = null,
+        GeometryFill = new SolidColorPaint(heatDemandColor),
+        GeometryStroke = new SolidColorPaint(heatDemandColor),
+    });
+
+    chart.Series = seriesList.ToArray();
+
+    chart.XAxes = new ICartesianAxis[]
+    {
+        new DateTimeAxis(TimeSpan.FromHours(24), date => date.ToString("dd MMM"))
+        {
+            LabelsPaint = this.GetAxisNamePaint(),
+            SeparatorsPaint = new SolidColorPaint(SKColor.Parse("#CBD5E1"))
+            {
+                StrokeThickness = 1,
+            },
+            TextSize = 12,
+        },
+    };
+
+    var maxHeatProduction = hourly
+        .Select(h => h.HeatProduction)
+        .DefaultIfEmpty(0)
+        .Max();
+
+    var yMax = Math.Ceiling(maxHeatProduction * 1.10);
+
+    chart.YAxes = new ICartesianAxis[]
+    {
+        new Axis
+        {
+            MinLimit = 0,
+            MaxLimit = yMax == 0 ? 12 : yMax,
+            Name = "MWh",
+            NamePaint = this.GetAxisNamePaint(),
+            LabelsPaint = this.GetAxisNamePaint(),
+            SeparatorsPaint = new SolidColorPaint(SKColor.Parse("#CBD5E1"))
+            {
+                StrokeThickness = 1,
+            },
+            TextSize = 12,
+        },
+    };
+
+    chart.LegendPosition = LiveChartsCore.Measure.LegendPosition.Right;
+    chart.LegendTextPaint = this.GetAxisNamePaint();
+    chart.ZoomMode = LiveChartsCore.Measure.ZoomAndPanMode.None;
     }
 }
