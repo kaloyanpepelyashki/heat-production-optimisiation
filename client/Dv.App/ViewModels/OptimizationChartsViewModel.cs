@@ -28,7 +28,7 @@ public sealed class OptimizationChartsViewModel : ViewModelBase
     public ChartCardViewModel ExpensesChart { get; }
     public ChartCardViewModel Co2EmissionsChart { get; }
 
-    public void LoadOptimizationResult(IReadOnlyList<OptimisationResultsHourlyClient> hourlyResults, string period)
+    public void LoadOptimizationResult(IReadOnlyList<OptimisationResultsHourlyClient> hourlyResults)
     {
         if (hourlyResults is null || hourlyResults.Count == 0)
         {

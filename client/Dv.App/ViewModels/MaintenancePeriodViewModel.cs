@@ -162,7 +162,7 @@ public partial class MaintenancePeriodViewModel : ViewModelBase
             this.TotalExpenses = Math.Round(this.OptimisationResults.Sum(r => r.Expenses), 2);
             this.TotalCo2Emissions = Math.Round(this.OptimisationResults.Sum(r => r.Co2Emissions), 2);
 
-            this.Charts.LoadOptimizationResult(response.Data.OptimisationResultsHourly, this.PeriodName);
+            this.Charts.LoadOptimizationResult(response.Data.OptimisationResultsHourly);
 
             this.HasOptimisationResults = true;
         }
