@@ -1,20 +1,17 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:components="using:Dv.App.Views.Optimization.Components"
-             xmlns:system="using:System"
-             xmlns:viewModels="using:Dv.App.ViewModels"
-             xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.Avalonia;assembly=LiveChartsCore.SkiaSharpView.Avalonia"
+             xmlns:vm="using:Dv.App.ViewModels"
              x:Class="Dv.App.Views.OptimizationView"
-             x:CompileBindings="False">
+             x:DataType="vm:OptimizationViewModel">
 
+    <ScrollViewer>
+        <StackPanel Margin="20" Spacing="20">
 
-  <ScrollViewer>
-    <StackPanel Margin="20" Spacing="20">
-        <components:OptimizerCard />
-        <components:GraphsCard />
-    </StackPanel>
-  </ScrollViewer>
+            <components:OptimizerCard />
+
+            <components:GraphsCard />
+
+        </StackPanel>
+    </ScrollViewer>
 </UserControl>
-
-
-

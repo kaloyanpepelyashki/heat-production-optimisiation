@@ -11,6 +11,7 @@ public static class ServiceCollectionExtension
     public static void AddCommonServices(this IServiceCollection services)
     {
         services.AddSingleton<IApiService, ApiService>();
+        services.AddSingleton<MaintenanceService>();
         services.AddLogging(builder =>
         {
             builder.AddDebug();

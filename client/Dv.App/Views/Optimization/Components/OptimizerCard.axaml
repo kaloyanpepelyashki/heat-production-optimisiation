@@ -5,217 +5,441 @@
              xmlns:viewModels="using:Dv.App.ViewModels"
              xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.Avalonia;assembly=LiveChartsCore.SkiaSharpView.Avalonia"
              x:Class="Dv.App.Views.Optimization.Components.OptimizerCard"
-             x:CompileBindings="False">
+             x:DataType="viewModels:OptimizationViewModel"
+             x:CompileBindings="True">
 
     <StackPanel>
         <StackPanel>
 
-
             <Border Background="{DynamicResource AppCard}"
                     Padding="20">
-            
-              <Grid VerticalAlignment="Top" ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
-                    
-                    <StackPanel Margin="10" DataContext="{Binding SummerScenario1}">
-                      <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,*" RowDefinitions="Auto" Margin="0,0,0,20">
 
-                        <!-- Period Start date -->
-                        <StackPanel Grid.Column="0" Spacing="8" Margin="0,0,20,20">
-                          <TextBlock Text="Start Date" FontSize="14" Foreground="{DynamicResource AppTextPrimary}" FontWeight="SemiBold"/>
-                          <Border Background="{DynamicResource AppInputBackground}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="2" CornerRadius="4" Padding="10,8" MaxWidth="250">
-                            <TextBlock Text="08/09/2025 - 00:00" Foreground="{DynamicResource AppTextPrimary}" VerticalAlignment="Center" />
-                          </Border>
-                        </StackPanel>
+                <Grid VerticalAlignment="Top"
+                      ColumnDefinitions="*,Auto"
+                      RowDefinitions="Auto,Auto">
 
-                        <!-- Period End Date -->
-                        <StackPanel Grid.Column="1" Spacing="8" Margin="0,0,20,20">
-                          <TextBlock Text="End Date" FontSize="14" Foreground="{DynamicResource AppTextPrimary}" FontWeight="SemiBold"/>
-                          <Border Background="{DynamicResource AppInputBackground}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="2" CornerRadius="4" Padding="10,8" MaxWidth="250">
-                            <TextBlock Text="21/09/2025 - 23:59" Foreground="{DynamicResource AppTextPrimary}" VerticalAlignment="Center" />
+                    <StackPanel Margin="10">
 
-                          </Border>
-                        </StackPanel>
+                        <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,*"
+                              RowDefinitions="Auto"
+                              Margin="0,0,0,20">
 
-                        <!-- Period Selection -->
-                        <WrapPanel Grid.Row="0" Grid.Column="2"
-                            HorizontalAlignment="Right"
-                            VerticalAlignment="Center"
-                            Margin="10">
-                  <!-- Dropdown menu periods-->
-                  <ComboBox x:Name="PeriodComboBox" SelectedIndex="0" MinWidth="120" MaxWidth="200">
-                    <ComboBoxItem Content="Summer" />
-                    <ComboBoxItem Content="Winter" />
-                  </ComboBox>
-                </WrapPanel>
-                       <!-- Scenario Selection -->
-                        <WrapPanel Grid.Row="0" Grid.Column="3"
-                            HorizontalAlignment="Right"
-                            VerticalAlignment="Center"
-                            Margin="10">
-                  <!-- Dropdown menu scenarios-->
-                  <ComboBox x:Name="ScenarioComboBox" SelectedIndex="0" MinWidth="120" MaxWidth="200">
-                    <ComboBoxItem Content="Scenario 1" />
-                    <ComboBoxItem Content="Scenario 2" />
-                  </ComboBox>
-                </WrapPanel>
+                            <!-- Start date -->
+                            <StackPanel Grid.Column="0"
+                                        Spacing="8"
+                                        Margin="0,0,20,20">
 
-                        <!-- Optimize button to start optimization-->
-                        <Button Grid.Column="4"
-                                Content="Optimize"
-                                HorizontalAlignment="Right"
-                                VerticalAlignment="Bottom"
-                                Margin="0,0,0,20"
-                                Padding="18,8"
-                                FontWeight="SemiBold"
-                                CornerRadius="4">
-                          <Button.Styles>
-                            <Style Selector="Button">
-                              <Setter Property="Background" Value="#16A34A" />
-                              <Setter Property="Foreground" Value="White" />
-                            </Style>
-                            <!-- hover to make it more appealing -->
-                            <Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-                              <Setter Property="Background" Value="#15803D" />
-                              <Setter Property="TextBlock.Foreground" Value="White" />
-                            </Style>
-                          </Button.Styles>
-                        </Button>
-                        
-                      </Grid>
+                                <TextBlock Text="Start Date"
+                                           FontSize="14"
+                                           Foreground="{DynamicResource AppTextPrimary}"
+                                           FontWeight="SemiBold"/>
 
-                      <TextBlock VerticalAlignment="Bottom"
-                                 FontSize="18"
-                                 FontWeight="SemiBold"
-                                 Foreground="{DynamicResource AppTextPrimary}"
-                                 Text="Schedule Maintenance"
-                                 Margin="0,20,10,0"/>
-                      <TextBlock VerticalAlignment="Bottom"
-                                 FontSize="14"
-                                 Foreground="{DynamicResource AppTextPrimary}"
-                                 TextWrapping="Wrap"
-                                 Text="Click on a unit to mark it for maintenance. Select a time interval lasting 30-60 hours. The interval has to be during the Summer Period."
-                                 Margin="0,0,10,10"/>
+                                <Border Background="{DynamicResource AppInputBackground}"
+                                        BorderBrush="{DynamicResource AppBorder}"
+                                        BorderThickness="2"
+                                        CornerRadius="4"
+                                        Padding="10,8"
+                                        MaxWidth="250">
 
-                      <!-- Selectable Table for Boilers using ListBox -->
-                      <Border Background="{DynamicResource AppCardInner}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="1" CornerRadius="8" Padding="10">
-                        <StackPanel>
-                          <!-- Table names -->
-                          <Grid ColumnDefinitions="2*, 1*, 1*" Margin="10,5,10,10">
-                            <TextBlock Grid.Column="0" Text="Boiler ID" FontWeight="Bold" Foreground="{DynamicResource AppTextMuted}" />
-                            <TextBlock Grid.Column="1" Text="Fuel Type" FontWeight="Bold" Foreground="{DynamicResource AppTextMuted}" />
-                            <TextBlock Grid.Column="2" Text="Status" FontWeight="Bold" Foreground="{DynamicResource AppTextMuted}" />
-                          </Grid>
+                                    <TextBlock Text="{Binding CurrentContext.StartDate, StringFormat={}{0:dd/MM/yyyy - HH:mm}}"
+                                               Foreground="{DynamicResource AppTextPrimary}"
+                                               VerticalAlignment="Center"/>
+                                </Border>
+                            </StackPanel>
 
-                          <Separator Background="{DynamicResource AppBorder}" Height="1" Margin="0,0,0,5" />
+                            <!-- End date -->
+                            <StackPanel Grid.Column="1"
+                                        Spacing="8"
+                                        Margin="0,0,20,20">
 
-                          <!-- Selectable rows for maintenance -->
-                          <ListBox ItemsSource="{Binding Boilers}" SelectedItem="{Binding SelectedBoiler, Mode=TwoWay}" Background="Transparent" BorderThickness="0" CornerRadius="4">
-                            <ListBox.Styles>
-                              <Style Selector="ListBoxItem">
-                                <Setter Property="Padding" Value="0" />
-                              </Style>
-                            </ListBox.Styles>
-                            <!--Updated listbox to make the status binding-->
-                            <ListBox.ItemTemplate>
-                              <DataTemplate x:CompileBindings="False">
-                                <Grid ColumnDefinitions="2*, 1*, 1*" Margin="10">
-                                  <TextBlock Grid.Column="0" Text="{Binding BoilerId}" Foreground="{DynamicResource AppTextPrimary}" FontWeight="SemiBold" VerticalAlignment="Center"/>
-                                  <TextBlock Grid.Column="1" Text="{Binding FuelType}" Foreground="{DynamicResource AppTextPrimary}" VerticalAlignment="Center"/>
-                                  <TextBlock Grid.Column="2" Text="{Binding StatusText}" Foreground="{Binding StatusBrush}" VerticalAlignment="Center"/>
+                                <TextBlock Text="End Date"
+                                           FontSize="14"
+                                           Foreground="{DynamicResource AppTextPrimary}"
+                                           FontWeight="SemiBold"/>
+
+                                <Border Background="{DynamicResource AppInputBackground}"
+                                        BorderBrush="{DynamicResource AppBorder}"
+                                        BorderThickness="2"
+                                        CornerRadius="4"
+                                        Padding="10,8"
+                                        MaxWidth="250">
+
+                                    <TextBlock Text="{Binding CurrentContext.EndDate, StringFormat={}{0:dd/MM/yyyy - HH:mm}}"
+                                               Foreground="{DynamicResource AppTextPrimary}"
+                                               VerticalAlignment="Center"/>
+                                </Border>
+                            </StackPanel>
+
+                            <!-- Period Selection -->
+                            <WrapPanel Grid.Row="0"
+                                       Grid.Column="2"
+                                       HorizontalAlignment="Right"
+                                       VerticalAlignment="Center"
+                                       Margin="10">
+
+                                <ComboBox ItemsSource="{Binding Periods}"
+                                          SelectedItem="{Binding SelectedPeriod, Mode=TwoWay}"
+                                          MinWidth="120"
+                                          MaxWidth="200"/>
+                            </WrapPanel>
+
+                            <!-- Scenario Selection -->
+                            <WrapPanel Grid.Row="0"
+                                       Grid.Column="3"
+                                       HorizontalAlignment="Right"
+                                       VerticalAlignment="Center"
+                                       Margin="10">
+
+                                <ComboBox ItemsSource="{Binding Scenarios}"
+                                          SelectedItem="{Binding SelectedScenario, Mode=TwoWay}"
+                                          MinWidth="120"
+                                          MaxWidth="200"/>
+                            </WrapPanel>
+
+                            <!-- Optimize button -->
+                            <Button Grid.Column="4"
+                                    Content="Optimize"
+                                    Command="{Binding RunOptimizationCommand}"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Bottom"
+                                    Margin="0,0,0,20"
+                                    Padding="18,8"
+                                    FontWeight="SemiBold"
+                                    CornerRadius="4">
+
+                                <Button.Styles>
+                                    <Style Selector="Button">
+                                        <Setter Property="Background" Value="#16A34A"/>
+                                        <Setter Property="Foreground" Value="White"/>
+                                    </Style>
+
+                                    <Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                                        <Setter Property="Background" Value="#15803D"/>
+                                        <Setter Property="TextBlock.Foreground" Value="White"/>
+                                    </Style>
+                                </Button.Styles>
+                            </Button>
+
+                        </Grid>
+
+                        <!-- Loading -->
+                        <ProgressBar IsVisible="{Binding IsLoading}"
+                                     IsIndeterminate="True"
+                                     Height="4"
+                                     Margin="0,0,0,20"/>
+
+                        <!-- Error -->
+                        <TextBlock Text="{Binding ErrorMessage}"
+                                   Foreground="Tomato"
+                                   Margin="0,0,0,20"
+                                   TextWrapping="Wrap"/>
+
+                        <!-- Maintenance -->
+                        <TextBlock VerticalAlignment="Bottom"
+                                   FontSize="18"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource AppTextPrimary}"
+                                   Text="Schedule Maintenance"
+                                   Margin="0,20,10,0"/>
+
+                        <TextBlock VerticalAlignment="Bottom"
+                                   FontSize="14"
+                                   Foreground="{DynamicResource AppTextPrimary}"
+                                   TextWrapping="Wrap"
+                                   Text="{Binding MaintenanceInstructions}"
+                                   Margin="0,0,10,10"/>
+
+                        <!-- Boilers -->
+                        <Border Background="{DynamicResource AppCardInner}"
+                                BorderBrush="{DynamicResource AppBorder}"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="10">
+
+                            <StackPanel>
+
+                                <Grid ColumnDefinitions="2*,1*,1*"
+                                      Margin="10,5,10,10">
+
+                                    <TextBlock Grid.Column="0"
+                                               Text="Boiler ID"
+                                               FontWeight="Bold"
+                                               Foreground="{DynamicResource AppTextMuted}"/>
+
+                                    <TextBlock Grid.Column="1"
+                                               Text="Fuel Type"
+                                               FontWeight="Bold"
+                                               Foreground="{DynamicResource AppTextMuted}"/>
+
+                                    <TextBlock Grid.Column="2"
+                                               Text="Status"
+                                               FontWeight="Bold"
+                                               Foreground="{DynamicResource AppTextMuted}"/>
                                 </Grid>
-                              </DataTemplate>
-                            </ListBox.ItemTemplate>
-                          </ListBox>
-                        </StackPanel>
-                      </Border>
 
-                      <!-- Maintenance date choosing -->
-                      <Grid ColumnDefinitions="Auto, Auto, *" Margin="0,20,0,0" VerticalAlignment="Top" IsVisible="{Binding SelectedBoiler, Converter={x:Static ObjectConverters.IsNotNull}}">
-                        <!-- Maintenance start time -->
-                        <StackPanel Grid.Column="0" Spacing="8" Margin="0,0,40,20" VerticalAlignment="Top">
-                          <TextBlock Text="Maintenance Start" FontSize="14" Foreground="{DynamicResource AppTextPrimary}" FontWeight="SemiBold"/>
-                          <WrapPanel Margin="0">
-                            <CalendarDatePicker SelectedDate="{Binding MaintenanceStartDate, Mode=TwoWay}" Width="140" Watermark="Select date" Margin="0,0,10,0"/>
-                            <NumericUpDown Minimum="0" Maximum="23" Value="{Binding MaintenanceStartHour, Mode=TwoWay}" FormatString="00" Margin="0" VerticalAlignment="Center" Width="70" ShowButtonSpinner="True"/>
-                            <TextBlock Text="{Binding MaintenanceStartHour, StringFormat={}{0:00}}" VerticalAlignment="Center" Margin="8,0,0,0" FontWeight="SemiBold" Foreground="{DynamicResource AppTextPrimary}"/>
-                            <TextBlock Text=": 00" VerticalAlignment="Center" Margin="5,0,0,0" FontWeight="SemiBold" Foreground="{DynamicResource AppTextPrimary}"/>
-                          </WrapPanel>
-                        </StackPanel>
+                                <Separator Background="{DynamicResource AppBorder}"
+                                           Height="1"
+                                           Margin="0,0,0,5"/>
 
-                        <!-- Maintenance duration -->
-                        <StackPanel Grid.Column="1" Spacing="8" Margin="0,0,20,20" VerticalAlignment="Top">
-                          <TextBlock Text="Maintenance Duration" FontSize="14" Foreground="{DynamicResource AppTextPrimary}" FontWeight="SemiBold"/>
-                          <Grid Margin="0" ColumnDefinitions="140,Auto,Auto" VerticalAlignment="Center">
-                            <Slider Grid.Column="0" Minimum="30" Maximum="60" Value="{Binding MaintenanceDuration, Mode=TwoWay}" TickFrequency="1" IsSnapToTickEnabled="True" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="1" Text="{Binding MaintenanceDuration}" VerticalAlignment="Center" Margin="10,0,0,0" FontWeight="SemiBold" Foreground="{DynamicResource AppTextPrimary}"/>
-                            <TextBlock Grid.Column="2" Text="hours" VerticalAlignment="Center" Margin="8,0,0,0" Foreground="{DynamicResource AppTextMuted}"/>
-                          </Grid>
-                        </StackPanel>
+                                <ListBox ItemsSource="{Binding Boilers}"
+                                         SelectedItem="{Binding SelectedBoiler, Mode=TwoWay}"
+                                         Background="Transparent"
+                                         BorderThickness="0"
+                                         CornerRadius="4">
 
-                        <!-- Confirm Maintenance Button -->
-                        <Button Grid.Column="2"
-                            HorizontalAlignment="Right"
-                          Command="{Binding ScheduleMaintenanceCommand}"
-                          Content="Select"
-                                FontWeight="SemiBold"
-                                CornerRadius="4"
-                                Padding="16,8"
-                                VerticalAlignment="Bottom"
-                                Margin="0,0,0,20">
-                            <Button.Styles>
-                              <!-- Default state -->
-                              <Style Selector="Button">
-                                <Setter Property="Background" Value="#3B82F6"/>
-                                <Setter Property="Foreground" Value="White"/>
-                              </Style>
-                              <!-- Hover state, because default made the button not visible -->
-                              <Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-                                <Setter Property="Background" Value="#2563EB"/>
-                                <Setter Property="TextBlock.Foreground" Value="White"/>
-                              </Style>
-                            </Button.Styles>
-                          </Button>
-                      </Grid>
+                                    <ListBox.Styles>
+                                        <Style Selector="ListBoxItem">
+                                            <Setter Property="Padding" Value="0"/>
+                                        </Style>
+                                    </ListBox.Styles>
 
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+
+                                            <Grid ColumnDefinitions="2*,1*,1*"
+                                                  Margin="10">
+
+                                                <TextBlock Grid.Column="0"
+                                                           Text="{Binding BoilerId}"
+                                                           Foreground="{DynamicResource AppTextPrimary}"
+                                                           FontWeight="SemiBold"
+                                                           VerticalAlignment="Center"/>
+
+                                                <TextBlock Grid.Column="1"
+                                                           Text="{Binding FuelType}"
+                                                           Foreground="{DynamicResource AppTextPrimary}"
+                                                           VerticalAlignment="Center"/>
+
+                                                <TextBlock Grid.Column="2"
+                                                           Text="{Binding StatusText}"
+                                                           Foreground="{Binding StatusBrush}"
+                                                           VerticalAlignment="Center"/>
+                                            </Grid>
+
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Maintenance Selection -->
+                        <Grid ColumnDefinitions="Auto,Auto,*"
+                              Margin="0,20,0,0"
+                              VerticalAlignment="Top"
+                              IsVisible="{Binding HasSelectedBoiler}">
+
+                            <!-- Start -->
+                            <StackPanel Grid.Column="0"
+                                        Spacing="8"
+                                        Margin="0,0,40,20"
+                                        VerticalAlignment="Top">
+
+                                <TextBlock Text="Maintenance Start"
+                                           FontSize="14"
+                                           Foreground="{DynamicResource AppTextPrimary}"
+                                           FontWeight="SemiBold"/>
+
+                                <WrapPanel Margin="0">
+
+                                    <CalendarDatePicker SelectedDate="{Binding MaintenanceStartDate, Mode=TwoWay}"
+                                                        Width="140"
+                                                        Watermark="Select date"
+                                                        Margin="0,0,10,0"/>
+
+                                    <NumericUpDown Minimum="0"
+                                                   Maximum="23"
+                                                   Value="{Binding MaintenanceStartHour, Mode=TwoWay}"
+                                                   FormatString="00"
+                                                   Margin="0"
+                                                   VerticalAlignment="Center"
+                                                   Width="70"
+                                                   ShowButtonSpinner="True"/>
+
+                                    <TextBlock Text="{Binding MaintenanceStartHour, StringFormat={}{0:00}}"
+                                               VerticalAlignment="Center"
+                                               Margin="8,0,0,0"
+                                               FontWeight="SemiBold"
+                                               Foreground="{DynamicResource AppTextPrimary}"/>
+
+                                    <TextBlock Text=": 00"
+                                               VerticalAlignment="Center"
+                                               Margin="5,0,0,0"
+                                               FontWeight="SemiBold"
+                                               Foreground="{DynamicResource AppTextPrimary}"/>
+                                </WrapPanel>
+                            </StackPanel>
+
+                            <!-- Duration -->
+                            <StackPanel Grid.Column="1"
+                                        Spacing="8"
+                                        Margin="0,0,20,20"
+                                        VerticalAlignment="Top">
+
+                                <TextBlock Text="Maintenance Duration"
+                                           FontSize="14"
+                                           Foreground="{DynamicResource AppTextPrimary}"
+                                           FontWeight="SemiBold"/>
+
+                                <Grid Margin="0"
+                                      ColumnDefinitions="140,Auto,Auto"
+                                      VerticalAlignment="Center">
+
+                                    <Slider Grid.Column="0"
+                                            Minimum="30"
+                                            Maximum="60"
+                                            Value="{Binding MaintenanceDuration, Mode=TwoWay}"
+                                            TickFrequency="1"
+                                            IsSnapToTickEnabled="True"
+                                            VerticalAlignment="Center"/>
+
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding MaintenanceDuration}"
+                                               VerticalAlignment="Center"
+                                               Margin="10,0,0,0"
+                                               FontWeight="SemiBold"
+                                               Foreground="{DynamicResource AppTextPrimary}"/>
+
+                                    <TextBlock Grid.Column="2"
+                                               Text="hours"
+                                               VerticalAlignment="Center"
+                                               Margin="8,0,0,0"
+                                               Foreground="{DynamicResource AppTextMuted}"/>
+                                </Grid>
+                            </StackPanel>
+
+                            <!-- Confirm -->
+                            <Button Grid.Column="2"
+                                    HorizontalAlignment="Right"
+                                    Command="{Binding ScheduleMaintenanceCommand}"
+                                    Content="Select"
+                                    FontWeight="SemiBold"
+                                    CornerRadius="4"
+                                    Padding="16,8"
+                                    VerticalAlignment="Bottom"
+                                    Margin="0,0,0,20">
+
+                                <Button.Styles>
+
+                                    <Style Selector="Button">
+                                        <Setter Property="Background" Value="#3B82F6"/>
+                                        <Setter Property="Foreground" Value="White"/>
+                                    </Style>
+
+                                    <Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                                        <Setter Property="Background" Value="#2563EB"/>
+                                        <Setter Property="TextBlock.Foreground" Value="White"/>
+                                    </Style>
+
+                                </Button.Styles>
+                            </Button>
+                        </Grid>
+
+                        <!-- Schedule Table -->
                         <TextBlock VerticalAlignment="Bottom"
                                    FontSize="18"
                                    FontWeight="SemiBold"
                                    Foreground="{DynamicResource AppTextPrimary}"
                                    Text="Maintenance Schedule"
-                                   Margin="0,20,10,0" />
+                                   Margin="0,20,10,0"/>
 
-                        <!-- Maintenance Table -->
-                        <Border Margin="0,0,0,10" BorderBrush="{DynamicResource AppBorder}" BorderThickness="1" CornerRadius="4" Padding="10" Background="{DynamicResource AppCard}" BoxShadow="0 4 10 0 #33000000">
-                          <!-- Bindings to the OptimizationView -->
-                          <Grid Margin="10" RowDefinitions="Auto,Auto,*" ColumnDefinitions="*,*,*,*,*">
+                        <Border Margin="0,0,0,10"
+                                BorderBrush="{DynamicResource AppBorder}"
+                                BorderThickness="1"
+                                CornerRadius="4"
+                                Padding="10"
+                                Background="{DynamicResource AppCard}"
+                                BoxShadow="0 4 10 0 #33000000">
 
-                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Asset Name" FontWeight="Bold" Margin="10" Foreground="{DynamicResource AppTextPrimary}"/>
-                            <TextBlock Grid.Row="0" Grid.Column="1" Text="From (Date)" FontWeight="Bold" Margin="10" Foreground="{DynamicResource AppTextPrimary}"/>
-                            <TextBlock Grid.Row="0" Grid.Column="2" Text="To (Date)" FontWeight="Bold" Margin="10" Foreground="{DynamicResource AppTextPrimary}"/>
-                            <TextBlock Grid.Row="0" Grid.Column="3" Text="Period" FontWeight="Bold" Margin="10" Foreground="{DynamicResource AppTextPrimary}"/>
-                            <TextBlock Grid.Row="0" Grid.Column="4" Text="Scenario" FontWeight="Bold" Margin="10" Foreground="{DynamicResource AppTextPrimary}"/>
+                            <Grid Margin="10"
+                                  RowDefinitions="Auto,Auto,*"
+                                  ColumnDefinitions="*,*,*,*,*">
 
-                            <!-- Line separating rows -->
-                            <Rectangle Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="5" Height="1" Fill="{DynamicResource AppBorder}" VerticalAlignment="Bottom"/>
+                                <TextBlock Grid.Row="0"
+                                           Grid.Column="0"
+                                           Text="Asset Name"
+                                           FontWeight="Bold"
+                                           Margin="10"
+                                           Foreground="{DynamicResource AppTextPrimary}"/>
 
-                            <ItemsControl ItemsSource="{Binding Schedules}" Grid.Row="2" Grid.ColumnSpan="5">
-                              <ItemsControl.ItemTemplate>
-                              <DataTemplate x:CompileBindings="False">
-                                  <Grid ColumnDefinitions="*,*,*,*,*">
-                                    <TextBlock Grid.Column="0" Text="{Binding AssetName}" Margin="10" Foreground="{DynamicResource AppTextPrimary}"/>
-                                    <TextBlock Grid.Column="1" Text="{Binding StartDate, StringFormat='{}{0:yyyy-MM-dd HH:mm}'}" Margin="10" Foreground="{DynamicResource AppTextPrimary}"/>
-                                    <TextBlock Grid.Column="2" Text="{Binding EndDate, StringFormat='{}{0:yyyy-MM-dd HH:mm}'}" Margin="10" Foreground="{DynamicResource AppTextPrimary}"/>
-                                    <TextBlock Grid.Column="3" Text="{Binding Period}" Margin="10" Foreground="{DynamicResource AppTextPrimary}"/>
-                                    <TextBlock Grid.Column="4" Text="{Binding Scenario}" Margin="10" Foreground="{DynamicResource AppTextPrimary}"/>
-                                  </Grid>
-                                </DataTemplate>
-                              </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                          </Grid>
+                                <TextBlock Grid.Row="0"
+                                           Grid.Column="1"
+                                           Text="From (Date)"
+                                           FontWeight="Bold"
+                                           Margin="10"
+                                           Foreground="{DynamicResource AppTextPrimary}"/>
+
+                                <TextBlock Grid.Row="0"
+                                           Grid.Column="2"
+                                           Text="To (Date)"
+                                           FontWeight="Bold"
+                                           Margin="10"
+                                           Foreground="{DynamicResource AppTextPrimary}"/>
+
+                                <TextBlock Grid.Row="0"
+                                           Grid.Column="3"
+                                           Text="Period"
+                                           FontWeight="Bold"
+                                           Margin="10"
+                                           Foreground="{DynamicResource AppTextPrimary}"/>
+
+                                <TextBlock Grid.Row="0"
+                                           Grid.Column="4"
+                                           Text="Scenario"
+                                           FontWeight="Bold"
+                                           Margin="10"
+                                           Foreground="{DynamicResource AppTextPrimary}"/>
+
+                                <Rectangle Grid.Row="1"
+                                           Grid.Column="0"
+                                           Grid.ColumnSpan="5"
+                                           Height="1"
+                                           Fill="{DynamicResource AppBorder}"
+                                           VerticalAlignment="Bottom"/>
+
+                                <ItemsControl ItemsSource="{Binding Schedules}"
+                                              Grid.Row="2"
+                                              Grid.ColumnSpan="5">
+
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+
+                                            <Grid ColumnDefinitions="*,*,*,*,*">
+
+                                                <TextBlock Grid.Column="0"
+                                                           Text="{Binding AssetName}"
+                                                           Margin="10"
+                                                           Foreground="{DynamicResource AppTextPrimary}"/>
+
+                                                <TextBlock Grid.Column="1"
+                                                           Text="{Binding StartDate, StringFormat='{}{0:yyyy-MM-dd HH:mm}'}"
+                                                           Margin="10"
+                                                           Foreground="{DynamicResource AppTextPrimary}"/>
+
+                                                <TextBlock Grid.Column="2"
+                                                           Text="{Binding EndDate, StringFormat='{}{0:yyyy-MM-dd HH:mm}'}"
+                                                           Margin="10"
+                                                           Foreground="{DynamicResource AppTextPrimary}"/>
+
+                                                <TextBlock Grid.Column="3"
+                                                           Text="{Binding Period}"
+                                                           Margin="10"
+                                                           Foreground="{DynamicResource AppTextPrimary}"/>
+
+                                                <TextBlock Grid.Column="4"
+                                                           Text="{Binding Scenario}"
+                                                           Margin="10"
+                                                           Foreground="{DynamicResource AppTextPrimary}"/>
+                                            </Grid>
+
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Grid>
                         </Border>
+
                     </StackPanel>
-                    </Grid>
-                </Border>    
-            </StackPanel>
-            </StackPanel>
+                </Grid>
+            </Border>
+        </StackPanel>
+    </StackPanel>
 </UserControl>
