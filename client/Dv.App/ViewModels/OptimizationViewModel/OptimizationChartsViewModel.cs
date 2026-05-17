@@ -112,10 +112,11 @@ public sealed class OptimizationChartsViewModel : ViewModelBase
             },
         };
 
+        var minPrice = electricityPrices.Select(p => p.Value ?? 0d).DefaultIfEmpty(0d).Min();
         var maxPrice = electricityPrices.Select(p => p.Value ?? 0d).DefaultIfEmpty(0d).Max();
         if (this.ElectricityPriceChart.YAxes.FirstOrDefault() is Axis priceAxis)
         {
-            priceAxis.MinLimit = 0;
+            priceAxis.MinLimit = Math.Floor(Math.Min(0, minPrice) * 1.1);
             priceAxis.MaxLimit = Math.Ceiling(Math.Max(1, maxPrice) * 1.1);
         }
     }
@@ -180,10 +181,11 @@ public sealed class OptimizationChartsViewModel : ViewModelBase
         };
 
         // set sensible axis limits for electricity consumption
+        var minConsumption = electricityConsumption.Select(p => p.Value ?? 0d).DefaultIfEmpty(0d).Min();
         var maxConsumption = electricityConsumption.Select(p => p.Value ?? 0d).DefaultIfEmpty(0d).Max();
         if (this.ElectricityConsumptionChart.YAxes.FirstOrDefault() is Axis consAxis)
         {
-            consAxis.MinLimit = 0;
+            consAxis.MinLimit = Math.Floor(Math.Min(0, minConsumption) * 1.1);
             consAxis.MaxLimit = Math.Ceiling(Math.Max(1, maxConsumption) * 1.1);
         }
 
@@ -202,10 +204,11 @@ public sealed class OptimizationChartsViewModel : ViewModelBase
             },
         };
 
+        var minExpenses = expenses.Select(p => p.Value ?? 0d).DefaultIfEmpty(0d).Min();
         var maxExpenses = expenses.Select(p => p.Value ?? 0d).DefaultIfEmpty(0d).Max();
         if (this.ExpensesChart.YAxes.FirstOrDefault() is Axis expensesAxis)
         {
-            expensesAxis.MinLimit = 0;
+            expensesAxis.MinLimit = Math.Floor(Math.Min(0, minExpenses) * 1.1);
             expensesAxis.MaxLimit = Math.Ceiling(Math.Max(1, maxExpenses) * 1.1);
         }
 
@@ -224,10 +227,11 @@ public sealed class OptimizationChartsViewModel : ViewModelBase
             },
         };
 
+        var minEmissions = co2Emissions.Select(p => p.Value ?? 0d).DefaultIfEmpty(0d).Min();
         var maxEmissions = co2Emissions.Select(p => p.Value ?? 0d).DefaultIfEmpty(0d).Max();
         if (this.Co2EmissionsChart.YAxes.FirstOrDefault() is Axis emissionsAxis)
         {
-            emissionsAxis.MinLimit = 0;
+            emissionsAxis.MinLimit = Math.Floor(Math.Min(0, minEmissions) * 1.1);
             emissionsAxis.MaxLimit = Math.Ceiling(Math.Max(1, maxEmissions) * 1.1);
         }
 
