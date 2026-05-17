@@ -19,6 +19,7 @@ public sealed class OptimizationViewModel : ViewModelBase
     private readonly SemaphoreSlim loadLock = new(1, 1);
     private readonly OptimizationChartsViewModel chartsModule;
     private readonly OptimizationMaintenanceViewModel maintenanceModule;
+    private List<SourceDataDto> cachedSourceData = [];
 
     private string selectedPeriod = "Winter";
     private string selectedScenario = "Scenario 2";
@@ -104,6 +105,7 @@ public sealed class OptimizationViewModel : ViewModelBase
                         this.SelectedPeriod,
                         this.SelectedScenario);
 
+                this.RefreshSourceCharts();
                 this.maintenanceModule.ApplyContext(
                     this.CurrentContext);
             }
@@ -122,6 +124,7 @@ public sealed class OptimizationViewModel : ViewModelBase
                         this.SelectedPeriod,
                         this.SelectedScenario);
 
+                this.RefreshSourceCharts();
                 this.maintenanceModule.ApplyContext(
                     this.CurrentContext);
             }
@@ -222,8 +225,9 @@ public sealed class OptimizationViewModel : ViewModelBase
                     $"Failed to load source data: {ex.Message}";
             }
 
+            this.cachedSourceData = sourceData;
             this.chartsModule.LoadSourceData(
-                sourceData,
+                this.cachedSourceData,
                 this.CurrentContext);
         }
         catch (Exception ex)
@@ -294,6 +298,18 @@ public sealed class OptimizationViewModel : ViewModelBase
             TimeFrom = this.CurrentContext.StartDate,
             TimeTo = this.CurrentContext.EndDate,
         };
+    }
+
+    private void RefreshSourceCharts()
+    {
+        if (this.cachedSourceData.Count == 0)
+        {
+            return;
+        }
+
+        this.chartsModule.LoadSourceData(
+            this.cachedSourceData,
+            this.CurrentContext);
     }
 
     private void ModuleOnPropertyChanged(
