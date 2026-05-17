@@ -100,7 +100,7 @@ public sealed partial class OptimizationViewModel : ViewModelBase
         return new ObservableCollection<BoilerStatusViewModel>
         {
             new BoilerStatusViewModel("GB1", "Gas", period),
-            new BoilerStatusViewModel("GB2", "Gas", period),
+            new BoilerStatusViewModel("GB3", "Gas", period),
             new BoilerStatusViewModel("GM1", "Gas", period),
             new BoilerStatusViewModel("EB1", "Electric", period),
         };

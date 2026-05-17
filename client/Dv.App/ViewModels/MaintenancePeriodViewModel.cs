@@ -80,7 +80,11 @@ public partial class MaintenancePeriodViewModel : ViewModelBase
         this.PeriodEnd = end;
         this.Boilers = initialBoilers;
 
-        MaintenanceStore.MaintenanceSchedules.CollectionChanged += (s, e) => this.UpdateBoilerStatuses();
+        MaintenanceStore.MaintenanceSchedules.CollectionChanged += (s, e) =>
+        {
+            this.UpdateBoilerStatuses();
+            this.RunOptimisationCommand.NotifyCanExecuteChanged();
+        };
         this.UpdateBoilerStatuses();
     }
 
@@ -122,7 +126,13 @@ public partial class MaintenancePeriodViewModel : ViewModelBase
         }
     }
 
-    [RelayCommand]
+    private bool CanRunOptimisationAsync()
+    {
+        var periodId = this.maintenanceService.GetPeriodId(this.PeriodName);
+        return MaintenanceStore.MaintenanceSchedules.Any(s => s.Period == periodId && s.Scenario == this.Scenario);
+    }
+
+    [RelayCommand(CanExecute = nameof(CanRunOptimisationAsync))]
     private async Task RunOptimisationAsync()
     {
         var periodId = this.maintenanceService.GetPeriodId(this.PeriodName);
