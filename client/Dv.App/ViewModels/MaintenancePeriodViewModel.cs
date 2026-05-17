@@ -63,6 +63,8 @@ public partial class MaintenancePeriodViewModel : ViewModelBase
 
     public ObservableCollection<OptimisationResultsHourlyClient> OptimisationResults { get; } = new();
 
+    public OptimizationChartsViewModel Charts { get; } = new();
+
     // Exposes MaintenanceStore schedules for XAML binding
     public ObservableCollection<MaintenanceEvent> Schedules => MaintenanceStore.MaintenanceSchedules;
 
@@ -159,6 +161,8 @@ public partial class MaintenancePeriodViewModel : ViewModelBase
             this.TotalHeatProduction = Math.Round(this.OptimisationResults.Sum(r => r.HeatProduction), 2);
             this.TotalExpenses = Math.Round(this.OptimisationResults.Sum(r => r.Expenses), 2);
             this.TotalCo2Emissions = Math.Round(this.OptimisationResults.Sum(r => r.Co2Emissions), 2);
+
+            this.Charts.LoadOptimizationResult(response.Data.OptimisationResultsHourly, this.PeriodName);
 
             this.HasOptimisationResults = true;
         }
