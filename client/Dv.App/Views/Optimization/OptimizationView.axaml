@@ -666,32 +666,13 @@
                             </Border>
                           </Grid>
 
-                          <!-- Hourly results table -->
-                          <Border Background="{DynamicResource AppCardInner}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="1" CornerRadius="8" Padding="10">
-                            <StackPanel>
-                              <Grid ColumnDefinitions="2*,1*,1*,1*,1*" Margin="10,5,10,10">
-                                <TextBlock Grid.Column="0" Text="Time" FontWeight="Bold" Foreground="{DynamicResource AppTextMuted}"/>
-                                <TextBlock Grid.Column="1" Text="Heat (MWh)" FontWeight="Bold" Foreground="{DynamicResource AppTextMuted}"/>
-                                <TextBlock Grid.Column="2" Text="Electricity (MWh)" FontWeight="Bold" Foreground="{DynamicResource AppTextMuted}"/>
-                                <TextBlock Grid.Column="3" Text="Expenses (DKK)" FontWeight="Bold" Foreground="{DynamicResource AppTextMuted}"/>
-                                <TextBlock Grid.Column="4" Text="CO2 (kg)" FontWeight="Bold" Foreground="{DynamicResource AppTextMuted}"/>
-                              </Grid>
-                              <Separator Background="{DynamicResource AppBorder}" Height="1" Margin="0,0,0,5"/>
-                              <ItemsControl ItemsSource="{Binding OptimisationResults}">
-                                <ItemsControl.ItemTemplate>
-                                  <DataTemplate x:CompileBindings="False">
-                                    <Grid ColumnDefinitions="2*,1*,1*,1*,1*" Margin="10,6">
-                                      <TextBlock Grid.Column="0" Text="{Binding TimeFrom, StringFormat='{}{0:dd MMM HH:mm}'}" Foreground="{DynamicResource AppTextPrimary}"/>
-                                      <TextBlock Grid.Column="1" Text="{Binding HeatProduction, StringFormat='{}{0:F2}'}" Foreground="{DynamicResource AppTextPrimary}"/>
-                                      <TextBlock Grid.Column="2" Text="{Binding ElectricityConsumption, StringFormat='{}{0:F2}'}" Foreground="{DynamicResource AppTextPrimary}"/>
-                                      <TextBlock Grid.Column="3" Text="{Binding Expenses, StringFormat='{}{0:F2}'}" Foreground="{DynamicResource AppTextPrimary}"/>
-                                      <TextBlock Grid.Column="4" Text="{Binding Co2Emissions, StringFormat='{}{0:F2}'}" Foreground="{DynamicResource AppTextPrimary}"/>
-                                    </Grid>
-                                  </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                              </ItemsControl>
-                            </StackPanel>
-                          </Border>
+                          <!-- Optimisation result charts -->
+                          <StackPanel DataContext="{Binding Charts}" Spacing="12" Margin="0,8,0,0">
+                            <components:ChartCardView DataContext="{Binding OptimizationResultsChart}" />
+                            <components:ChartCardView DataContext="{Binding ElectricityConsumptionChart}" />
+                            <components:ChartCardView DataContext="{Binding ExpensesChart}" />
+                            <components:ChartCardView DataContext="{Binding Co2EmissionsChart}" />
+                          </StackPanel>
                         </StackPanel>
                       </Border>
 
@@ -1317,32 +1298,13 @@
                             </Border>
                           </Grid>
 
-                          <!-- Hourly results table -->
-                          <Border Background="{DynamicResource AppCardInner}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="1" CornerRadius="8" Padding="10">
-                            <StackPanel>
-                              <Grid ColumnDefinitions="2*,1*,1*,1*,1*" Margin="10,5,10,10">
-                                <TextBlock Grid.Column="0" Text="Time" FontWeight="Bold" Foreground="{DynamicResource AppTextMuted}"/>
-                                <TextBlock Grid.Column="1" Text="Heat (MWh)" FontWeight="Bold" Foreground="{DynamicResource AppTextMuted}"/>
-                                <TextBlock Grid.Column="2" Text="Electricity (MWh)" FontWeight="Bold" Foreground="{DynamicResource AppTextMuted}"/>
-                                <TextBlock Grid.Column="3" Text="Expenses (DKK)" FontWeight="Bold" Foreground="{DynamicResource AppTextMuted}"/>
-                                <TextBlock Grid.Column="4" Text="CO2 (kg)" FontWeight="Bold" Foreground="{DynamicResource AppTextMuted}"/>
-                              </Grid>
-                              <Separator Background="{DynamicResource AppBorder}" Height="1" Margin="0,0,0,5"/>
-                              <ItemsControl ItemsSource="{Binding OptimisationResults}">
-                                <ItemsControl.ItemTemplate>
-                                  <DataTemplate x:CompileBindings="False">
-                                    <Grid ColumnDefinitions="2*,1*,1*,1*,1*" Margin="10,6">
-                                      <TextBlock Grid.Column="0" Text="{Binding TimeFrom, StringFormat='{}{0:dd MMM HH:mm}'}" Foreground="{DynamicResource AppTextPrimary}"/>
-                                      <TextBlock Grid.Column="1" Text="{Binding HeatProduction, StringFormat='{}{0:F2}'}" Foreground="{DynamicResource AppTextPrimary}"/>
-                                      <TextBlock Grid.Column="2" Text="{Binding ElectricityConsumption, StringFormat='{}{0:F2}'}" Foreground="{DynamicResource AppTextPrimary}"/>
-                                      <TextBlock Grid.Column="3" Text="{Binding Expenses, StringFormat='{}{0:F2}'}" Foreground="{DynamicResource AppTextPrimary}"/>
-                                      <TextBlock Grid.Column="4" Text="{Binding Co2Emissions, StringFormat='{}{0:F2}'}" Foreground="{DynamicResource AppTextPrimary}"/>
-                                    </Grid>
-                                  </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                              </ItemsControl>
-                            </StackPanel>
-                          </Border>
+                          <!-- Optimisation result charts -->
+                          <StackPanel DataContext="{Binding Charts}" Spacing="12" Margin="0,8,0,0">
+                            <components:ChartCardView DataContext="{Binding OptimizationResultsChart}" />
+                            <components:ChartCardView DataContext="{Binding ElectricityConsumptionChart}" />
+                            <components:ChartCardView DataContext="{Binding ExpensesChart}" />
+                            <components:ChartCardView DataContext="{Binding Co2EmissionsChart}" />
+                          </StackPanel>
                         </StackPanel>
                       </Border>
 
