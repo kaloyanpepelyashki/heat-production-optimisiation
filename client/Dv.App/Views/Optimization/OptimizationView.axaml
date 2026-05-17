@@ -123,6 +123,7 @@
 
                         <!-- Optimize button to start optimization-->
                         <Button Grid.Column="2"
+                                Command="{Binding RunOptimisationCommand}"
                                 Content="Optimize"
                                 HorizontalAlignment="Right"
                                 VerticalAlignment="Bottom"
@@ -328,6 +329,83 @@
                           </StackPanel>
                         </Border>
 
+                        <!-- Optimisation Status -->
+                        <StackPanel IsVisible="{Binding IsOptimising}" Margin="0,20,0,0" HorizontalAlignment="Center">
+                          <TextBlock Text="Running optimisation, this may take a moment..." FontSize="14" Foreground="{DynamicResource AppTextMuted}" HorizontalAlignment="Center"/>
+                        </StackPanel>
+
+                        <TextBlock IsVisible="{Binding OptimisationStatusMessage, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                   Text="{Binding OptimisationStatusMessage}"
+                                   FontSize="14"
+                                   Foreground="#EF4444"
+                                   Margin="0,10,0,0"
+                                   TextWrapping="Wrap"/>
+
+                        <!-- Optimisation Results -->
+                        <Border IsVisible="{Binding HasOptimisationResults}"
+                                Margin="0,20,0,0"
+                                Background="{DynamicResource AppCard}"
+                                BoxShadow="0 4 10 0 #33000000"
+                                CornerRadius="8"
+                                Padding="20">
+                          <StackPanel>
+                            <TextBlock Text="Optimisation Results"
+                                       FontSize="18"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource AppTextPrimary}"
+                                       Margin="0,0,0,16"/>
+
+                            <!-- Summary cards -->
+                            <Grid ColumnDefinitions="*,*,*" Margin="0,0,0,20">
+                              <Border Grid.Column="0" Background="{DynamicResource AppCardInner}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="1" CornerRadius="8" Padding="16" Margin="0,0,8,0">
+                                <StackPanel>
+                                  <TextBlock Text="Total Heat Production" FontSize="12" Foreground="{DynamicResource AppTextMuted}" Margin="0,0,0,4"/>
+                                  <TextBlock Text="{Binding TotalHeatProduction, StringFormat='{}{0:F2} MWh'}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource AppTextPrimary}"/>
+                                </StackPanel>
+                              </Border>
+                              <Border Grid.Column="1" Background="{DynamicResource AppCardInner}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="1" CornerRadius="8" Padding="16" Margin="4,0,4,0">
+                                <StackPanel>
+                                  <TextBlock Text="Total Expenses" FontSize="12" Foreground="{DynamicResource AppTextMuted}" Margin="0,0,0,4"/>
+                                  <TextBlock Text="{Binding TotalExpenses, StringFormat='{}{0:F2} DKK'}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource AppTextPrimary}"/>
+                                </StackPanel>
+                              </Border>
+                              <Border Grid.Column="2" Background="{DynamicResource AppCardInner}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="1" CornerRadius="8" Padding="16" Margin="8,0,0,0">
+                                <StackPanel>
+                                  <TextBlock Text="Total CO2 Emissions" FontSize="12" Foreground="{DynamicResource AppTextMuted}" Margin="0,0,0,4"/>
+                                  <TextBlock Text="{Binding TotalCo2Emissions, StringFormat='{}{0:F2} kg'}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource AppTextPrimary}"/>
+                                </StackPanel>
+                              </Border>
+                            </Grid>
+
+                            <!-- Hourly results table -->
+                            <Border Background="{DynamicResource AppCardInner}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="1" CornerRadius="8" Padding="10">
+                              <StackPanel>
+                                <Grid ColumnDefinitions="2*,1*,1*,1*,1*" Margin="10,5,10,10">
+                                  <TextBlock Grid.Column="0" Text="Time" FontWeight="Bold" Foreground="{DynamicResource AppTextMuted}"/>
+                                  <TextBlock Grid.Column="1" Text="Heat (MWh)" FontWeight="Bold" Foreground="{DynamicResource AppTextMuted}"/>
+                                  <TextBlock Grid.Column="2" Text="Electricity (MWh)" FontWeight="Bold" Foreground="{DynamicResource AppTextMuted}"/>
+                                  <TextBlock Grid.Column="3" Text="Expenses (DKK)" FontWeight="Bold" Foreground="{DynamicResource AppTextMuted}"/>
+                                  <TextBlock Grid.Column="4" Text="CO2 (kg)" FontWeight="Bold" Foreground="{DynamicResource AppTextMuted}"/>
+                                </Grid>
+                                <Separator Background="{DynamicResource AppBorder}" Height="1" Margin="0,0,0,5"/>
+                                <ItemsControl ItemsSource="{Binding OptimisationResults}">
+                                  <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:CompileBindings="False">
+                                      <Grid ColumnDefinitions="2*,1*,1*,1*,1*" Margin="10,6">
+                                        <TextBlock Grid.Column="0" Text="{Binding TimeFrom, StringFormat='{}{0:dd MMM HH:mm}'}" Foreground="{DynamicResource AppTextPrimary}"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding HeatProduction, StringFormat='{}{0:F2}'}" Foreground="{DynamicResource AppTextPrimary}"/>
+                                        <TextBlock Grid.Column="2" Text="{Binding ElectricityConsumption, StringFormat='{}{0:F2}'}" Foreground="{DynamicResource AppTextPrimary}"/>
+                                        <TextBlock Grid.Column="3" Text="{Binding Expenses, StringFormat='{}{0:F2}'}" Foreground="{DynamicResource AppTextPrimary}"/>
+                                        <TextBlock Grid.Column="4" Text="{Binding Co2Emissions, StringFormat='{}{0:F2}'}" Foreground="{DynamicResource AppTextPrimary}"/>
+                                      </Grid>
+                                    </DataTemplate>
+                                  </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                              </StackPanel>
+                            </Border>
+                          </StackPanel>
+                        </Border>
+
                     </StackPanel>
 
                     <!-- Stackpanel for Winter view-->
@@ -353,6 +431,7 @@
 
                         <!-- Optimize button to start optimization -->
                         <Button Grid.Column="2"
+                                Command="{Binding RunOptimisationCommand}"
                                 Content="Optimize"
                                 HorizontalAlignment="Right"
                                 VerticalAlignment="Bottom"
@@ -557,6 +636,83 @@
                         </StackPanel>
                       </Border>
 
+                      <!-- Optimisation Status -->
+                      <StackPanel IsVisible="{Binding IsOptimising}" Margin="0,20,0,0" HorizontalAlignment="Center">
+                        <TextBlock Text="Running optimisation, this may take a moment..." FontSize="14" Foreground="{DynamicResource AppTextMuted}" HorizontalAlignment="Center"/>
+                      </StackPanel>
+
+                      <TextBlock IsVisible="{Binding OptimisationStatusMessage, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                 Text="{Binding OptimisationStatusMessage}"
+                                 FontSize="14"
+                                 Foreground="#EF4444"
+                                 Margin="0,10,0,0"
+                                 TextWrapping="Wrap"/>
+
+                      <!-- Optimisation Results -->
+                      <Border IsVisible="{Binding HasOptimisationResults}"
+                              Margin="0,20,0,0"
+                              Background="{DynamicResource AppCard}"
+                              BoxShadow="0 4 10 0 #33000000"
+                              CornerRadius="8"
+                              Padding="20">
+                        <StackPanel>
+                          <TextBlock Text="Optimisation Results"
+                                     FontSize="18"
+                                     FontWeight="SemiBold"
+                                     Foreground="{DynamicResource AppTextPrimary}"
+                                     Margin="0,0,0,16"/>
+
+                          <!-- Summary cards -->
+                          <Grid ColumnDefinitions="*,*,*" Margin="0,0,0,20">
+                            <Border Grid.Column="0" Background="{DynamicResource AppCardInner}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="1" CornerRadius="8" Padding="16" Margin="0,0,8,0">
+                              <StackPanel>
+                                <TextBlock Text="Total Heat Production" FontSize="12" Foreground="{DynamicResource AppTextMuted}" Margin="0,0,0,4"/>
+                                <TextBlock Text="{Binding TotalHeatProduction, StringFormat='{}{0:F2} MWh'}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource AppTextPrimary}"/>
+                              </StackPanel>
+                            </Border>
+                            <Border Grid.Column="1" Background="{DynamicResource AppCardInner}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="1" CornerRadius="8" Padding="16" Margin="4,0,4,0">
+                              <StackPanel>
+                                <TextBlock Text="Total Expenses" FontSize="12" Foreground="{DynamicResource AppTextMuted}" Margin="0,0,0,4"/>
+                                <TextBlock Text="{Binding TotalExpenses, StringFormat='{}{0:F2} DKK'}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource AppTextPrimary}"/>
+                              </StackPanel>
+                            </Border>
+                            <Border Grid.Column="2" Background="{DynamicResource AppCardInner}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="1" CornerRadius="8" Padding="16" Margin="8,0,0,0">
+                              <StackPanel>
+                                <TextBlock Text="Total CO2 Emissions" FontSize="12" Foreground="{DynamicResource AppTextMuted}" Margin="0,0,0,4"/>
+                                <TextBlock Text="{Binding TotalCo2Emissions, StringFormat='{}{0:F2} kg'}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource AppTextPrimary}"/>
+                              </StackPanel>
+                            </Border>
+                          </Grid>
+
+                          <!-- Hourly results table -->
+                          <Border Background="{DynamicResource AppCardInner}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="1" CornerRadius="8" Padding="10">
+                            <StackPanel>
+                              <Grid ColumnDefinitions="2*,1*,1*,1*,1*" Margin="10,5,10,10">
+                                <TextBlock Grid.Column="0" Text="Time" FontWeight="Bold" Foreground="{DynamicResource AppTextMuted}"/>
+                                <TextBlock Grid.Column="1" Text="Heat (MWh)" FontWeight="Bold" Foreground="{DynamicResource AppTextMuted}"/>
+                                <TextBlock Grid.Column="2" Text="Electricity (MWh)" FontWeight="Bold" Foreground="{DynamicResource AppTextMuted}"/>
+                                <TextBlock Grid.Column="3" Text="Expenses (DKK)" FontWeight="Bold" Foreground="{DynamicResource AppTextMuted}"/>
+                                <TextBlock Grid.Column="4" Text="CO2 (kg)" FontWeight="Bold" Foreground="{DynamicResource AppTextMuted}"/>
+                              </Grid>
+                              <Separator Background="{DynamicResource AppBorder}" Height="1" Margin="0,0,0,5"/>
+                              <ItemsControl ItemsSource="{Binding OptimisationResults}">
+                                <ItemsControl.ItemTemplate>
+                                  <DataTemplate x:CompileBindings="False">
+                                    <Grid ColumnDefinitions="2*,1*,1*,1*,1*" Margin="10,6">
+                                      <TextBlock Grid.Column="0" Text="{Binding TimeFrom, StringFormat='{}{0:dd MMM HH:mm}'}" Foreground="{DynamicResource AppTextPrimary}"/>
+                                      <TextBlock Grid.Column="1" Text="{Binding HeatProduction, StringFormat='{}{0:F2}'}" Foreground="{DynamicResource AppTextPrimary}"/>
+                                      <TextBlock Grid.Column="2" Text="{Binding ElectricityConsumption, StringFormat='{}{0:F2}'}" Foreground="{DynamicResource AppTextPrimary}"/>
+                                      <TextBlock Grid.Column="3" Text="{Binding Expenses, StringFormat='{}{0:F2}'}" Foreground="{DynamicResource AppTextPrimary}"/>
+                                      <TextBlock Grid.Column="4" Text="{Binding Co2Emissions, StringFormat='{}{0:F2}'}" Foreground="{DynamicResource AppTextPrimary}"/>
+                                    </Grid>
+                                  </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                              </ItemsControl>
+                            </StackPanel>
+                          </Border>
+                        </StackPanel>
+                      </Border>
+
                     </StackPanel>
 
                   </Carousel.Items>
@@ -564,20 +720,6 @@
               </Grid>
             </Border>
           </StackPanel>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -651,6 +793,7 @@
 
                         <!-- Optimize button to start optimization-->
                         <Button Grid.Column="2"
+                                Command="{Binding RunOptimisationCommand}"
                                 Content="Optimize"
                                 HorizontalAlignment="Right"
                                 VerticalAlignment="Bottom"
@@ -856,6 +999,83 @@
                           </StackPanel>
                         </Border>
 
+                        <!-- Optimisation Status -->
+                        <StackPanel IsVisible="{Binding IsOptimising}" Margin="0,20,0,0" HorizontalAlignment="Center">
+                          <TextBlock Text="Running optimisation, this may take a moment..." FontSize="14" Foreground="{DynamicResource AppTextMuted}" HorizontalAlignment="Center"/>
+                        </StackPanel>
+
+                        <TextBlock IsVisible="{Binding OptimisationStatusMessage, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                   Text="{Binding OptimisationStatusMessage}"
+                                   FontSize="14"
+                                   Foreground="#EF4444"
+                                   Margin="0,10,0,0"
+                                   TextWrapping="Wrap"/>
+
+                        <!-- Optimisation Results -->
+                        <Border IsVisible="{Binding HasOptimisationResults}"
+                                Margin="0,20,0,0"
+                                Background="{DynamicResource AppCard}"
+                                BoxShadow="0 4 10 0 #33000000"
+                                CornerRadius="8"
+                                Padding="20">
+                          <StackPanel>
+                            <TextBlock Text="Optimisation Results"
+                                       FontSize="18"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource AppTextPrimary}"
+                                       Margin="0,0,0,16"/>
+
+                            <!-- Summary cards -->
+                            <Grid ColumnDefinitions="*,*,*" Margin="0,0,0,20">
+                              <Border Grid.Column="0" Background="{DynamicResource AppCardInner}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="1" CornerRadius="8" Padding="16" Margin="0,0,8,0">
+                                <StackPanel>
+                                  <TextBlock Text="Total Heat Production" FontSize="12" Foreground="{DynamicResource AppTextMuted}" Margin="0,0,0,4"/>
+                                  <TextBlock Text="{Binding TotalHeatProduction, StringFormat='{}{0:F2} MWh'}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource AppTextPrimary}"/>
+                                </StackPanel>
+                              </Border>
+                              <Border Grid.Column="1" Background="{DynamicResource AppCardInner}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="1" CornerRadius="8" Padding="16" Margin="4,0,4,0">
+                                <StackPanel>
+                                  <TextBlock Text="Total Expenses" FontSize="12" Foreground="{DynamicResource AppTextMuted}" Margin="0,0,0,4"/>
+                                  <TextBlock Text="{Binding TotalExpenses, StringFormat='{}{0:F2} DKK'}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource AppTextPrimary}"/>
+                                </StackPanel>
+                              </Border>
+                              <Border Grid.Column="2" Background="{DynamicResource AppCardInner}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="1" CornerRadius="8" Padding="16" Margin="8,0,0,0">
+                                <StackPanel>
+                                  <TextBlock Text="Total CO2 Emissions" FontSize="12" Foreground="{DynamicResource AppTextMuted}" Margin="0,0,0,4"/>
+                                  <TextBlock Text="{Binding TotalCo2Emissions, StringFormat='{}{0:F2} kg'}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource AppTextPrimary}"/>
+                                </StackPanel>
+                              </Border>
+                            </Grid>
+
+                            <!-- Hourly results table -->
+                            <Border Background="{DynamicResource AppCardInner}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="1" CornerRadius="8" Padding="10">
+                              <StackPanel>
+                                <Grid ColumnDefinitions="2*,1*,1*,1*,1*" Margin="10,5,10,10">
+                                  <TextBlock Grid.Column="0" Text="Time" FontWeight="Bold" Foreground="{DynamicResource AppTextMuted}"/>
+                                  <TextBlock Grid.Column="1" Text="Heat (MWh)" FontWeight="Bold" Foreground="{DynamicResource AppTextMuted}"/>
+                                  <TextBlock Grid.Column="2" Text="Electricity (MWh)" FontWeight="Bold" Foreground="{DynamicResource AppTextMuted}"/>
+                                  <TextBlock Grid.Column="3" Text="Expenses (DKK)" FontWeight="Bold" Foreground="{DynamicResource AppTextMuted}"/>
+                                  <TextBlock Grid.Column="4" Text="CO2 (kg)" FontWeight="Bold" Foreground="{DynamicResource AppTextMuted}"/>
+                                </Grid>
+                                <Separator Background="{DynamicResource AppBorder}" Height="1" Margin="0,0,0,5"/>
+                                <ItemsControl ItemsSource="{Binding OptimisationResults}">
+                                  <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:CompileBindings="False">
+                                      <Grid ColumnDefinitions="2*,1*,1*,1*,1*" Margin="10,6">
+                                        <TextBlock Grid.Column="0" Text="{Binding TimeFrom, StringFormat='{}{0:dd MMM HH:mm}'}" Foreground="{DynamicResource AppTextPrimary}"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding HeatProduction, StringFormat='{}{0:F2}'}" Foreground="{DynamicResource AppTextPrimary}"/>
+                                        <TextBlock Grid.Column="2" Text="{Binding ElectricityConsumption, StringFormat='{}{0:F2}'}" Foreground="{DynamicResource AppTextPrimary}"/>
+                                        <TextBlock Grid.Column="3" Text="{Binding Expenses, StringFormat='{}{0:F2}'}" Foreground="{DynamicResource AppTextPrimary}"/>
+                                        <TextBlock Grid.Column="4" Text="{Binding Co2Emissions, StringFormat='{}{0:F2}'}" Foreground="{DynamicResource AppTextPrimary}"/>
+                                      </Grid>
+                                    </DataTemplate>
+                                  </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                              </StackPanel>
+                            </Border>
+                          </StackPanel>
+                        </Border>
+
                     </StackPanel>
 
                     <!-- Stackpanel for Winter view-->
@@ -881,6 +1101,7 @@
 
                         <!-- Optimize button to start optimization -->
                         <Button Grid.Column="2"
+                                Command="{Binding RunOptimisationCommand}"
                                 Content="Optimize"
                                 HorizontalAlignment="Right"
                                 VerticalAlignment="Bottom"
@@ -1085,6 +1306,83 @@
                         </StackPanel>
                       </Border>
 
+                      <!-- Optimisation Status -->
+                      <StackPanel IsVisible="{Binding IsOptimising}" Margin="0,20,0,0" HorizontalAlignment="Center">
+                        <TextBlock Text="Running optimisation, this may take a moment..." FontSize="14" Foreground="{DynamicResource AppTextMuted}" HorizontalAlignment="Center"/>
+                      </StackPanel>
+
+                      <TextBlock IsVisible="{Binding OptimisationStatusMessage, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                 Text="{Binding OptimisationStatusMessage}"
+                                 FontSize="14"
+                                 Foreground="#EF4444"
+                                 Margin="0,10,0,0"
+                                 TextWrapping="Wrap"/>
+
+                      <!-- Optimisation Results -->
+                      <Border IsVisible="{Binding HasOptimisationResults}"
+                              Margin="0,20,0,0"
+                              Background="{DynamicResource AppCard}"
+                              BoxShadow="0 4 10 0 #33000000"
+                              CornerRadius="8"
+                              Padding="20">
+                        <StackPanel>
+                          <TextBlock Text="Optimisation Results"
+                                     FontSize="18"
+                                     FontWeight="SemiBold"
+                                     Foreground="{DynamicResource AppTextPrimary}"
+                                     Margin="0,0,0,16"/>
+
+                          <!-- Summary cards -->
+                          <Grid ColumnDefinitions="*,*,*" Margin="0,0,0,20">
+                            <Border Grid.Column="0" Background="{DynamicResource AppCardInner}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="1" CornerRadius="8" Padding="16" Margin="0,0,8,0">
+                              <StackPanel>
+                                <TextBlock Text="Total Heat Production" FontSize="12" Foreground="{DynamicResource AppTextMuted}" Margin="0,0,0,4"/>
+                                <TextBlock Text="{Binding TotalHeatProduction, StringFormat='{}{0:F2} MWh'}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource AppTextPrimary}"/>
+                              </StackPanel>
+                            </Border>
+                            <Border Grid.Column="1" Background="{DynamicResource AppCardInner}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="1" CornerRadius="8" Padding="16" Margin="4,0,4,0">
+                              <StackPanel>
+                                <TextBlock Text="Total Expenses" FontSize="12" Foreground="{DynamicResource AppTextMuted}" Margin="0,0,0,4"/>
+                                <TextBlock Text="{Binding TotalExpenses, StringFormat='{}{0:F2} DKK'}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource AppTextPrimary}"/>
+                              </StackPanel>
+                            </Border>
+                            <Border Grid.Column="2" Background="{DynamicResource AppCardInner}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="1" CornerRadius="8" Padding="16" Margin="8,0,0,0">
+                              <StackPanel>
+                                <TextBlock Text="Total CO2 Emissions" FontSize="12" Foreground="{DynamicResource AppTextMuted}" Margin="0,0,0,4"/>
+                                <TextBlock Text="{Binding TotalCo2Emissions, StringFormat='{}{0:F2} kg'}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource AppTextPrimary}"/>
+                              </StackPanel>
+                            </Border>
+                          </Grid>
+
+                          <!-- Hourly results table -->
+                          <Border Background="{DynamicResource AppCardInner}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="1" CornerRadius="8" Padding="10">
+                            <StackPanel>
+                              <Grid ColumnDefinitions="2*,1*,1*,1*,1*" Margin="10,5,10,10">
+                                <TextBlock Grid.Column="0" Text="Time" FontWeight="Bold" Foreground="{DynamicResource AppTextMuted}"/>
+                                <TextBlock Grid.Column="1" Text="Heat (MWh)" FontWeight="Bold" Foreground="{DynamicResource AppTextMuted}"/>
+                                <TextBlock Grid.Column="2" Text="Electricity (MWh)" FontWeight="Bold" Foreground="{DynamicResource AppTextMuted}"/>
+                                <TextBlock Grid.Column="3" Text="Expenses (DKK)" FontWeight="Bold" Foreground="{DynamicResource AppTextMuted}"/>
+                                <TextBlock Grid.Column="4" Text="CO2 (kg)" FontWeight="Bold" Foreground="{DynamicResource AppTextMuted}"/>
+                              </Grid>
+                              <Separator Background="{DynamicResource AppBorder}" Height="1" Margin="0,0,0,5"/>
+                              <ItemsControl ItemsSource="{Binding OptimisationResults}">
+                                <ItemsControl.ItemTemplate>
+                                  <DataTemplate x:CompileBindings="False">
+                                    <Grid ColumnDefinitions="2*,1*,1*,1*,1*" Margin="10,6">
+                                      <TextBlock Grid.Column="0" Text="{Binding TimeFrom, StringFormat='{}{0:dd MMM HH:mm}'}" Foreground="{DynamicResource AppTextPrimary}"/>
+                                      <TextBlock Grid.Column="1" Text="{Binding HeatProduction, StringFormat='{}{0:F2}'}" Foreground="{DynamicResource AppTextPrimary}"/>
+                                      <TextBlock Grid.Column="2" Text="{Binding ElectricityConsumption, StringFormat='{}{0:F2}'}" Foreground="{DynamicResource AppTextPrimary}"/>
+                                      <TextBlock Grid.Column="3" Text="{Binding Expenses, StringFormat='{}{0:F2}'}" Foreground="{DynamicResource AppTextPrimary}"/>
+                                      <TextBlock Grid.Column="4" Text="{Binding Co2Emissions, StringFormat='{}{0:F2}'}" Foreground="{DynamicResource AppTextPrimary}"/>
+                                    </Grid>
+                                  </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                              </ItemsControl>
+                            </StackPanel>
+                          </Border>
+                        </StackPanel>
+                      </Border>
+
                     </StackPanel>
 
                   </Carousel.Items>
@@ -1092,7 +1390,7 @@
               </Grid>
             </Border>
           </StackPanel>
-          
+
           </Carousel.Items>
       </Carousel>
 
@@ -1100,7 +1398,3 @@
 
   </ScrollViewer>
 </UserControl>
-
-
-
-

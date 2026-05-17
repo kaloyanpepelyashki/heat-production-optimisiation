@@ -14,6 +14,7 @@ public partial class MaintenancePeriodViewModel : ViewModelBase
 {
     private readonly MaintenanceService maintenanceService;
     private readonly IDialogService dialogService;
+    private readonly IApiService apiService;
 
     [ObservableProperty]
     private string periodName = string.Empty;
@@ -42,14 +43,35 @@ public partial class MaintenancePeriodViewModel : ViewModelBase
     [ObservableProperty]
     private double maintenanceDuration = 30;
 
+    [ObservableProperty]
+    private bool isOptimising;
+
+    [ObservableProperty]
+    private bool hasOptimisationResults;
+
+    [ObservableProperty]
+    private string? optimisationStatusMessage;
+
+    [ObservableProperty]
+    private double totalHeatProduction;
+
+    [ObservableProperty]
+    private double totalExpenses;
+
+    [ObservableProperty]
+    private double totalCo2Emissions;
+
+    public ObservableCollection<OptimisationResultsHourlyClient> OptimisationResults { get; } = new();
+
     // Exposes MaintenanceStore schedules for XAML binding
     public ObservableCollection<MaintenanceEvent> Schedules => MaintenanceStore.MaintenanceSchedules;
 
     // setting up the instance
-    public MaintenancePeriodViewModel(MaintenanceService maintenanceService, IDialogService dialogService, string periodName, string scenario, DateTime start, DateTime end, ObservableCollection<BoilerStatusViewModel> initialBoilers)
+    public MaintenancePeriodViewModel(MaintenanceService maintenanceService, IDialogService dialogService, IApiService apiService, string periodName, string scenario, DateTime start, DateTime end, ObservableCollection<BoilerStatusViewModel> initialBoilers)
     {
         this.maintenanceService = maintenanceService;
         this.dialogService = dialogService;
+        this.apiService = apiService;
         this.PeriodName = periodName;
         this.Scenario = scenario;
         this.PeriodStart = start;
@@ -95,6 +117,59 @@ public partial class MaintenancePeriodViewModel : ViewModelBase
         else
         {
             await this.dialogService.ShowValidationDialogAsync("Please completely fill out the Date/Time fields.");
+        }
+    }
+
+    [RelayCommand]
+    private async Task RunOptimisationAsync()
+    {
+        var periodId = this.maintenanceService.GetPeriodId(this.PeriodName);
+
+        var schedule = MaintenanceStore.MaintenanceSchedules.FirstOrDefault(s =>
+            s.Period == periodId && s.Scenario == this.Scenario);
+
+        var request = new OptimisationRequestDto
+        {
+            ScenarioId = int.Parse(this.Scenario),
+            PeriodId = int.Parse(periodId),
+            MaintenanceId = schedule?.MaintenanceId ?? 0,
+            TimeFrom = this.PeriodStart,
+            TimeTo = this.PeriodEnd,
+        };
+
+        this.IsOptimising = true;
+        this.OptimisationStatusMessage = null;
+        this.HasOptimisationResults = false;
+
+        try
+        {
+            var response = await this.apiService.PostAsync<OptimisationRequestDto, ApiResponseWrapper<OptimisationRunClient>>(
+                BackendService.Rdm, "optimisation", request);
+
+            if (response?.Data == null || response.Data.OptimisationResultsHourly.Count == 0)
+            {
+                this.OptimisationStatusMessage = "No results returned from the optimiser.";
+                return;
+            }
+
+            this.OptimisationResults.Clear();
+            foreach (var hourly in response.Data.OptimisationResultsHourly)
+                this.OptimisationResults.Add(hourly);
+
+            this.TotalHeatProduction = Math.Round(this.OptimisationResults.Sum(r => r.HeatProduction), 2);
+            this.TotalExpenses = Math.Round(this.OptimisationResults.Sum(r => r.Expenses), 2);
+            this.TotalCo2Emissions = Math.Round(this.OptimisationResults.Sum(r => r.Co2Emissions), 2);
+
+            this.HasOptimisationResults = true;
+        }
+        catch (Exception ex)
+        {
+            this.OptimisationStatusMessage = $"Optimisation failed: {ex.Message}";
+            await this.dialogService.ShowValidationDialogAsync($"Optimisation failed.\n{ex.Message}");
+        }
+        finally
+        {
+            this.IsOptimising = false;
         }
     }
 

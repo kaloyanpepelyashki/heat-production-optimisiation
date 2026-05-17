@@ -44,6 +44,7 @@ public sealed partial class OptimizationViewModel : ViewModelBase
         this.summerScenario1 = new MaintenancePeriodViewModel(
             this.maintenanceService,
             this.dialogService,
+            _apiService,
             "Summer",
             "1",
             new DateTime(2025, 9, 8, 0, 0, 0),
@@ -53,6 +54,7 @@ public sealed partial class OptimizationViewModel : ViewModelBase
         this.winterScenario1 = new MaintenancePeriodViewModel(
             this.maintenanceService,
             this.dialogService,
+            _apiService,
             "Winter",
             "1",
             new DateTime(2026, 1, 5, 0, 0, 0),
@@ -62,6 +64,7 @@ public sealed partial class OptimizationViewModel : ViewModelBase
         this.summerScenario2 = new MaintenancePeriodViewModel(
             this.maintenanceService,
             this.dialogService,
+            _apiService,
             "Summer",
             "2",
             new DateTime(2025, 9, 8, 0, 0, 0),
@@ -71,6 +74,7 @@ public sealed partial class OptimizationViewModel : ViewModelBase
         this.winterScenario2 = new MaintenancePeriodViewModel(
             this.maintenanceService,
             this.dialogService,
+            _apiService,
             "Winter",
             "2",
             new DateTime(2026, 1, 5, 0, 0, 0),

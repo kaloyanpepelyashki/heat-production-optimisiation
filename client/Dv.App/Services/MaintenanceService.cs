@@ -31,6 +31,7 @@ public sealed class MaintenanceService
 
         MaintenanceStore.MaintenanceSchedules.Add(new MaintenanceEvent
         {
+            MaintenanceId = maintenanceId,
             AssetName = boilerId,
             BoilerId = boilerMetadata.BoilerId,
             BoilerType = boilerMetadata.BoilerType,

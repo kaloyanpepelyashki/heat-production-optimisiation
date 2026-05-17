@@ -6,6 +6,7 @@ namespace Dv.App.Models;
 // Storing data to view in ProductionUnitsView UI
 public class MaintenanceEvent
 {
+    public int MaintenanceId { get; set; }
     public string AssetName { get; set; } = string.Empty;
     public int BoilerId { get; set; }
     public string BoilerType { get; set; } = string.Empty;
