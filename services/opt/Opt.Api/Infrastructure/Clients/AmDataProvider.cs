@@ -75,9 +75,11 @@ public sealed class AmDataProvider : IAssetDataProvider
                 _options.Am.GasMotorsEndpoint,
                 cancellationToken);
 
-            var schedule = await this.GetWithRetryAsync<AmMaintenanceScheduleResponseDto>(
-                _options.Am.ResolveMaintenanceSchedulesEndpoint(maintenanceId),
-                cancellationToken);
+            var schedule = maintenanceId == 0
+                ? null
+                : await this.GetWithRetryAsync<AmMaintenanceScheduleResponseDto>(
+                    _options.Am.ResolveMaintenanceSchedulesEndpoint(maintenanceId),
+                    cancellationToken);
 
             var gasBoilersMapped = (gasBoilers ?? []).Select(x => new GasBoiler
             {
