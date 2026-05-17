@@ -1,87 +1,24 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.Avalonia;assembly=LiveChartsCore.SkiaSharpView.Avalonia"
+             xmlns:components="using:Dv.App.Views.Optimization.Components"
              xmlns:vm="using:Dv.App.ViewModels"
              x:Class="Dv.App.Views.Optimization.Components.GraphsCard"
-             x:DataType="vm:OptimizationViewModel">
+             x:DataType="vm:OptimizationViewModel"
+             x:CompileBindings="True">
 
     <StackPanel Spacing="16">
 
-        <Border Background="{DynamicResource AppCardInner}"
-                BorderBrush="{DynamicResource AppBorder}"
-                BorderThickness="1"
-                CornerRadius="8"
-                Padding="16">
+        <components:ChartCardView DataContext="{Binding HeatDemandChart}" />
 
-            <StackPanel>
-                <TextBlock Text="{Binding HeatDemandChart.Title}"
-                           FontSize="18"
-                           FontWeight="SemiBold"/>
+        <components:ChartCardView DataContext="{Binding ElectricityPriceChart}" />
 
-                <lvc:CartesianChart
-                    Height="260"
-                    Series="{Binding HeatDemandChart.Series}"
-                    XAxes="{Binding HeatDemandChart.XAxes}"
-                    YAxes="{Binding HeatDemandChart.YAxes}"/>
-            </StackPanel>
-        </Border>
+        <components:ChartCardView DataContext="{Binding OptimizationResultsChart}" />
 
-        <Border Background="{DynamicResource AppCardInner}"
-                BorderBrush="{DynamicResource AppBorder}"
-                BorderThickness="1"
-                CornerRadius="8"
-                Padding="16">
+        <components:ChartCardView DataContext="{Binding ElectricityConsumptionChart}" />
 
-            <StackPanel>
-                <TextBlock Text="{Binding ElectricityPriceChart.Title}"
-                           FontSize="18"
-                           FontWeight="SemiBold"/>
+        <components:ChartCardView DataContext="{Binding ExpensesChart}" />
 
-                <lvc:CartesianChart
-                    Height="260"
-                    Series="{Binding ElectricityPriceChart.Series}"
-                    XAxes="{Binding ElectricityPriceChart.XAxes}"
-                    YAxes="{Binding ElectricityPriceChart.YAxes}"/>
-            </StackPanel>
-        </Border>
-
-        <Border Background="{DynamicResource AppCardInner}"
-                BorderBrush="{DynamicResource AppBorder}"
-                BorderThickness="1"
-                CornerRadius="8"
-                Padding="16">
-
-            <StackPanel>
-                <TextBlock Text="{Binding OptimizationResultsChart.Title}"
-                           FontSize="18"
-                           FontWeight="SemiBold"/>
-
-                <lvc:CartesianChart
-                    Height="260"
-                    Series="{Binding OptimizationResultsChart.Series}"
-                    XAxes="{Binding OptimizationResultsChart.XAxes}"
-                    YAxes="{Binding OptimizationResultsChart.YAxes}"/>
-            </StackPanel>
-        </Border>
-
-        <Border Background="{DynamicResource AppCardInner}"
-                BorderBrush="{DynamicResource AppBorder}"
-                BorderThickness="1"
-                CornerRadius="8"
-                Padding="16">
-
-            <StackPanel>
-                <TextBlock Text="{Binding ElectricityConsumptionChart.Title}"
-                           FontSize="18"
-                           FontWeight="SemiBold"/>
-
-                <lvc:CartesianChart
-                    Height="260"
-                    Series="{Binding ElectricityConsumptionChart.Series}"
-                    XAxes="{Binding ElectricityConsumptionChart.XAxes}"
-                    YAxes="{Binding ElectricityConsumptionChart.YAxes}"/>
-            </StackPanel>
-        </Border>
+        <components:ChartCardView DataContext="{Binding Co2EmissionsChart}" />
 
     </StackPanel>
 </UserControl>

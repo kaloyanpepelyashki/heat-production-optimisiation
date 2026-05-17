@@ -15,7 +15,7 @@ public static class OptimizationContextFactory
             : new DateTime(2025, 9, 8, 0, 0, 0);
 
         var endDate = string.Equals(normalizedPeriod, "Winter", StringComparison.OrdinalIgnoreCase)
-            ? new DateTime(2026, 1, 18, 23, 59, 59)
+            ? new DateTime(2026, 1, 19, 0, 0, 0)
             : new DateTime(2025, 9, 21, 23, 59, 59);
 
         IReadOnlyList<OptimizationBoilerDefinition> boilers =

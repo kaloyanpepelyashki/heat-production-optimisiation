@@ -8,9 +8,9 @@
     <ScrollViewer>
         <StackPanel Margin="20" Spacing="20">
 
-            <components:OptimizerCard />
+            <components:OptimizerCard DataContext="{Binding}" />
 
-            <components:GraphsCard />
+            <components:GraphsCard DataContext="{Binding}" />
 
         </StackPanel>
     </ScrollViewer>

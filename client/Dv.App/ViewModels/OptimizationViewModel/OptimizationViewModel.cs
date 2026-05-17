@@ -20,13 +20,13 @@ public sealed class OptimizationViewModel : ViewModelBase
     private readonly OptimizationChartsViewModel chartsModule;
     private readonly OptimizationMaintenanceViewModel maintenanceModule;
 
-    private string selectedPeriod = "Summer";
-    private string selectedScenario = "Scenario 1";
+    private string selectedPeriod = "Winter";
+    private string selectedScenario = "Scenario 2";
     private bool isLoading;
     private string? errorMessage;
 
     private OptimizationContext currentContext =
-        OptimizationContextFactory.Create("Summer", "Scenario 1");
+        OptimizationContextFactory.Create("Winter", "Scenario 2");
 
     public bool HasSelectedBoiler =>
         this.SelectedBoiler is not null;
@@ -73,6 +73,12 @@ public sealed class OptimizationViewModel : ViewModelBase
 
     public ChartCardViewModel ElectricityConsumptionChart =>
         this.chartsModule.ElectricityConsumptionChart;
+
+    public ChartCardViewModel ExpensesChart =>
+        this.chartsModule.ExpensesChart;
+
+    public ChartCardViewModel Co2EmissionsChart =>
+        this.chartsModule.Co2EmissionsChart;
 
     public ObservableCollection<string> Periods { get; } =
     [

@@ -29,6 +29,12 @@ public sealed class OptimizationChartsViewModel : ViewModelBase
 
         this.ElectricityConsumptionChart =
             this.CreateChart("Electricity Consumption");
+
+        this.ExpensesChart =
+            this.CreateChart("Expenses");
+
+        this.Co2EmissionsChart =
+            this.CreateChart("CO2 Emissions");
     }
 
     public ChartCardViewModel HeatDemandChart { get; }
@@ -38,6 +44,10 @@ public sealed class OptimizationChartsViewModel : ViewModelBase
     public ChartCardViewModel OptimizationResultsChart { get; }
 
     public ChartCardViewModel ElectricityConsumptionChart { get; }
+
+    public ChartCardViewModel ExpensesChart { get; }
+
+    public ChartCardViewModel Co2EmissionsChart { get; }
 
     public void LoadSourceData(
         IEnumerable<SourceDataDto> sourceData,
@@ -108,6 +118,10 @@ public sealed class OptimizationChartsViewModel : ViewModelBase
             this.ElectricityConsumptionChart.Series =
                 new ObservableCollection<ISeries>();
 
+            this.ExpensesChart.Series = new ObservableCollection<ISeries>();
+
+            this.Co2EmissionsChart.Series = new ObservableCollection<ISeries>();
+
             return;
         }
 
@@ -121,7 +135,19 @@ public sealed class OptimizationChartsViewModel : ViewModelBase
                 .Select(x => new DateTimePoint(x.TimeFrom, (double)x.ElectricityConsumption))
                 .ToArray();
 
+        var expenses =
+            orderedResults
+                .Select(x => new DateTimePoint(x.TimeFrom, x.Expenses))
+                .ToArray();
+
+        var co2Emissions =
+            orderedResults
+                .Select(x => new DateTimePoint(x.TimeFrom, x.Co2Emissions))
+                .ToArray();
+
         var consumptionColor = SKColor.Parse("#3B82F6");
+        var expensesColor = SKColor.Parse("#F59E0B");
+        var emissionsColor = SKColor.Parse("#DC2626");
 
         this.ElectricityConsumptionChart.Series = new ObservableCollection<ISeries>
         {
@@ -135,6 +161,36 @@ public sealed class OptimizationChartsViewModel : ViewModelBase
                 Fill = new SolidColorPaint(consumptionColor.WithAlpha(35)),
                 GeometryFill = new SolidColorPaint(consumptionColor),
                 GeometryStroke = new SolidColorPaint(consumptionColor),
+            },
+        };
+
+        this.ExpensesChart.Series = new ObservableCollection<ISeries>
+        {
+            new LineSeries<DateTimePoint>
+            {
+                Values = expenses,
+                Name = "Expenses",
+                LineSmoothness = 0.15,
+                GeometrySize = 6,
+                Stroke = new SolidColorPaint(expensesColor) { StrokeThickness = 3 },
+                Fill = new SolidColorPaint(expensesColor.WithAlpha(35)),
+                GeometryFill = new SolidColorPaint(expensesColor),
+                GeometryStroke = new SolidColorPaint(expensesColor),
+            },
+        };
+
+        this.Co2EmissionsChart.Series = new ObservableCollection<ISeries>
+        {
+            new LineSeries<DateTimePoint>
+            {
+                Values = co2Emissions,
+                Name = "CO2 Emissions",
+                LineSmoothness = 0.15,
+                GeometrySize = 6,
+                Stroke = new SolidColorPaint(emissionsColor) { StrokeThickness = 3 },
+                Fill = new SolidColorPaint(emissionsColor.WithAlpha(35)),
+                GeometryFill = new SolidColorPaint(emissionsColor),
+                GeometryStroke = new SolidColorPaint(emissionsColor),
             },
         };
 
