@@ -1,8 +1,8 @@
-using System.Threading;
-
-namespace Dv.App.Services;
+namespace Dv.App.Interfaces;
 
 using System.Threading.Tasks;
+using System.Threading;
+using Dv.App.Services;
 
 public interface IApiService
 {

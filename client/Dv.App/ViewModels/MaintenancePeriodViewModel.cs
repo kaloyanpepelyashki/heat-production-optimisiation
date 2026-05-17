@@ -8,6 +8,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Dv.App.Models;
 using Dv.App.Services;
+using Dv.App.Interfaces;
 
 // holds the maintenance logic based on the period and scenario
 public partial class MaintenancePeriodViewModel : ViewModelBase

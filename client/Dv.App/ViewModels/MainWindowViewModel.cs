@@ -8,6 +8,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Dv.App.Models;
 using Dv.App.Services;
 using Microsoft.Extensions.Logging;
+using Dv.App.Interfaces;
 
 namespace Dv.App.ViewModels;
 
@@ -36,7 +37,6 @@ public sealed partial class MainWindowViewModel : ViewModelBase
 	public MainWindowViewModel(IApiService apiService, ILogger<MainWindowViewModel> logger, 
 		DashboardViewModel dashboardViewModel,
 		ProductionUnitsViewModel productionUnitsViewModel,
-		SourceDataViewModel sourceDataViewModel,
 		OptimizationViewModel optimizationViewModel,
 		SettingsViewModel settingsViewModel)
 	{
@@ -49,7 +49,6 @@ public sealed partial class MainWindowViewModel : ViewModelBase
 		{
 			new NavigationItem { Title = "Dashboard", ViewKey = "dashboard" },
 			new NavigationItem { Title = "Production Units", ViewKey = "production-units" },
-			new NavigationItem { Title = "Source Data", ViewKey = "source-data" },
 			new NavigationItem { Title = "Optimization", ViewKey = "optimization" },
 			new NavigationItem { Title = "Settings", ViewKey = "settings" },
 		};
@@ -58,7 +57,6 @@ public sealed partial class MainWindowViewModel : ViewModelBase
 		{
 			["dashboard"] = dashboardViewModel,
 			["production-units"] = productionUnitsViewModel,
-			["source-data"] = sourceDataViewModel,
 			["optimization"] = optimizationViewModel,
 			["settings"] = settingsViewModel,
 		};

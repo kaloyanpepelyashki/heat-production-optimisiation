@@ -6,6 +6,8 @@ using System;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Dv.App.Services;
+using Dv.App.Models;
+using Dv.App.Interfaces;   
 
 // creates the four period view models / wires the optimization screen based on the period data
 public sealed partial class OptimizationViewModel : ViewModelBase
@@ -48,7 +50,7 @@ public sealed partial class OptimizationViewModel : ViewModelBase
             "1",
             new DateTime(2025, 9, 8, 0, 0, 0),
             new DateTime(2025, 9, 21, 23, 59, 59),
-            this.CreateBoilerRows("Summer"));
+            this.CreateBoilerRowsScenario1("Summer"));
 
         this.winterScenario1 = new MaintenancePeriodViewModel(
             this.maintenanceService,
@@ -57,7 +59,7 @@ public sealed partial class OptimizationViewModel : ViewModelBase
             "1",
             new DateTime(2026, 1, 5, 0, 0, 0),
             new DateTime(2026, 1, 18, 23, 59, 59),
-            this.CreateBoilerRows("Winter"));
+            this.CreateBoilerRowsScenario1("Winter"));
 
         this.summerScenario2 = new MaintenancePeriodViewModel(
             this.maintenanceService,
@@ -79,7 +81,7 @@ public sealed partial class OptimizationViewModel : ViewModelBase
     }
 
     // boiler list for scenario 1
-    private ObservableCollection<BoilerStatusViewModel> CreateBoilerRows(string period)
+    private ObservableCollection<BoilerStatusViewModel> CreateBoilerRowsScenario1(string period)
     {
         return new ObservableCollection<BoilerStatusViewModel>
         {

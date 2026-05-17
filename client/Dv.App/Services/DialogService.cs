@@ -6,6 +6,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Layout;
 using Avalonia.Media;
+using Dv.App.Interfaces;
 
 // Dialogs for Optimizationview - maintenance selection - error handling
 public class DialogService : IDialogService
