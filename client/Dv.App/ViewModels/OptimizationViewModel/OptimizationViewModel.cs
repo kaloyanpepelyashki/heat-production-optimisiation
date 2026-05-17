@@ -278,14 +278,19 @@ public sealed class OptimizationViewModel : ViewModelBase
 
     private OptimizationRequestDto BuildOptimizationRequest()
     {
+        var periodId = this.CurrentContext.PeriodId.ToString();
+        var scenarioId = this.CurrentContext.ScenarioId.ToString();
+
+        var schedule = MaintenanceStore.MaintenanceSchedules
+            .FirstOrDefault(s => s.Period == periodId && s.Scenario == scenarioId);
+
+        var maintenanceId = schedule?.MaintenanceId ?? 0;
+
         return new OptimizationRequestDto
         {
             ScenarioId = this.CurrentContext.ScenarioId,
             PeriodId = this.CurrentContext.PeriodId,
-
-            // TEMP until maintenance IDs are wired properly
-            MaintenanceId = 20,
-
+            MaintenanceId = maintenanceId,
             TimeFrom = this.CurrentContext.StartDate,
             TimeTo = this.CurrentContext.EndDate,
         };

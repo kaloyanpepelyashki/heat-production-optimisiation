@@ -89,6 +89,14 @@ public sealed class OptimizationChartsViewModel : ViewModelBase
             },
         };
 
+        // Adjust Y axis for heat demand to provide headroom and avoid clipping
+        var maxHeat = heatDemand.Select(p => p.Value ?? 0d).DefaultIfEmpty(0d).Max();
+        if (this.HeatDemandChart.YAxes.FirstOrDefault() is Axis heatAxis)
+        {
+            heatAxis.MinLimit = 0;
+            heatAxis.MaxLimit = Math.Ceiling(Math.Max(1, maxHeat) * 1.1);
+        }
+
         this.ElectricityPriceChart.Series = new ObservableCollection<ISeries>
         {
             new LineSeries<DateTimePoint>
@@ -103,6 +111,13 @@ public sealed class OptimizationChartsViewModel : ViewModelBase
                 GeometryStroke = new SolidColorPaint(priceColor),
             },
         };
+
+        var maxPrice = electricityPrices.Select(p => p.Value ?? 0d).DefaultIfEmpty(0d).Max();
+        if (this.ElectricityPriceChart.YAxes.FirstOrDefault() is Axis priceAxis)
+        {
+            priceAxis.MinLimit = 0;
+            priceAxis.MaxLimit = Math.Ceiling(Math.Max(1, maxPrice) * 1.1);
+        }
     }
 
     public void LoadOptimizationResult(
@@ -164,6 +179,14 @@ public sealed class OptimizationChartsViewModel : ViewModelBase
             },
         };
 
+        // set sensible axis limits for electricity consumption
+        var maxConsumption = electricityConsumption.Select(p => p.Value ?? 0d).DefaultIfEmpty(0d).Max();
+        if (this.ElectricityConsumptionChart.YAxes.FirstOrDefault() is Axis consAxis)
+        {
+            consAxis.MinLimit = 0;
+            consAxis.MaxLimit = Math.Ceiling(Math.Max(1, maxConsumption) * 1.1);
+        }
+
         this.ExpensesChart.Series = new ObservableCollection<ISeries>
         {
             new LineSeries<DateTimePoint>
@@ -179,6 +202,13 @@ public sealed class OptimizationChartsViewModel : ViewModelBase
             },
         };
 
+        var maxExpenses = expenses.Select(p => p.Value ?? 0d).DefaultIfEmpty(0d).Max();
+        if (this.ExpensesChart.YAxes.FirstOrDefault() is Axis expensesAxis)
+        {
+            expensesAxis.MinLimit = 0;
+            expensesAxis.MaxLimit = Math.Ceiling(Math.Max(1, maxExpenses) * 1.1);
+        }
+
         this.Co2EmissionsChart.Series = new ObservableCollection<ISeries>
         {
             new LineSeries<DateTimePoint>
@@ -193,6 +223,13 @@ public sealed class OptimizationChartsViewModel : ViewModelBase
                 GeometryStroke = new SolidColorPaint(emissionsColor),
             },
         };
+
+        var maxEmissions = co2Emissions.Select(p => p.Value ?? 0d).DefaultIfEmpty(0d).Max();
+        if (this.Co2EmissionsChart.YAxes.FirstOrDefault() is Axis emissionsAxis)
+        {
+            emissionsAxis.MinLimit = 0;
+            emissionsAxis.MaxLimit = Math.Ceiling(Math.Max(1, maxEmissions) * 1.1);
+        }
 
         var productionUnitSeries =
             orderedResults
@@ -225,6 +262,22 @@ public sealed class OptimizationChartsViewModel : ViewModelBase
         this.OptimizationResultsChart.Series =
             new ObservableCollection<ISeries>(
                 productionUnitSeries);
+
+        // Compute max heat production across all production units and apply scaling
+        var maxProduction = orderedResults
+            .Where(x => x.ProductionUnits is not null)
+            .SelectMany(x => x.ProductionUnits.Select(u => (double)u.HeatProduction))
+            .DefaultIfEmpty(0)
+            .Max();
+
+        var minAllowed = context.Period.Equals("Winter", StringComparison.OrdinalIgnoreCase) ? 14.0 : 5.0;
+        var yMax = Math.Ceiling(Math.Max(minAllowed, maxProduction) * 1.1);
+
+        if (this.OptimizationResultsChart.YAxes.FirstOrDefault() is Axis resAxis)
+        {
+            resAxis.MinLimit = 0;
+            resAxis.MaxLimit = yMax;
+        }
     }
 
     private ChartCardViewModel CreateChart(

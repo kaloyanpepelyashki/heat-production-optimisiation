@@ -37,7 +37,7 @@ public sealed class MaintenanceService
             ScenarioId = int.Parse(scenarioId),
         };
 
-        _ = await this.apiService.PostAsync<ProductionUnitMaintenanceDTO, int>(
+        var newId = await this.apiService.PostAsync<ProductionUnitMaintenanceDTO, int>(
             BackendService.Am,
             "api/GetProductionUnits/productionUnitMaintenance",
             productionUnitMaintenanceDTO);
@@ -46,6 +46,7 @@ public sealed class MaintenanceService
         {
             AssetName = boilerId,
             BoilerId = boilerMetadata.BoilerId,
+            MaintenanceId = newId,
             BoilerType = boilerMetadata.BoilerType,
             StartDate = startDateTime,
             EndDate = endDateTime,
