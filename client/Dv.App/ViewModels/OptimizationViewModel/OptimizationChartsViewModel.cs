@@ -235,37 +235,121 @@ public sealed class OptimizationChartsViewModel : ViewModelBase
             emissionsAxis.MaxLimit = Math.Ceiling(Math.Max(1, maxEmissions) * 1.1);
         }
 
-        var productionUnitSeries =
-            orderedResults
-                .Where(x => x.ProductionUnits is not null)
-                .SelectMany(x => x.ProductionUnits.Select(unit => new
+        var hourly = optimizationResult.optimisationResultsHourly?
+        .OrderBy(h => h.TimeFrom)
+        .ToList() ?? new List<OptimisationResultsHourlyDto>();
+
+        if (!hourly.Any())
+        {
+            return;
+        }
+        var allUnits = hourly
+        .SelectMany(h => h.ProductionUnits)
+        .GroupBy(u => new
+        {
+            u.ProductionUnitType,
+            u.ProductionUnitId,
+        })
+        .Select(g => new
+        {
+            ProductionUnitType = g.Key.ProductionUnitType,
+            ProductionUnitId = g.Key.ProductionUnitId,
+            MaxHeatProduction = g
+            .Where(u => u.Capacity > 0)
+            .Max(u => u.Capacity),
+
+        })
+        .OrderByDescending(u => u.MaxHeatProduction)
+        .ToList();
+
+        var colors = new[]
+        {
+            SKColor.Parse("#FF0000"),
+            SKColor.Parse("#00FF00"),
+            SKColor.Parse("#0000FF"),
+            SKColor.Parse("#000000"),
+            SKColor.Parse("#ff0ff3"),
+            SKColor.Parse("#A855F7")
+        };
+
+        var seriesList = new List<ISeries>();
+        var colorIdx = 0;
+
+        foreach (var unit in allUnits)
+        {
+            var color = colors[colorIdx % colors.Length];
+            colorIdx++;
+
+            var unitPoints = hourly.Select(h =>
+            {
+                var unitsThisHour = h.ProductionUnits.ToList();
+
+                var currentUnit = unitsThisHour
+                    .FirstOrDefault(u =>
+                        u.ProductionUnitId == unit.ProductionUnitId &&
+                        u.ProductionUnitType == unit.ProductionUnitType);
+
+                if (currentUnit == null || currentUnit.HeatProduction <= 0 || h.HeatProduction <= 0)
                 {
-                    Result = x,
-                    Unit = unit,
-                }))
-                .GroupBy(x => x.Unit.ProductionUnitType)
-                .Select(group =>
-                    new LineSeries<DateTimePoint>
-                        {
-                            Name = group.Key.ToString(),
+                    return new DateTimePoint(h.TimeFrom, 0);
+                }
 
-                            Values = group
-                                    .OrderBy(x => x.Result.TimeFrom)
-                                    .Select(x => new DateTimePoint(x.Result.TimeFrom, (double)x.Unit.HeatProduction))
-                                    .ToArray(),
+                return new DateTimePoint(h.TimeFrom, currentUnit.HeatProduction);
+            }).ToList();
 
-                            LineSmoothness = 0.15,
-                            GeometrySize = 6,
-                            Stroke = new SolidColorPaint(SKColors.LightGray) { StrokeThickness = 2 },
-                            GeometryFill = new SolidColorPaint(SKColors.LightGray),
-                            GeometryStroke = new SolidColorPaint(SKColors.LightGray),
-                        })
-                    .Cast<ISeries>()
-                    .ToList();
+            seriesList.Add(new StackedAreaSeries<DateTimePoint>
+            {
+                Name = $"{unit.ProductionUnitType} {unit.ProductionUnitId}",
+                Values = unitPoints,
+                LineSmoothness = 0.15,
+                GeometrySize = 0,
+                Stroke = new SolidColorPaint(color)
+                {
+                    StrokeThickness = 3
+                },
+                Fill = new SolidColorPaint(color.WithAlpha(150))
+            });
+        }
 
-        this.OptimizationResultsChart.Series =
-            new ObservableCollection<ISeries>(
-                productionUnitSeries);
+        this.OptimizationResultsChart.Series = new ObservableCollection<ISeries>(
+                seriesList);
+
+        this.OptimizationResultsChart.XAxes = new ObservableCollection<ICartesianAxis>
+        {
+            new DateTimeAxis(TimeSpan.FromHours(24), date => date.ToString("dd MMM"))
+            {
+                LabelsPaint = this.GetAxisNamePaint(),
+                SeparatorsPaint = new SolidColorPaint(SKColor.Parse("#CBD5E1"))
+                {
+                    StrokeThickness = 1,
+                },
+                TextSize = 12,
+            },
+        };
+
+        var maxHeatProduction = hourly
+            .Select(h => h.HeatProduction)
+            .DefaultIfEmpty(0)
+            .Max();
+
+        var yMax = Math.Ceiling(maxHeatProduction * 1.10);
+
+        this.OptimizationResultsChart.YAxes = new ObservableCollection<ICartesianAxis>
+        {
+            new Axis
+            {
+                MinLimit = 0,
+                MaxLimit = yMax == 0 ? 12 : yMax,
+                Name = "MWh",
+                NamePaint = this.GetAxisNamePaint(),
+                LabelsPaint = this.GetAxisNamePaint(),
+                SeparatorsPaint = new SolidColorPaint(SKColor.Parse("#CBD5E1"))
+                {
+                    StrokeThickness = 1,
+                },
+                TextSize = 12,
+            },
+        };
 
         // Compute max heat production across all production units and apply scaling
         var maxProduction = orderedResults
@@ -275,7 +359,6 @@ public sealed class OptimizationChartsViewModel : ViewModelBase
             .Max();
 
         var minAllowed = context.Period.Equals("Winter", StringComparison.OrdinalIgnoreCase) ? 14.0 : 5.0;
-        var yMax = Math.Ceiling(Math.Max(minAllowed, maxProduction) * 1.1);
 
         if (this.OptimizationResultsChart.YAxes.FirstOrDefault() is Axis resAxis)
         {
