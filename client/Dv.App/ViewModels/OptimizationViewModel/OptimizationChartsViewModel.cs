@@ -9,6 +9,7 @@ using LiveChartsCore;
 using LiveChartsCore.Defaults;
 using LiveChartsCore.Kernel.Sketches;
 using LiveChartsCore.SkiaSharpView;
+using LiveChartsCore.SkiaSharpView.Avalonia;
 using LiveChartsCore.SkiaSharpView.Painting;
 using SkiaSharp;
 
@@ -16,42 +17,20 @@ namespace Dv.App.ViewModels;
 
 public sealed class OptimizationChartsViewModel : ViewModelBase
 {
-    public OptimizationChartsViewModel()
-    {
-        this.HeatDemandChart =
-            this.CreateChart("Heat Demand");
 
-        this.ElectricityPriceChart =
-            this.CreateChart("Electricity Price");
+    CartesianChart HeatDemandChart = this.FindControl<CartesianChart>("HeatDemandChart");
 
-        this.OptimizationResultsChart =
-            this.CreateChart("Optimization Results");
+    CartesianChart ElectricityPriceChart = this.FindControl<CartesianChart>("ElectricityPriceChart");
 
-        this.ElectricityConsumptionChart =
-            this.CreateChart("Electricity Consumption");
+    CartesianChart OptimizationResultsChart = this.FindControl<CartesianChart>("OptimizationResultsChart");
 
-        this.ExpensesChart =
-            this.CreateChart("Expenses");
+    CartesianChart ElectricityConsumptionChart = this.FindControl<CartesianChart>("ElectricityConsumptionChart");
 
-        this.Co2EmissionsChart =
-            this.CreateChart("CO2 Emissions");
-    }
+    CartesianChart ExpensesChart = this.FindControl<CartesianChart>("ExpensesChart");
 
-    public ChartCardViewModel HeatDemandChart { get; }
+    CartesianChart CO2EmissionsChart = this.FindControl<CartesianChart>("CO2EmissionsChart");
 
-    public ChartCardViewModel ElectricityPriceChart { get; }
-
-    public ChartCardViewModel OptimizationResultsChart { get; }
-
-    public ChartCardViewModel ElectricityConsumptionChart { get; }
-
-    public ChartCardViewModel ExpensesChart { get; }
-
-    public ChartCardViewModel Co2EmissionsChart { get; }
-
-    public void LoadSourceData(
-        IEnumerable<SourceDataDto> sourceData,
-        OptimizationContext context)
+    public void LoadSourceData(IEnumerable<SourceDataDto> sourceData, OptimizationContext context)
     {
         var filtered =
             sourceData
@@ -112,12 +91,12 @@ public sealed class OptimizationChartsViewModel : ViewModelBase
             },
         };
 
-        var minPrice = electricityPrices.Select(p => p.Value ?? 0d).DefaultIfEmpty(0d).Min();
-        var maxPrice = electricityPrices.Select(p => p.Value ?? 0d).DefaultIfEmpty(0d).Max();
+        double minPrice = electricityPrices.Select(p => p.Value ?? 0).Min();
+        double maxPrice = electricityPrices.Select(p => p.Value ?? 0).Max();
         if (this.ElectricityPriceChart.YAxes.FirstOrDefault() is Axis priceAxis)
         {
             priceAxis.MinLimit = Math.Floor(Math.Min(0, minPrice) * 1.1);
-            priceAxis.MaxLimit = Math.Ceiling(Math.Max(1, maxPrice) * 1.1);
+            priceAxis.MaxLimit = Math.Ceiling(Math.Max(0, maxPrice) * 1.1);
         }
     }
 
@@ -125,34 +104,30 @@ public sealed class OptimizationChartsViewModel : ViewModelBase
     {
         if (optimizationResult.optimisationResultsHourly is null || optimizationResult.optimisationResultsHourly.Count == 0)
         {
-            this.OptimizationResultsChart.Series = new ObservableCollection<ISeries>();
+            OptimizationResultsChart.Series = new ObservableCollection<ISeries>();
 
-            this.ElectricityConsumptionChart.Series = new ObservableCollection<ISeries>();
+            ElectricityConsumptionChart.Series = new ObservableCollection<ISeries>();
 
-            this.ExpensesChart.Series = new ObservableCollection<ISeries>();
+            ExpensesChart.Series = new ObservableCollection<ISeries>();
 
-            this.Co2EmissionsChart.Series = new ObservableCollection<ISeries>();
+            CO2EmissionsChart.Series = new ObservableCollection<ISeries>();
         }
 
-        var orderedResults =
-            optimizationResult.optimisationResultsHourly
-                .OrderBy(x => x.TimeFrom)
-                .ToList();
+        var orderedResults = optimizationResult.optimisationResultsHourly
+            .OrderBy(x => x.TimeFrom)
+            .ToList();
 
-        var electricityConsumption =
-            orderedResults
-                .Select(x => new DateTimePoint(x.TimeFrom, (double)x.ElectricityConsumption))
-                .ToArray();
+        var electricityConsumption = orderedResults
+            .Select(x => new DateTimePoint(x.TimeFrom, (double)x.ElectricityConsumption))
+            .ToArray();
 
-        var expenses =
-            orderedResults
-                .Select(x => new DateTimePoint(x.TimeFrom, x.Expenses))
-                .ToArray();
+        var expenses = orderedResults
+            .Select(x => new DateTimePoint(x.TimeFrom, x.Expenses))
+            .ToArray();
 
-        var co2Emissions =
-            orderedResults
-                .Select(x => new DateTimePoint(x.TimeFrom, x.Co2Emissions))
-                .ToArray();
+        var co2Emissions = orderedResults
+            .Select(x => new DateTimePoint(x.TimeFrom, x.Co2Emissions))
+            .ToArray();
 
         var consumptionColor = SKColor.Parse("#3B82F6");
         var expensesColor = SKColor.Parse("#F59E0B");
@@ -174,8 +149,8 @@ public sealed class OptimizationChartsViewModel : ViewModelBase
         };
 
         // set sensible axis limits for electricity consumption
-        var minConsumption = electricityConsumption.Select(p => p.Value ?? 0d).DefaultIfEmpty(0d).Min();
-        var maxConsumption = electricityConsumption.Select(p => p.Value ?? 0d).DefaultIfEmpty(0d).Max();
+        var minConsumption = electricityConsumption.Min(p => p.Value ?? 0d);
+        var maxConsumption = electricityConsumption.Max(p => p.Value ?? 0d);
         if (this.ElectricityConsumptionChart.YAxes.FirstOrDefault() is Axis consAxis)
         {
             consAxis.MinLimit = Math.Floor(Math.Min(0, minConsumption) * 1.1);
@@ -197,15 +172,15 @@ public sealed class OptimizationChartsViewModel : ViewModelBase
             },
         };
 
-        var minExpenses = expenses.Select(p => p.Value ?? 0d).DefaultIfEmpty(0d).Min();
-        var maxExpenses = expenses.Select(p => p.Value ?? 0d).DefaultIfEmpty(0d).Max();
+        var minExpenses = expenses.Min(p => p.Value ?? 0d);
+        var maxExpenses = expenses.Max(p => p.Value ?? 0d);
         if (this.ExpensesChart.YAxes.FirstOrDefault() is Axis expensesAxis)
         {
             expensesAxis.MinLimit = Math.Floor(Math.Min(0, minExpenses) * 1.1);
             expensesAxis.MaxLimit = Math.Ceiling(Math.Max(1, maxExpenses) * 1.1);
         }
 
-        this.Co2EmissionsChart.Series = new ObservableCollection<ISeries>
+        this.CO2EmissionsChart.Series = new ObservableCollection<ISeries>
         {
             new LineSeries<DateTimePoint>
             {
@@ -220,10 +195,10 @@ public sealed class OptimizationChartsViewModel : ViewModelBase
             },
         };
 
-        var minEmissions = co2Emissions.Select(p => p.Value ?? 0d).DefaultIfEmpty(0d).Min();
-        var maxEmissions = co2Emissions.Select(p => p.Value ?? 0d).DefaultIfEmpty(0d).Max();
+        var minEmissions = co2Emissions.Min(p => p.Value ?? 0d);
+        var maxEmissions = co2Emissions.Max(p => p.Value ?? 0d);
 
-        if (this.Co2EmissionsChart.YAxes.FirstOrDefault() is Axis emissionsAxis)
+        if (this.CO2EmissionsChart.YAxes.FirstOrDefault() is Axis emissionsAxis)
         {
             emissionsAxis.MinLimit = Math.Floor(Math.Min(0, minEmissions) * 1.1);
             emissionsAxis.MaxLimit = Math.Ceiling(Math.Max(1, maxEmissions) * 1.1);
@@ -293,9 +268,9 @@ public sealed class OptimizationChartsViewModel : ViewModelBase
                 GeometrySize = 0,
                 Stroke = new SolidColorPaint(color)
                 {
-                    StrokeThickness = 3
+                    StrokeThickness = 3,
                 },
-                Fill = new SolidColorPaint(color.WithAlpha(150))
+                Fill = new SolidColorPaint(color.WithAlpha(150)),
             });
         }
 
@@ -354,32 +329,31 @@ public sealed class OptimizationChartsViewModel : ViewModelBase
         }
     }
 
-    private ChartCardViewModel CreateChart(string title)
+    private void ConfigureSingleChart(CartesianChart chart, ISeries[] series, string axisName)
     {
-        return new ChartCardViewModel
+        chart.Series = series;
+
+        chart.XAxes = new ICartesianAxis[]
         {
-            Title = title,
-            Series = new ObservableCollection<ISeries>(),
-
-            XAxes = new ObservableCollection<ICartesianAxis>
+            new DateTimeAxis(TimeSpan.FromHours(24), date => date.ToString("dd MMM"))
             {
-                new DateTimeAxis(TimeSpan.FromHours(24), date => date.ToString("dd MMM"))
-                {
-                    LabelsPaint = this.GetAxisNamePaint(),
-                    SeparatorsPaint = new SolidColorPaint(SKColor.Parse("#CBD5E1")) { StrokeThickness = 1 },
-                    TextSize = 12,
-                }
+                LabelsPaint = this.GetAxisNamePaint(),
+                SeparatorsPaint = new SolidColorPaint(SKColor.Parse("#CBD5E1")) { StrokeThickness = 1 },
+                TextSize = 12,
             },
+        };
 
-            YAxes = new ObservableCollection<ICartesianAxis>
+        chart.YAxes = new ICartesianAxis[]
+        {
+            new Axis
             {
-                new Axis
-                {
-                    LabelsPaint = this.GetAxisNamePaint(),
-                    NamePaint = this.GetAxisNamePaint(),
-                    SeparatorsPaint = new SolidColorPaint(SKColor.Parse("#CBD5E1")) { StrokeThickness = 1 },
-                    TextSize = 12,
-                }
+                MinLimit = minValue,
+                MaxLimit = maxLimit,
+                Name = axisName,
+                NamePaint = this.GetAxisNamePaint(),
+                LabelsPaint = this.GetAxisNamePaint(),
+                SeparatorsPaint = new SolidColorPaint(SKColor.Parse("#CBD5E1")) { StrokeThickness = 1 },
+                TextSize = 12,
             },
         };
     }
