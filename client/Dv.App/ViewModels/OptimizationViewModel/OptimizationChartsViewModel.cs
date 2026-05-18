@@ -121,24 +121,17 @@ public sealed class OptimizationChartsViewModel : ViewModelBase
         }
     }
 
-    public void LoadOptimizationResult(
-        OptimisationRunDto optimizationResult,
-        OptimizationContext context)
+    public void LoadOptimizationResult(OptimisationRunDto optimizationResult, OptimizationContext context)
     {
-        if (optimizationResult.optimisationResultsHourly is null
-            || optimizationResult.optimisationResultsHourly.Count == 0)
+        if (optimizationResult.optimisationResultsHourly is null || optimizationResult.optimisationResultsHourly.Count == 0)
         {
-            this.OptimizationResultsChart.Series =
-                new ObservableCollection<ISeries>();
+            this.OptimizationResultsChart.Series = new ObservableCollection<ISeries>();
 
-            this.ElectricityConsumptionChart.Series =
-                new ObservableCollection<ISeries>();
+            this.ElectricityConsumptionChart.Series = new ObservableCollection<ISeries>();
 
             this.ExpensesChart.Series = new ObservableCollection<ISeries>();
 
             this.Co2EmissionsChart.Series = new ObservableCollection<ISeries>();
-
-            return;
         }
 
         var orderedResults =
@@ -229,21 +222,15 @@ public sealed class OptimizationChartsViewModel : ViewModelBase
 
         var minEmissions = co2Emissions.Select(p => p.Value ?? 0d).DefaultIfEmpty(0d).Min();
         var maxEmissions = co2Emissions.Select(p => p.Value ?? 0d).DefaultIfEmpty(0d).Max();
+
         if (this.Co2EmissionsChart.YAxes.FirstOrDefault() is Axis emissionsAxis)
         {
             emissionsAxis.MinLimit = Math.Floor(Math.Min(0, minEmissions) * 1.1);
             emissionsAxis.MaxLimit = Math.Ceiling(Math.Max(1, maxEmissions) * 1.1);
         }
 
-        var hourly = optimizationResult.optimisationResultsHourly?
-        .OrderBy(h => h.TimeFrom)
-        .ToList() ?? new List<OptimisationResultsHourlyDto>();
-
-        if (!hourly.Any())
-        {
-            return;
-        }
-        var allUnits = hourly
+        // finding active untis and sorting them, by capacity for better graphical look
+        var allUnits = orderedResults
         .SelectMany(h => h.ProductionUnits)
         .GroupBy(u => new
         {
@@ -269,7 +256,7 @@ public sealed class OptimizationChartsViewModel : ViewModelBase
             SKColor.Parse("#0000FF"),
             SKColor.Parse("#000000"),
             SKColor.Parse("#ff0ff3"),
-            SKColor.Parse("#A855F7")
+            SKColor.Parse("#A855F7"),
         };
 
         var seriesList = new List<ISeries>();
@@ -280,7 +267,8 @@ public sealed class OptimizationChartsViewModel : ViewModelBase
             var color = colors[colorIdx % colors.Length];
             colorIdx++;
 
-            var unitPoints = hourly.Select(h =>
+            // creating line for each of the units
+            var unitPoints = orderedResults.Select(h =>
             {
                 var unitsThisHour = h.ProductionUnits.ToList();
 
@@ -311,8 +299,7 @@ public sealed class OptimizationChartsViewModel : ViewModelBase
             });
         }
 
-        this.OptimizationResultsChart.Series = new ObservableCollection<ISeries>(
-                seriesList);
+        this.OptimizationResultsChart.Series = new ObservableCollection<ISeries>(seriesList);
 
         this.OptimizationResultsChart.XAxes = new ObservableCollection<ICartesianAxis>
         {
@@ -327,7 +314,7 @@ public sealed class OptimizationChartsViewModel : ViewModelBase
             },
         };
 
-        var maxHeatProduction = hourly
+        var maxHeatProduction = orderedResults
             .Select(h => h.HeatProduction)
             .DefaultIfEmpty(0)
             .Max();
@@ -367,8 +354,7 @@ public sealed class OptimizationChartsViewModel : ViewModelBase
         }
     }
 
-    private ChartCardViewModel CreateChart(
-        string title)
+    private ChartCardViewModel CreateChart(string title)
     {
         return new ChartCardViewModel
         {
