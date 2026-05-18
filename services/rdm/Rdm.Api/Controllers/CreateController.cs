@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Net.Http;
+using System.Text.Json;
+using Microsoft.AspNetCore.Mvc;
+using Rdm.Api.Application.Exceptions;
 using Rdm.Api.Application.Interfaces;
 using Rdm.Api.Application.Model;
 using Rdm.Api.Application.Services.Helpers;
@@ -51,6 +54,24 @@ public class CreateController : Controller
                 return Ok(returnObject);
             }
             
+        }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogError(ex, "Connectivity error reaching the optimiser service");
+            ApiResponseModel<OptimisationRun> returnObject = new ApiResponseModel<OptimisationRun>("Service Unavailable", null, 0, "Could not reach the optimiser service.");
+            return StatusCode(503, returnObject);
+        }
+        catch (TaskCanceledException ex)
+        {
+            _logger.LogError(ex, "Request to optimiser service timed out");
+            ApiResponseModel<OptimisationRun> returnObject = new ApiResponseModel<OptimisationRun>("Request Timeout", null, 0, "Optimiser service did not respond in time.");
+            return StatusCode(408, returnObject);
+        }
+        catch (JsonException ex)
+        {
+            _logger.LogError(ex, "Failed to deserialize optimiser response");
+            ApiResponseModel<OptimisationRun> returnObject = new ApiResponseModel<OptimisationRun>("Internal Server Error", null, 0, "Invalid response received from optimiser service.");
+            return StatusCode(500, returnObject);
         }
         catch (Exception ex)
         {

@@ -136,4 +136,64 @@ public class Optimizer_Test
 
         Assert.False(hasEb && hasGm);
     }
+
+    [Fact]
+    public async Task OptimizeAsync_ReturnsEmpty_WhenTimeFromIsAfterTimeTo()
+    {
+        var bundle = new AssetDataBundle
+        {
+            GasBoilers = new[] { new GasBoiler { Id = 1, Name = "GB1", MaxHeat = 20.0f, ProductionCost = 400f } }
+        };
+
+        assetProvider.Setup(x => x.GetAssetDataAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(bundle);
+
+        sourceProvider.Setup(x => x.GetSourceDataAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<SourceDataPoint>());
+
+        var optimizer = new Optimizer(assetProvider.Object, sourceProvider.Object, NullLogger<Optimizer>.Instance);
+        var request = new OptimizationRequestDto { ScenarioId = 1, PeriodId = 1, TimeFrom = new DateTime(2026, 1, 2), TimeTo = new DateTime(2026, 1, 1) };
+
+        var result = await optimizer.OptimizeAsync(request, CancellationToken.None);
+
+        Assert.Empty(result.OptResultsHourly);
+    }
+
+    [Fact]
+    public async Task OptimizeAsync_HandlesException_FromAssetProvider()
+    {
+        assetProvider.Setup(x => x.GetAssetDataAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new Exception("Asset Provider Failed"));
+
+        var optimizer = new Optimizer(assetProvider.Object, sourceProvider.Object, NullLogger<Optimizer>.Instance);
+        var request = new OptimizationRequestDto { ScenarioId = 1, PeriodId = 1, TimeFrom = new DateTime(2026, 1, 1), TimeTo = new DateTime(2026, 1, 2) };
+
+        await Assert.ThrowsAsync<Opt.Api.Application.Exceptions.ExternalDataFetchException>(() => optimizer.OptimizeAsync(request, CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task OptimizeAsync_ZeroDemand_ResultsInZeroExpenses()
+    {
+        var bundle = new AssetDataBundle
+        {
+            GasBoilers = new[] { new GasBoiler { Id = 1, Name = "GB1", MaxHeat = 20.0f, ProductionCost = 400f } }
+        };
+
+        assetProvider.Setup(x => x.GetAssetDataAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(bundle);
+
+        sourceProvider.Setup(x => x.GetSourceDataAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<SourceDataPoint>
+            {
+                new SourceDataPoint { PeriodId = 1, TimeFrom = new DateTime(2026, 1, 1, 10, 0, 0), TimeTo = new DateTime(2026, 1, 1, 11, 0, 0), HeatDemand = 0.0, ElectricityPrice = 100 }
+            });
+
+        var optimizer = new Optimizer(assetProvider.Object, sourceProvider.Object, NullLogger<Optimizer>.Instance);
+        var request = new OptimizationRequestDto { ScenarioId = 1, PeriodId = 1, TimeFrom = new DateTime(2026, 1, 1), TimeTo = new DateTime(2026, 1, 2) };
+
+        var result = await optimizer.OptimizeAsync(request, CancellationToken.None);
+
+        Assert.Single(result.OptResultsHourly);
+        Assert.Equal(0, result.OptResultsHourly[0].Expenses);
+    }
 }

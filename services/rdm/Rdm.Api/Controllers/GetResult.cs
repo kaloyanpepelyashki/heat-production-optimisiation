@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Rdm.Api.Application.Exceptions;
 using Rdm.Api.Application.Interfaces;
 using Rdm.Api.Application.Model;
 using Rdm.Api.Application.Services;
@@ -39,10 +40,16 @@ public class GetResult : Controller
             
             
         }
+        catch (DatabaseOperationException e)
+        {
+            _logger.LogError(e, "Database operation error getting all optimisation results");
+            ApiResponseModel<List<OptimisationRun>> returnObject = new ApiResponseModel<List<OptimisationRun>>("Internal Server error", [], 0, "Database error retrieving optimisation results");
+            return StatusCode(500, returnObject);
+        }
         catch (Exception e)
         {
-            _logger.LogError($"Error in controller. Error getting all optimisation results: {e.Message}, {e.GetType()}");
-            ApiResponseModel<List<OptimisationRun>> returnObject = new ApiResponseModel<List<OptimisationRun>>("Internal Server error", [], 0, "Error in controller. Error getting all optimisation results"); 
+            _logger.LogError(e, "Error getting all optimisation results");
+            ApiResponseModel<List<OptimisationRun>> returnObject = new ApiResponseModel<List<OptimisationRun>>("Internal Server error", [], 0, "Error in controller. Error getting all optimisation results");
             return StatusCode(500, returnObject);
         }
         
