@@ -105,6 +105,7 @@ public class Optimizer
         var boilers = new List<DispatchUnit>();
 
         boilers.AddRange(assets.GasBoilers
+            .Where(x => x.Name != "GB2")
             .Select(x => new DispatchUnit(
                 x.Id,
                 "GB",
