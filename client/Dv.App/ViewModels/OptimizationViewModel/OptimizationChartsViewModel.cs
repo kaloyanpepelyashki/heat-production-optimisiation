@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
-using Avalonia;
-using Avalonia.Styling;
+using Avalonia.Controls;
 using Dv.App.Models;
 using LiveChartsCore;
 using LiveChartsCore.Defaults;
@@ -17,18 +15,28 @@ namespace Dv.App.ViewModels;
 
 public sealed class OptimizationChartsViewModel : ViewModelBase
 {
+    private CartesianChart? heatDemandChart;
+    private CartesianChart? electricityPriceChart;
+    private CartesianChart? optimizationResultsChart;
+    private CartesianChart? electricityConsumptionChart;
+    private CartesianChart? expensesChart;
+    private CartesianChart? co2EmissionsChart;
 
-    CartesianChart HeatDemandChart = this.FindControl<CartesianChart>("HeatDemandChart");
-
-    CartesianChart ElectricityPriceChart = this.FindControl<CartesianChart>("ElectricityPriceChart");
-
-    CartesianChart OptimizationResultsChart = this.FindControl<CartesianChart>("OptimizationResultsChart");
-
-    CartesianChart ElectricityConsumptionChart = this.FindControl<CartesianChart>("ElectricityConsumptionChart");
-
-    CartesianChart ExpensesChart = this.FindControl<CartesianChart>("ExpensesChart");
-
-    CartesianChart CO2EmissionsChart = this.FindControl<CartesianChart>("CO2EmissionsChart");
+    public void AttachCharts(
+        CartesianChart heatDemandChart,
+        CartesianChart electricityPriceChart,
+        CartesianChart optimizationResultsChart,
+        CartesianChart electricityConsumptionChart,
+        CartesianChart expensesChart,
+        CartesianChart co2EmissionsChart)
+    {
+        this.heatDemandChart = heatDemandChart;
+        this.electricityPriceChart = electricityPriceChart;
+        this.optimizationResultsChart = optimizationResultsChart;
+        this.electricityConsumptionChart = electricityConsumptionChart;
+        this.expensesChart = expensesChart;
+        this.co2EmissionsChart = co2EmissionsChart;
+    }
 
     public void LoadSourceData(IEnumerable<SourceDataDto> sourceData, OptimizationContext context)
     {
@@ -50,159 +58,47 @@ public sealed class OptimizationChartsViewModel : ViewModelBase
                 .Select(x => new DateTimePoint(x.TimeFrom, (double)x.ElectricityPrice))
                 .ToArray();
 
-        var heatColor = SKColor.Parse("#F59E0B");
         var priceColor = SKColor.Parse("#3B82F6");
 
-        this.HeatDemandChart.Series = new ObservableCollection<ISeries>
-        {
-            new LineSeries<DateTimePoint>
-            {
-                Values = heatDemand,
-                Name = "Heat Demand",
-                LineSmoothness = 0.15,
-                GeometrySize = 6,
-                Stroke = new SolidColorPaint(heatColor) { StrokeThickness = 3 },
-                Fill = new SolidColorPaint(heatColor.WithAlpha(35)),
-                GeometryFill = new SolidColorPaint(heatColor),
-                GeometryStroke = new SolidColorPaint(heatColor),
-            },
-        };
-
-        // Adjust Y axis for heat demand to provide headroom and avoid clipping
-        var maxHeat = heatDemand.Select(p => p.Value ?? 0d).DefaultIfEmpty(0d).Max();
-        if (this.HeatDemandChart.YAxes.FirstOrDefault() is Axis heatAxis)
-        {
-            heatAxis.MinLimit = 0;
-            heatAxis.MaxLimit = Math.Ceiling(Math.Max(1, maxHeat) * 1.1);
-        }
-
-        this.ElectricityPriceChart.Series = new ObservableCollection<ISeries>
-        {
-            new LineSeries<DateTimePoint>
-            {
-                Values = electricityPrices,
-                Name = "Electricity Price",
-                LineSmoothness = 0.15,
-                GeometrySize = 6,
-                Stroke = new SolidColorPaint(priceColor) { StrokeThickness = 3 },
-                Fill = new SolidColorPaint(priceColor.WithAlpha(35)),
-                GeometryFill = new SolidColorPaint(priceColor),
-                GeometryStroke = new SolidColorPaint(priceColor),
-            },
-        };
-
-        double minPrice = electricityPrices.Select(p => p.Value ?? 0).Min();
-        double maxPrice = electricityPrices.Select(p => p.Value ?? 0).Max();
-        if (this.ElectricityPriceChart.YAxes.FirstOrDefault() is Axis priceAxis)
-        {
-            priceAxis.MinLimit = Math.Floor(Math.Min(0, minPrice) * 1.1);
-            priceAxis.MaxLimit = Math.Ceiling(Math.Max(0, maxPrice) * 1.1);
-        }
+        ConfigureSingleChart(heatDemandChart,"Heat Demand", "#F59E0B", "MWh", heatDemand);
+        ConfigureSingleChart(electricityPriceChart,"ElectricityPrice", "#3B82F6", "MW", electricityPrices);
     }
 
     public void LoadOptimizationResult(OptimisationRunDto optimizationResult, OptimizationContext context)
     {
         if (optimizationResult.optimisationResultsHourly is null || optimizationResult.optimisationResultsHourly.Count == 0)
         {
-            OptimizationResultsChart.Series = new ObservableCollection<ISeries>();
-
-            ElectricityConsumptionChart.Series = new ObservableCollection<ISeries>();
-
-            ExpensesChart.Series = new ObservableCollection<ISeries>();
-
-            CO2EmissionsChart.Series = new ObservableCollection<ISeries>();
+            this.optimizationResultsChart.Series = new List<ISeries>();
+            this.electricityConsumptionChart.Series = new List<ISeries>();
+            this.expensesChart.Series = new List<ISeries>();
+            this.co2EmissionsChart.Series = new List<ISeries>();
+            return;
         }
 
         var orderedResults = optimizationResult.optimisationResultsHourly
             .OrderBy(x => x.TimeFrom)
             .ToList();
 
-        var electricityConsumption = orderedResults
+        DateTimePoint[] electricityConsumption = orderedResults
             .Select(x => new DateTimePoint(x.TimeFrom, (double)x.ElectricityConsumption))
             .ToArray();
 
-        var expenses = orderedResults
+        DateTimePoint[] expenses = orderedResults
             .Select(x => new DateTimePoint(x.TimeFrom, x.Expenses))
             .ToArray();
 
-        var co2Emissions = orderedResults
+        DateTimePoint[] co2Emissions = orderedResults
             .Select(x => new DateTimePoint(x.TimeFrom, x.Co2Emissions))
             .ToArray();
 
-        var consumptionColor = SKColor.Parse("#3B82F6");
-        var expensesColor = SKColor.Parse("#F59E0B");
-        var emissionsColor = SKColor.Parse("#DC2626");
+        DateTimePoint[] heatProduction = orderedResults
+            .Select(x => new DateTimePoint(x.TimeFrom, x.HeatProduction))
+            .ToArray();
 
-        this.ElectricityConsumptionChart.Series = new ObservableCollection<ISeries>
-        {
-            new LineSeries<DateTimePoint>
-            {
-                Values = electricityConsumption,
-                Name = "Electricity Consumption",
-                LineSmoothness = 0.15,
-                GeometrySize = 6,
-                Stroke = new SolidColorPaint(consumptionColor) { StrokeThickness = 3 },
-                Fill = new SolidColorPaint(consumptionColor.WithAlpha(35)),
-                GeometryFill = new SolidColorPaint(consumptionColor),
-                GeometryStroke = new SolidColorPaint(consumptionColor),
-            },
-        };
-
-        // set sensible axis limits for electricity consumption
-        var minConsumption = electricityConsumption.Min(p => p.Value ?? 0d);
-        var maxConsumption = electricityConsumption.Max(p => p.Value ?? 0d);
-        if (this.ElectricityConsumptionChart.YAxes.FirstOrDefault() is Axis consAxis)
-        {
-            consAxis.MinLimit = Math.Floor(Math.Min(0, minConsumption) * 1.1);
-            consAxis.MaxLimit = Math.Ceiling(Math.Max(1, maxConsumption) * 1.1);
-        }
-
-        this.ExpensesChart.Series = new ObservableCollection<ISeries>
-        {
-            new LineSeries<DateTimePoint>
-            {
-                Values = expenses,
-                Name = "Expenses",
-                LineSmoothness = 0.15,
-                GeometrySize = 6,
-                Stroke = new SolidColorPaint(expensesColor) { StrokeThickness = 3 },
-                Fill = new SolidColorPaint(expensesColor.WithAlpha(35)),
-                GeometryFill = new SolidColorPaint(expensesColor),
-                GeometryStroke = new SolidColorPaint(expensesColor),
-            },
-        };
-
-        var minExpenses = expenses.Min(p => p.Value ?? 0d);
-        var maxExpenses = expenses.Max(p => p.Value ?? 0d);
-        if (this.ExpensesChart.YAxes.FirstOrDefault() is Axis expensesAxis)
-        {
-            expensesAxis.MinLimit = Math.Floor(Math.Min(0, minExpenses) * 1.1);
-            expensesAxis.MaxLimit = Math.Ceiling(Math.Max(1, maxExpenses) * 1.1);
-        }
-
-        this.CO2EmissionsChart.Series = new ObservableCollection<ISeries>
-        {
-            new LineSeries<DateTimePoint>
-            {
-                Values = co2Emissions,
-                Name = "CO2 Emissions",
-                LineSmoothness = 0.15,
-                GeometrySize = 6,
-                Stroke = new SolidColorPaint(emissionsColor) { StrokeThickness = 3 },
-                Fill = new SolidColorPaint(emissionsColor.WithAlpha(35)),
-                GeometryFill = new SolidColorPaint(emissionsColor),
-                GeometryStroke = new SolidColorPaint(emissionsColor),
-            },
-        };
-
-        var minEmissions = co2Emissions.Min(p => p.Value ?? 0d);
-        var maxEmissions = co2Emissions.Max(p => p.Value ?? 0d);
-
-        if (this.CO2EmissionsChart.YAxes.FirstOrDefault() is Axis emissionsAxis)
-        {
-            emissionsAxis.MinLimit = Math.Floor(Math.Min(0, minEmissions) * 1.1);
-            emissionsAxis.MaxLimit = Math.Ceiling(Math.Max(1, maxEmissions) * 1.1);
-        }
+        ConfigureSingleChart(electricityConsumptionChart,"Electricity Consumption", "#3B82F6", "MW", electricityConsumption);
+        ConfigureSingleChart(expensesChart,"Expenses", "#F59E0B", "DKK", expenses);
+        ConfigureSingleChart(co2EmissionsChart,"CO2 Emission", "#DC2626", "Kg/MWh", co2Emissions);
+        ConfigureSingleChart(optimizationResultsChart,"Optimization Results", "#000000", "MWh", heatProduction);
 
         // finding active untis and sorting them, by capacity for better graphical look
         var allUnits = orderedResults
@@ -221,6 +117,7 @@ public sealed class OptimizationChartsViewModel : ViewModelBase
             .Max(u => u.Capacity),
 
         })
+        .OrderBy(u => u.ProductionUnitId)
         .OrderByDescending(u => u.MaxHeatProduction)
         .ToList();
 
@@ -274,64 +171,33 @@ public sealed class OptimizationChartsViewModel : ViewModelBase
             });
         }
 
-        this.OptimizationResultsChart.Series = new ObservableCollection<ISeries>(seriesList);
-
-        this.OptimizationResultsChart.XAxes = new ObservableCollection<ICartesianAxis>
-        {
-            new DateTimeAxis(TimeSpan.FromHours(24), date => date.ToString("dd MMM"))
-            {
-                LabelsPaint = this.GetAxisNamePaint(),
-                SeparatorsPaint = new SolidColorPaint(SKColor.Parse("#CBD5E1"))
-                {
-                    StrokeThickness = 1,
-                },
-                TextSize = 12,
-            },
-        };
-
-        var maxHeatProduction = orderedResults
-            .Select(h => h.HeatProduction)
-            .DefaultIfEmpty(0)
-            .Max();
-
-        var yMax = Math.Ceiling(maxHeatProduction * 1.10);
-
-        this.OptimizationResultsChart.YAxes = new ObservableCollection<ICartesianAxis>
-        {
-            new Axis
-            {
-                MinLimit = 0,
-                MaxLimit = yMax == 0 ? 12 : yMax,
-                Name = "MWh",
-                NamePaint = this.GetAxisNamePaint(),
-                LabelsPaint = this.GetAxisNamePaint(),
-                SeparatorsPaint = new SolidColorPaint(SKColor.Parse("#CBD5E1"))
-                {
-                    StrokeThickness = 1,
-                },
-                TextSize = 12,
-            },
-        };
-
-        // Compute max heat production across all production units and apply scaling
-        var maxProduction = orderedResults
-            .Where(x => x.ProductionUnits is not null)
-            .SelectMany(x => x.ProductionUnits.Select(u => (double)u.HeatProduction))
-            .DefaultIfEmpty(0)
-            .Max();
-
-        var minAllowed = context.Period.Equals("Winter", StringComparison.OrdinalIgnoreCase) ? 14.0 : 5.0;
-
-        if (this.OptimizationResultsChart.YAxes.FirstOrDefault() is Axis resAxis)
-        {
-            resAxis.MinLimit = 0;
-            resAxis.MaxLimit = yMax;
-        }
+        this.optimizationResultsChart.Series = seriesList;
     }
 
-    private void ConfigureSingleChart(CartesianChart chart, ISeries[] series, string axisName)
+    private void ConfigureSingleChart(CartesianChart chart, string seriesName, string colorName, string axisName, DateTimePoint[] data)
     {
-        chart.Series = series;
+        SKColor color= SKColor.Parse(colorName);
+        chart.Series = new List<ISeries>
+        {
+            new LineSeries<DateTimePoint>
+            {
+                Values = data,
+                Name = seriesName,
+                LineSmoothness = 0.15,
+                GeometrySize = 6,
+                Stroke = new SolidColorPaint(color) { StrokeThickness = 3 },
+                Fill = new SolidColorPaint(color.WithAlpha(35)),
+                GeometryFill = new SolidColorPaint(color),
+                GeometryStroke = new SolidColorPaint(color),
+            },
+        };
+
+
+        double minPrice = data.Min(p => p.Value ?? 0);
+        double maxPrice = data.Max(p => p.Value ?? 0);
+
+        double minLimit = Math.Floor(Math.Min(0, minPrice) * 1.1);
+        double maxLimit = Math.Ceiling(Math.Max(0, maxPrice) * 1.1);
 
         chart.XAxes = new ICartesianAxis[]
         {
@@ -347,7 +213,7 @@ public sealed class OptimizationChartsViewModel : ViewModelBase
         {
             new Axis
             {
-                MinLimit = minValue,
+                MinLimit = minLimit,
                 MaxLimit = maxLimit,
                 Name = axisName,
                 NamePaint = this.GetAxisNamePaint(),

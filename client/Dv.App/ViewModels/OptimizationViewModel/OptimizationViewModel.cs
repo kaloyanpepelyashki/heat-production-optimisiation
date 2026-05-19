@@ -15,9 +15,9 @@ namespace Dv.App.ViewModels;
 
 public sealed class OptimizationViewModel : ViewModelBase
 {
+    public OptimizationChartsViewModel ChartsVM { get; } = new();
     private readonly IApiService apiService;
     private readonly SemaphoreSlim loadLock = new(1, 1);
-    private readonly OptimizationChartsViewModel chartsModule;
     private readonly OptimizationMaintenanceViewModel maintenanceModule;
     private List<SourceDataDto> cachedSourceData = [];
 
@@ -39,8 +39,6 @@ public sealed class OptimizationViewModel : ViewModelBase
     {
         this.apiService = apiService;
 
-        this.chartsModule = new OptimizationChartsViewModel();
-
         this.maintenanceModule =
             new OptimizationMaintenanceViewModel(
                 maintenanceService,
@@ -51,7 +49,6 @@ public sealed class OptimizationViewModel : ViewModelBase
                 this.selectedPeriod,
                 this.selectedScenario);
 
-        this.chartsModule.PropertyChanged += this.ModuleOnPropertyChanged;
         this.maintenanceModule.PropertyChanged += this.ModuleOnPropertyChanged;
 
         this.RefreshCommand =
@@ -62,24 +59,6 @@ public sealed class OptimizationViewModel : ViewModelBase
 
         this.maintenanceModule.ApplyContext(this.CurrentContext);
     }
-
-    public ChartCardViewModel HeatDemandChart =>
-        this.chartsModule.HeatDemandChart;
-
-    public ChartCardViewModel ElectricityPriceChart =>
-        this.chartsModule.ElectricityPriceChart;
-
-    public ChartCardViewModel OptimizationResultsChart =>
-        this.chartsModule.OptimizationResultsChart;
-
-    public ChartCardViewModel ElectricityConsumptionChart =>
-        this.chartsModule.ElectricityConsumptionChart;
-
-    public ChartCardViewModel ExpensesChart =>
-        this.chartsModule.ExpensesChart;
-
-    public ChartCardViewModel Co2EmissionsChart =>
-        this.chartsModule.Co2EmissionsChart;
 
     public ObservableCollection<string> Periods { get; } =
     [
@@ -226,7 +205,7 @@ public sealed class OptimizationViewModel : ViewModelBase
             }
 
             this.cachedSourceData = sourceData;
-            this.chartsModule.LoadSourceData(
+            this.ChartsVM.LoadSourceData(
                 this.cachedSourceData,
                 this.CurrentContext);
         }
@@ -266,7 +245,7 @@ public sealed class OptimizationViewModel : ViewModelBase
                 return;
             }
 
-            this.chartsModule.LoadOptimizationResult(
+            this.ChartsVM.LoadOptimizationResult(
                 response.Data,
                 this.CurrentContext);
         }
@@ -307,7 +286,7 @@ public sealed class OptimizationViewModel : ViewModelBase
             return;
         }
 
-        this.chartsModule.LoadSourceData(
+        this.ChartsVM.LoadSourceData(
             this.cachedSourceData,
             this.CurrentContext);
     }
