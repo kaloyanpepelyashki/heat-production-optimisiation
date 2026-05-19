@@ -21,7 +21,6 @@ public class ApiService : IApiService
         { BackendService.Rdm, "https://rdm-api.onrender.com/" },
         { BackendService.Sdm, "https://sdm-api.onrender.com/" },
         { BackendService.Am, "https://heat-production-optimisiation.onrender.com/" },
-        { BackendService.Opt, "https://opt-api-7dj4.onrender.com"}
     };
 
     public ApiService()
@@ -71,65 +70,70 @@ public class ApiService : IApiService
     }
     
     
-    /// <summary>
-    /// Used to wake up an API service based on a provided url from the BackendService enum.
-    /// Performs a GET request to the Health endpoint for wakeup.
-    /// Will fail if different than 200 status code is returned. 
-    /// </summary>
-    /// <param name="service">the url of the service taken from the BackendService enum</param>
-    /// <returns>true if wake up was successful (200 was returned from the request), false if it was not</returns>
+    /// Polls service/api/Health/wakeup until it responds with a non-5xx status or 90 seconds elapse.
+    /// Render.com free-tier services return 5xx during cold start; a single request is not enough.
     public async Task<bool> WakeUpService(BackendService service, CancellationToken token)
     {
         var endpoint = this.BuildUrl(service, "api/Health/wakeup");
-        
+        var deadline = DateTime.UtcNow.AddSeconds(90);
+
+        while (DateTime.UtcNow < deadline)
+        {
+            try
+            {
+                var response = await SharedHttpClient.GetAsync(endpoint, token);
+
+                if ((int)response.StatusCode >= 500)
+                {
+                    Debug.WriteLine($"WakeUp: {service} returned {(int)response.StatusCode}, retrying…");
+                    await Task.Delay(5000, token);
+                    continue;
+                }
+
+                // 2xx or 4xx — the server is handling requests
+                return true;
+            }
+            catch (OperationCanceledException) when (token.IsCancellationRequested)
+            {
+                Debug.WriteLine($"WakeUp: {service} cancelled.");
+                throw;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine($"WakeUp: {service} error: {e.Message}, retrying…");
+                await Task.Delay(5000, token);
+            }
+        }
+
+        Debug.WriteLine($"WakeUp: {service} timed out after 90s.");
+        return false;
+    }
+
+    /// Wakes all registered services concurrently. Returns true only if every service becomes ready.
+    public async Task<bool> WakeUpAllServices(CancellationToken token = default)
+    {
+        var tasks = ServiceUrls.Keys
+            .Select(svc => WakeUpServiceSafe(svc, token))
+            .ToList();
+        bool[] results = await Task.WhenAll(tasks);
+        return results.All(success => success);
+    }
+
+    private async Task<bool> WakeUpServiceSafe(BackendService service, CancellationToken token)
+    {
         try
         {
-            var response = await SharedHttpClient.GetAsync(endpoint, token);
-
-            return response.IsSuccessStatusCode;
+            return await WakeUpService(service, token);
         }
         catch (OperationCanceledException) when (token.IsCancellationRequested)
         {
-            Debug.WriteLine($"Wake-up cancelled for service {service} at {endpoint}.");
-            throw;
-        }
-        catch (HttpRequestException e)
-        {
-            Debug.WriteLine($"Error in APIService. Connectivity error when waking up service at: {endpoint}: {e.Message} {e.GetType()} Status Code: {e.StatusCode}, {e.HttpRequestError}");
-            throw;
-        }
-        catch (TaskCanceledException e)
-        {
-            Debug.WriteLine($"Error in APIService when waking up service at: {endpoint}. Request timed out: {e.Message} {e.GetType()}");
             throw;
         }
         catch (Exception e)
         {
-            Debug.WriteLine($"Error waking up service at:  {endpoint}. {e.Message} {e.GetType()}");
-            throw; 
+            Debug.WriteLine($"WakeUp failed for {service}: {e.Message}");
+            return false;
         }
-    }
-
-    /// <summary>
-    /// Used to wake up all services at ones. Iterates over the ServiceUrls defined in the APIService.
-    /// For each service in the list schedules a task, calling the WakeUpService method - sends a request to the health/wakeup endpoint of each service
-    /// Expects all of them to respond with status code 200, to complete with a success. 
-    /// </summary>
-    /// <param name="token"></param>
-    /// <returns></returns>
-    public async Task<bool> WakeUpAllServices(CancellationToken token = default)
-    {
-            List<Task<bool>> tasks = new List<Task<bool>>();
-        
-            
-            foreach (KeyValuePair<BackendService, string> pair in ServiceUrls)
-            { 
-                tasks.Add(WakeUpService(pair.Key, token));
-            }
-            
-            bool[] results = await Task.WhenAll(tasks);
-
-            return results.All(success => success);
     }
     
     

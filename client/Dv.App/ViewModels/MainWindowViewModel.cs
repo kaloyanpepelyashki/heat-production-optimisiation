@@ -16,8 +16,9 @@ public sealed partial class MainWindowViewModel : ViewModelBase
 {
 	private readonly ILogger<MainWindowViewModel> _logger;
 	
-	private readonly IApiService _apiService; 
-	
+	private readonly IApiService _apiService;
+	private readonly SettingsViewModel _settingsViewModel;
+
 	private readonly Dictionary<string, ViewModelBase> viewMap;
 	private ViewModelBase currentViewModel;
 	private NavigationItem? selectedNavigationItem;
@@ -41,8 +42,8 @@ public sealed partial class MainWindowViewModel : ViewModelBase
 		SettingsViewModel settingsViewModel)
 	{
 		_logger = logger;
-		
 		_apiService = apiService;
+		_settingsViewModel = settingsViewModel;
 		_wakeUpServicesTask = WakeUpServices(_startupCts.Token);
 		 
 		this.NavigationItems = new ObservableCollection<NavigationItem>
@@ -69,36 +70,38 @@ public sealed partial class MainWindowViewModel : ViewModelBase
 	//Calls the WakeUpAllServices from the ApiClient, to send a health check to all the services and wake them up
 	private async Task WakeUpServices(CancellationToken ct)
 	{
-		_isWakingUp = true;
+		IsWakingUp = true;
+		StartUpError = string.Empty;
 		try
 		{
 			var response = await _apiService.WakeUpAllServices(ct);
 
 			if (!response)
 			{
-				_allServicesWokeUp = false;
-				_isWakingUp = false;
+				AllServicesWokeUp = false;
+				StartUpError = "One or more services failed to wake up.";
+			}
+			else
+			{
+				AllServicesWokeUp = true;
 			}
 		}
-		catch (OperationCanceledException)
+		catch (OperationCanceledException) when (ct.IsCancellationRequested)
 		{
-			_allServicesWokeUp = false;
-			_startUpError = "Waking up services process cancelled";
+			AllServicesWokeUp = false;
+			StartUpError = "Service wakeup was cancelled.";
 			_logger.LogError("Failed to wake up all services in MainWindowViewModel. Waking up services process cancelled");
 		}
 		catch (Exception e)
 		{
-			_isWakingUp = false;
-			_startUpError = e.Message;
-			Debug.WriteLine($"Error waking up all services {e.Message}, {e.GetType()}: {e.StackTrace}");
+			AllServicesWokeUp = false;
+			StartUpError = e.Message;
 			_logger.LogError($"Error waking up all services {e.Message}, {e.GetType()}: {e.StackTrace}");
 		}
 		finally
 		{
-			_isWakingUp = false;
-			_allServicesWokeUp = true;
-			Debug.WriteLine("All services woke up successfully in MainWindowViewModel");
-			_logger.LogInformation("All services woke up successfully in MainWindowViewModel");
+			IsWakingUp = false;
+			_settingsViewModel.RefreshServices();
 		}
 	}
 
