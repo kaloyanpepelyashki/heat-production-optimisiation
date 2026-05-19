@@ -181,8 +181,8 @@
                                            Height="1"
                                            Margin="0,0,0,5"/>
 
-                                <ListBox ItemsSource="{Binding Boilers}"
-                                         SelectedItem="{Binding SelectedBoiler, Mode=TwoWay}"
+                                <ListBox ItemsSource="{Binding Maintenance.Boilers}"
+                                         SelectedItem="{Binding Maintenance.SelectedBoiler, Mode=TwoWay}"
                                          Background="Transparent"
                                          BorderThickness="0"
                                          CornerRadius="4">
@@ -226,7 +226,7 @@
                         <Grid ColumnDefinitions="Auto,Auto,*"
                               Margin="0,20,0,0"
                               VerticalAlignment="Top"
-                              IsVisible="{Binding HasSelectedBoiler}">
+                              IsVisible="{Binding Maintenance.HasSelectedBoiler}">
 
                             <!-- Start -->
                             <StackPanel Grid.Column="0"
@@ -241,21 +241,21 @@
 
                                 <WrapPanel Margin="0">
 
-                                    <CalendarDatePicker SelectedDate="{Binding MaintenanceStartDate, Mode=TwoWay}"
+                                    <CalendarDatePicker SelectedDate="{Binding Maintenance.MaintenanceStartDate, Mode=TwoWay}"
                                                         Width="140"
                                                         Watermark="Select date"
                                                         Margin="0,0,10,0"/>
 
                                     <NumericUpDown Minimum="0"
                                                    Maximum="23"
-                                                   Value="{Binding MaintenanceStartHour, Mode=TwoWay}"
+                                                   Value="{Binding Maintenance.MaintenanceStartHour, Mode=TwoWay}"
                                                    FormatString="00"
                                                    Margin="0"
                                                    VerticalAlignment="Center"
                                                    Width="70"
                                                    ShowButtonSpinner="True"/>
 
-                                    <TextBlock Text="{Binding MaintenanceStartHour, StringFormat={}{0:00}}"
+                                    <TextBlock Text="{Binding Maintenance.MaintenanceStartHour, StringFormat={}{0:00}}"
                                                VerticalAlignment="Center"
                                                Margin="8,0,0,0"
                                                FontWeight="SemiBold"
@@ -287,13 +287,13 @@
                                     <Slider Grid.Column="0"
                                             Minimum="30"
                                             Maximum="60"
-                                            Value="{Binding MaintenanceDuration, Mode=TwoWay}"
+                                            Value="{Binding Maintenance.MaintenanceDuration, Mode=TwoWay}"
                                             TickFrequency="1"
                                             IsSnapToTickEnabled="True"
                                             VerticalAlignment="Center"/>
 
                                     <TextBlock Grid.Column="1"
-                                               Text="{Binding MaintenanceDuration}"
+                                               Text="{Binding Maintenance.MaintenanceDuration}"
                                                VerticalAlignment="Center"
                                                Margin="10,0,0,0"
                                                FontWeight="SemiBold"
@@ -310,7 +310,7 @@
                             <!-- Confirm -->
                             <Button Grid.Column="2"
                                     HorizontalAlignment="Right"
-                                    Command="{Binding ScheduleMaintenanceCommand}"
+                                    Command="{Binding Maintenance.ScheduleMaintenanceCommand}"
                                     Content="Select"
                                     FontWeight="SemiBold"
                                     CornerRadius="4"
@@ -396,7 +396,7 @@
                                            Fill="{DynamicResource AppBorder}"
                                            VerticalAlignment="Bottom"/>
 
-                                <ItemsControl ItemsSource="{Binding Schedules}"
+                                <ItemsControl ItemsSource="{Binding Maintenance.Schedules}"
                                               Grid.Row="2"
                                               Grid.ColumnSpan="5">
 

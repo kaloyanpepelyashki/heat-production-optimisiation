@@ -23,7 +23,7 @@ public static class OptimizationContextFactory
                 ? new[]
                 {
                     new OptimizationBoilerDefinition("GB1", "Gas"),
-                    new OptimizationBoilerDefinition("GB2", "Gas"),
+                    new OptimizationBoilerDefinition("GB3", "Gas"),
                     new OptimizationBoilerDefinition("GM1", "Gas"),
                     new OptimizationBoilerDefinition("EB1", "Electric"),
                 }

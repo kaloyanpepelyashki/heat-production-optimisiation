@@ -1,10 +1,9 @@
 using System;
-using System.Collections.ObjectModel;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Dv.App.Interfaces;
@@ -13,24 +12,21 @@ using Dv.App.Services;
 
 namespace Dv.App.ViewModels;
 
-public sealed class OptimizationViewModel : ViewModelBase
+public sealed partial class OptimizationViewModel : ViewModelBase
 {
-    public OptimizationChartsViewModel ChartsVM { get; } = new();
     private readonly IApiService apiService;
     private readonly SemaphoreSlim loadLock = new(1, 1);
-    private readonly OptimizationMaintenanceViewModel maintenanceModule;
     private List<SourceDataDto> cachedSourceData = [];
 
+    [ObservableProperty]
     private string selectedPeriod = "Winter";
+
+    [ObservableProperty]
     private string selectedScenario = "Scenario 2";
+
+    private OptimizationContext currentContext;
     private bool isLoading;
     private string? errorMessage;
-
-    private OptimizationContext currentContext =
-        OptimizationContextFactory.Create("Winter", "Scenario 2");
-
-    public bool HasSelectedBoiler =>
-        this.SelectedBoiler is not null;
 
     public OptimizationViewModel(
         IApiService apiService,
@@ -38,77 +34,22 @@ public sealed class OptimizationViewModel : ViewModelBase
         IDialogService dialogService)
     {
         this.apiService = apiService;
+        this.currentContext = OptimizationContextFactory.Create(this.selectedPeriod, this.selectedScenario);
 
-        this.maintenanceModule =
-            new OptimizationMaintenanceViewModel(
-                maintenanceService,
-                dialogService);
+        this.Maintenance = new OptimizationMaintenanceViewModel(maintenanceService, dialogService);
+        this.Maintenance.ApplyContext(this.currentContext);
 
-        this.CurrentContext =
-            OptimizationContextFactory.Create(
-                this.selectedPeriod,
-                this.selectedScenario);
-
-        this.maintenanceModule.PropertyChanged += this.ModuleOnPropertyChanged;
-
-        this.RefreshCommand =
-            new AsyncRelayCommand(this.LoadSourceDataAsync);
-
-        this.RunOptimizationCommand =
-            new AsyncRelayCommand(this.RunOptimizationAsync);
-
-        this.maintenanceModule.ApplyContext(this.CurrentContext);
+        MaintenanceStore.MaintenanceSchedules.CollectionChanged += (_, _) =>
+            this.RunOptimizationCommand.NotifyCanExecuteChanged();
     }
 
-    public ObservableCollection<string> Periods { get; } =
-    [
-        "Summer",
-        "Winter",
-    ];
+    public OptimizationChartsViewModel ChartsVM { get; } = new();
 
-    public ObservableCollection<string> Scenarios { get; } =
-    [
-        "Scenario 1",
-        "Scenario 2",
-    ];
+    public OptimizationMaintenanceViewModel Maintenance { get; }
 
-    public string SelectedPeriod
-    {
-        get => this.selectedPeriod;
-        set
-        {
-            if (this.SetProperty(ref this.selectedPeriod, value))
-            {
-                this.CurrentContext =
-                    OptimizationContextFactory.Create(
-                        this.SelectedPeriod,
-                        this.SelectedScenario);
+    public ObservableCollection<string> Periods { get; } = ["Summer", "Winter"];
 
-                this.RefreshSourceCharts();
-                this.maintenanceModule.ApplyContext(
-                    this.CurrentContext);
-            }
-        }
-    }
-
-    public string SelectedScenario
-    {
-        get => this.selectedScenario;
-        set
-        {
-            if (this.SetProperty(ref this.selectedScenario, value))
-            {
-                this.CurrentContext =
-                    OptimizationContextFactory.Create(
-                        this.SelectedPeriod,
-                        this.SelectedScenario);
-
-                this.RefreshSourceCharts();
-                this.maintenanceModule.ApplyContext(
-                    this.CurrentContext);
-            }
-        }
-    }
+    public ObservableCollection<string> Scenarios { get; } = ["Scenario 1", "Scenario 2"];
 
     public OptimizationContext CurrentContext
     {
@@ -118,47 +59,10 @@ public sealed class OptimizationViewModel : ViewModelBase
             if (this.SetProperty(ref this.currentContext, value))
             {
                 this.OnPropertyChanged(nameof(this.MaintenanceInstructions));
+                this.RunOptimizationCommand.NotifyCanExecuteChanged();
             }
         }
     }
-
-    public ObservableCollection<BoilerStatusViewModel> Boilers =>
-        this.maintenanceModule.Boilers;
-
-    public BoilerStatusViewModel? SelectedBoiler
-    {
-        get => this.maintenanceModule.SelectedBoiler;
-        set => this.maintenanceModule.SelectedBoiler = value;
-    }
-
-    public DateTime? MaintenanceStartDate
-    {
-        get => this.maintenanceModule.MaintenanceStartDate;
-        set => this.maintenanceModule.MaintenanceStartDate = value;
-    }
-
-    public int MaintenanceStartHour
-    {
-        get => this.maintenanceModule.MaintenanceStartHour;
-        set => this.maintenanceModule.MaintenanceStartHour = value;
-    }
-
-    public int MaintenanceDuration
-    {
-        get => this.maintenanceModule.MaintenanceDuration;
-        set => this.maintenanceModule.MaintenanceDuration = value;
-    }
-
-    public ObservableCollection<MaintenanceEvent> Schedules =>
-        this.maintenanceModule.Schedules;
-
-    public string MaintenanceInstructions =>
-        $"Click on a unit to mark it for maintenance. " +
-        $"Select a time interval lasting 30-60 hours. " +
-        $"The interval must stay within the selected " +
-        $"{this.CurrentContext.Period} period " +
-        $"({this.CurrentContext.StartDate:dd.MM.yyyy HH:mm} " +
-        $"to {this.CurrentContext.EndDate:dd.MM.yyyy HH:mm}).";
 
     public bool IsLoading
     {
@@ -172,14 +76,30 @@ public sealed class OptimizationViewModel : ViewModelBase
         private set => this.SetProperty(ref this.errorMessage, value);
     }
 
-    public IAsyncRelayCommand RefreshCommand { get; }
+    public string MaintenanceInstructions =>
+        $"Click on a unit to mark it for maintenance. " +
+        $"Select a time interval lasting 30-60 hours. " +
+        $"The interval must stay within the selected " +
+        $"{this.CurrentContext.Period} period " +
+        $"({this.CurrentContext.StartDate:dd.MM.yyyy HH:mm} " +
+        $"to {this.CurrentContext.EndDate:dd.MM.yyyy HH:mm}).";
 
-    public IAsyncRelayCommand RunOptimizationCommand { get; }
+    partial void OnSelectedPeriodChanged(string value)
+    {
+        this.CurrentContext = OptimizationContextFactory.Create(value, this.SelectedScenario);
+        this.RefreshSourceCharts();
+        this.Maintenance.ApplyContext(this.CurrentContext);
+    }
 
-    public ICommand ScheduleMaintenanceCommand =>
-        this.maintenanceModule.ScheduleMaintenanceCommand;
+    partial void OnSelectedScenarioChanged(string value)
+    {
+        this.CurrentContext = OptimizationContextFactory.Create(this.SelectedPeriod, value);
+        this.RefreshSourceCharts();
+        this.Maintenance.ApplyContext(this.CurrentContext);
+    }
 
-    private async Task LoadSourceDataAsync()
+    [RelayCommand]
+    private async Task RefreshAsync()
     {
         await this.loadLock.WaitAsync();
 
@@ -200,14 +120,11 @@ public sealed class OptimizationViewModel : ViewModelBase
             }
             catch (Exception ex)
             {
-                this.ErrorMessage =
-                    $"Failed to load source data: {ex.Message}";
+                this.ErrorMessage = $"Failed to load source data: {ex.Message}";
             }
 
             this.cachedSourceData = sourceData;
-            this.ChartsVM.LoadSourceData(
-                this.cachedSourceData,
-                this.CurrentContext);
+            this.ChartsVM.LoadSourceData(this.cachedSourceData, this.CurrentContext);
         }
         catch (Exception ex)
         {
@@ -220,6 +137,7 @@ public sealed class OptimizationViewModel : ViewModelBase
         }
     }
 
+    [RelayCommand(CanExecute = nameof(CanRunOptimization))]
     private async Task RunOptimizationAsync()
     {
         try
@@ -239,15 +157,11 @@ public sealed class OptimizationViewModel : ViewModelBase
 
             if (response?.Data is null)
             {
-                this.ErrorMessage =
-                    "Optimization returned no data.";
-
+                this.ErrorMessage = "Optimization returned no data.";
                 return;
             }
 
-            this.ChartsVM.LoadOptimizationResult(
-                response.Data,
-                this.CurrentContext);
+            this.ChartsVM.LoadOptimizationResult(response.Data, this.CurrentContext);
         }
         catch (Exception ex)
         {
@@ -259,6 +173,15 @@ public sealed class OptimizationViewModel : ViewModelBase
         }
     }
 
+    private bool CanRunOptimization()
+    {
+        var periodId = this.CurrentContext.PeriodId.ToString();
+        var scenarioId = this.CurrentContext.ScenarioId.ToString();
+
+        return MaintenanceStore.MaintenanceSchedules.Any(s =>
+            s.Period == periodId && s.Scenario == scenarioId);
+    }
+
     private OptimizationRequestDto BuildOptimizationRequest()
     {
         var periodId = this.CurrentContext.PeriodId.ToString();
@@ -267,13 +190,11 @@ public sealed class OptimizationViewModel : ViewModelBase
         var schedule = MaintenanceStore.MaintenanceSchedules
             .FirstOrDefault(s => s.Period == periodId && s.Scenario == scenarioId);
 
-        var maintenanceId = schedule?.MaintenanceId ?? 0;
-
         return new OptimizationRequestDto
         {
             ScenarioId = this.CurrentContext.ScenarioId,
             PeriodId = this.CurrentContext.PeriodId,
-            MaintenanceId = maintenanceId,
+            MaintenanceId = schedule?.MaintenanceId ?? 0,
             TimeFrom = this.CurrentContext.StartDate,
             TimeTo = this.CurrentContext.EndDate,
         };
@@ -286,20 +207,6 @@ public sealed class OptimizationViewModel : ViewModelBase
             return;
         }
 
-        this.ChartsVM.LoadSourceData(
-            this.cachedSourceData,
-            this.CurrentContext);
-    }
-
-    private void ModuleOnPropertyChanged(
-        object? sender,
-        System.ComponentModel.PropertyChangedEventArgs e)
-    {
-        if (string.IsNullOrWhiteSpace(e.PropertyName))
-        {
-            return;
-        }
-
-        this.OnPropertyChanged(e.PropertyName);
+        this.ChartsVM.LoadSourceData(this.cachedSourceData, this.CurrentContext);
     }
 }

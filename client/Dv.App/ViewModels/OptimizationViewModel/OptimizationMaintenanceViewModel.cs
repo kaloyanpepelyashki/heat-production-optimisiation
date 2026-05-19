@@ -15,6 +15,8 @@ public sealed partial class OptimizationMaintenanceViewModel : ObservableObject
 {
     private readonly MaintenanceService maintenanceService;
     private readonly IDialogService dialogService;
+
+    [ObservableProperty]
     private OptimizationContext currentContext = OptimizationContextFactory.Create("Summer", "Scenario 1");
 
     [ObservableProperty]
@@ -35,6 +37,8 @@ public sealed partial class OptimizationMaintenanceViewModel : ObservableObject
     [ObservableProperty]
     private ObservableCollection<MaintenanceEvent> schedules = new();
 
+    public bool HasSelectedBoiler => this.SelectedBoiler is not null;
+
     public OptimizationMaintenanceViewModel(MaintenanceService maintenanceService, IDialogService dialogService)
     {
         this.maintenanceService = maintenanceService;
@@ -44,14 +48,8 @@ public sealed partial class OptimizationMaintenanceViewModel : ObservableObject
         this.ApplyContext(this.currentContext);
     }
 
-    public OptimizationContext CurrentContext
-    {
-        get => this.currentContext;
-        private set => this.SetProperty(ref this.currentContext, value);
-    }
-
-    public string MaintenanceInstructions =>
-        $"Click on a unit to mark it for maintenance. Select a time interval lasting 30-60 hours. The interval must stay within the selected {this.CurrentContext.Period} period ({this.CurrentContext.StartDate:dd.MM.yyyy HH:mm} to {this.CurrentContext.EndDate:dd.MM.yyyy HH:mm}).";
+    partial void OnSelectedBoilerChanged(BoilerStatusViewModel? value) =>
+        this.OnPropertyChanged(nameof(this.HasSelectedBoiler));
 
     [RelayCommand]
     private async Task ScheduleMaintenanceAsync()
@@ -123,44 +121,37 @@ public sealed partial class OptimizationMaintenanceViewModel : ObservableObject
         this.MaintenanceStartHour = 0;
         this.MaintenanceDuration = 30;
 
-        var selectedBoilerId = this.SelectedBoiler?.BoilerId;
-        this.Boilers = new ObservableCollection<BoilerStatusViewModel>(context.Boilers.Select(boiler => new BoilerStatusViewModel(boiler.BoilerId, boiler.FuelType, context.Period)));
+        var previousBoilerId = this.SelectedBoiler?.BoilerId;
+        this.Boilers = new ObservableCollection<BoilerStatusViewModel>(
+            context.Boilers.Select(b => new BoilerStatusViewModel(b.BoilerId, b.FuelType, context.Period)));
 
         this.RefreshFromStore();
 
-        if (!string.IsNullOrWhiteSpace(selectedBoilerId))
-        {
-            this.SelectedBoiler = this.Boilers.FirstOrDefault(boiler => boiler.BoilerId == selectedBoilerId)
-                ?? this.Boilers.FirstOrDefault();
-        }
-        else
-        {
-            this.SelectedBoiler = this.Boilers.FirstOrDefault();
-        }
+        this.SelectedBoiler = (!string.IsNullOrWhiteSpace(previousBoilerId)
+            ? this.Boilers.FirstOrDefault(b => b.BoilerId == previousBoilerId)
+            : null)
+            ?? this.Boilers.FirstOrDefault();
     }
 
-    private void OnMaintenanceStoreChanged(object? sender, NotifyCollectionChangedEventArgs e)
-    {
+    private void OnMaintenanceStoreChanged(object? sender, NotifyCollectionChangedEventArgs e) =>
         this.RefreshFromStore();
-    }
 
     private void RefreshFromStore()
     {
         var periodId = this.CurrentContext.PeriodId.ToString();
         var scenarioId = this.CurrentContext.ScenarioId.ToString();
 
-        this.Schedules = new ObservableCollection<MaintenanceEvent>(MaintenanceStore.MaintenanceSchedules
-            .Where(schedule => schedule.Period == periodId && schedule.Scenario == scenarioId)
-            .OrderBy(schedule => schedule.StartDate));
+        this.Schedules = new ObservableCollection<MaintenanceEvent>(
+            MaintenanceStore.MaintenanceSchedules
+                .Where(s => s.Period == periodId && s.Scenario == scenarioId)
+                .OrderBy(s => s.StartDate));
 
         foreach (var boiler in this.Boilers)
         {
-            var isUnavailable = MaintenanceStore.MaintenanceSchedules.Any(schedule =>
-                schedule.Period == periodId
-                && schedule.Scenario == scenarioId
-                && schedule.AssetName == boiler.BoilerId);
-
-            boiler.SetUnavailable(isUnavailable);
+            boiler.SetUnavailable(MaintenanceStore.MaintenanceSchedules.Any(s =>
+                s.Period == periodId &&
+                s.Scenario == scenarioId &&
+                s.AssetName == boiler.BoilerId));
         }
     }
 
@@ -169,7 +160,7 @@ public sealed partial class OptimizationMaintenanceViewModel : ObservableObject
         var periodId = this.CurrentContext.PeriodId.ToString();
         var scenarioId = this.CurrentContext.ScenarioId.ToString();
 
-        return !MaintenanceStore.MaintenanceSchedules.Any(schedule =>
-            schedule.Period == periodId && schedule.Scenario == scenarioId);
+        return !MaintenanceStore.MaintenanceSchedules.Any(s =>
+            s.Period == periodId && s.Scenario == scenarioId);
     }
 }
