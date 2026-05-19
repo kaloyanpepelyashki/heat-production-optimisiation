@@ -10,17 +10,22 @@
         MinWidth="700"
         MinHeight="500"
         Title="Heat Optimization">
+
     <Grid ColumnDefinitions="250,*">
+
+        <!-- Sidebar -->
         <Border Grid.Column="0"
                 Background="{DynamicResource AppSidebar}"
                 Padding="16">
-            <Grid RowDefinitions="Auto,*"
-                  RowSpacing="18">
+
+            <Grid RowDefinitions="Auto,*,Auto">
+
                 <TextBlock Grid.Row="0"
                            Text="Heat Optimization"
                            Foreground="White"
                            FontSize="22"
-                           FontWeight="SemiBold" />
+                           FontWeight="SemiBold"
+                           Margin="0,0,0,0"/>
 
                 <ListBox Grid.Row="1"
                          Classes="nav-list"
@@ -33,17 +38,51 @@
                         <DataTemplate x:DataType="models:NavigationItem">
                             <TextBlock Text="{Binding Title}"
                                        FontSize="18"
-                                       Foreground="White" />
+                                       Foreground="White"/>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
+
+                <!-- Service wakeup status at bottom of sidebar -->
+                <StackPanel Grid.Row="2" Spacing="6" Margin="0,8,0,0">
+
+                    <!-- Waking up indicator -->
+                    <StackPanel IsVisible="{Binding IsWakingUp}" Spacing="6">
+                        <ProgressBar IsIndeterminate="True"
+                                     Height="3"
+                                     Background="Transparent"
+                                     Foreground="White"
+                                     Opacity="0.7"/>
+                        <TextBlock Text="Connecting to services..."
+                                   FontSize="11"
+                                   Foreground="White"
+                                   Opacity="0.7"/>
+                    </StackPanel>
+
+                    <!-- Error indicator -->
+                    <StackPanel IsVisible="{Binding StartUpError, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                Spacing="4">
+                        <TextBlock Text="⚠ Service unavailable"
+                                   FontSize="11"
+                                   Foreground="#FCA5A5"/>
+                        <TextBlock Text="{Binding StartUpError}"
+                                   FontSize="10"
+                                   Foreground="#FCA5A5"
+                                   TextWrapping="Wrap"
+                                   Opacity="0.8"/>
+                    </StackPanel>
+
+                </StackPanel>
+
             </Grid>
         </Border>
 
+        <!-- Content area -->
         <Border Grid.Column="1"
                 Background="{DynamicResource AppBackground}"
                 Padding="24">
-            <ContentControl Content="{Binding CurrentViewModel}" />
+            <ContentControl Content="{Binding CurrentViewModel}"/>
         </Border>
+
     </Grid>
 </Window>

@@ -20,6 +20,9 @@ public sealed partial class OptimizationViewModel : ViewModelBase
     private readonly SemaphoreSlim loadLock = new(1, 1);
     private List<SourceDataDto> cachedSourceData = [];
 
+    private readonly Dictionary<(int, int, int), (OptimisationRunDto Data, OptimizationContext Context)>
+        cachedOptimizationResults = new();
+
     [ObservableProperty]
     private string selectedPeriod = "Winter";
 
@@ -28,6 +31,7 @@ public sealed partial class OptimizationViewModel : ViewModelBase
 
     private OptimizationContext currentContext;
     private bool isLoading;
+    private bool hasOptimizationResults;
     private string? errorMessage;
 
     public OptimizationViewModel(
@@ -41,16 +45,17 @@ public sealed partial class OptimizationViewModel : ViewModelBase
         this.Maintenance = new OptimizationMaintenanceViewModel(maintenanceService, dialogService);
         this.Maintenance.ApplyContext(this.currentContext);
 
+        this.CompareVM = new OptimizationCompareViewModel();
+
         MaintenanceStore.MaintenanceSchedules.CollectionChanged += (_, _) =>
             this.RunOptimizationCommand.NotifyCanExecuteChanged();
     }
 
     public OptimizationChartsViewModel ChartsVM { get; } = new();
-
     public OptimizationMaintenanceViewModel Maintenance { get; }
+    public OptimizationCompareViewModel CompareVM { get; }
 
     public ObservableCollection<string> Periods { get; } = ["Summer", "Winter"];
-
     public ObservableCollection<string> Scenarios { get; } = ["Scenario 1", "Scenario 2"];
 
     public OptimizationContext CurrentContext
@@ -61,6 +66,7 @@ public sealed partial class OptimizationViewModel : ViewModelBase
             if (this.SetProperty(ref this.currentContext, value))
             {
                 this.OnPropertyChanged(nameof(this.MaintenanceInstructions));
+                this.OnPropertyChanged(nameof(this.DateRangeText));
                 this.RunOptimizationCommand.NotifyCanExecuteChanged();
             }
         }
@@ -70,6 +76,12 @@ public sealed partial class OptimizationViewModel : ViewModelBase
     {
         get => this.isLoading;
         private set => this.SetProperty(ref this.isLoading, value);
+    }
+
+    public bool HasOptimizationResults
+    {
+        get => this.hasOptimizationResults;
+        private set => this.SetProperty(ref this.hasOptimizationResults, value);
     }
 
     public string? ErrorMessage
@@ -86,11 +98,15 @@ public sealed partial class OptimizationViewModel : ViewModelBase
         $"({this.CurrentContext.StartDate:dd.MM.yyyy HH:mm} " +
         $"to {this.CurrentContext.EndDate:dd.MM.yyyy HH:mm}).";
 
+    public string DateRangeText =>
+        $"{this.CurrentContext.StartDate:dd MMM yyyy} – {this.CurrentContext.EndDate:dd MMM yyyy}";
+
     partial void OnSelectedPeriodChanged(string value)
     {
         this.CurrentContext = OptimizationContextFactory.Create(value, this.SelectedScenario);
         this.RefreshSourceCharts();
         this.Maintenance.ApplyContext(this.CurrentContext);
+        this.RestoreOrClearOptimizationResults();
     }
 
     partial void OnSelectedScenarioChanged(string value)
@@ -98,11 +114,19 @@ public sealed partial class OptimizationViewModel : ViewModelBase
         this.CurrentContext = OptimizationContextFactory.Create(this.SelectedPeriod, value);
         this.RefreshSourceCharts();
         this.Maintenance.ApplyContext(this.CurrentContext);
+        this.RestoreOrClearOptimizationResults();
     }
 
     [RelayCommand]
     private async Task RefreshAsync()
     {
+        if (this.cachedSourceData.Count > 0)
+        {
+            this.ChartsVM.LoadSourceData(this.cachedSourceData, this.CurrentContext);
+            this.RestoreOrClearOptimizationResults();
+            return;
+        }
+
         await this.loadLock.WaitAsync();
 
         try
@@ -127,6 +151,8 @@ public sealed partial class OptimizationViewModel : ViewModelBase
 
             this.cachedSourceData = sourceData;
             this.ChartsVM.LoadSourceData(this.cachedSourceData, this.CurrentContext);
+            this.CompareVM.UpdateSourceData(this.cachedSourceData, this.CurrentContext);
+            this.RestoreOrClearOptimizationResults();
         }
         catch (Exception ex)
         {
@@ -148,6 +174,15 @@ public sealed partial class OptimizationViewModel : ViewModelBase
             this.ErrorMessage = null;
 
             var request = this.BuildOptimizationRequest();
+            var cacheKey = (this.CurrentContext.PeriodId, this.CurrentContext.ScenarioId, request.MaintenanceId);
+
+            if (this.cachedOptimizationResults.TryGetValue(cacheKey, out var cached))
+            {
+                this.ChartsVM.LoadOptimizationResult(cached.Data, this.CurrentContext);
+                this.HasOptimizationResults = true;
+                return;
+            }
+
             var response = await this.PostOptimizationAsync(request);
 
             if (response?.Data is null)
@@ -156,7 +191,19 @@ public sealed partial class OptimizationViewModel : ViewModelBase
                 return;
             }
 
+            this.cachedOptimizationResults[cacheKey] = (response.Data, this.CurrentContext);
             this.ChartsVM.LoadOptimizationResult(response.Data, this.CurrentContext);
+            this.HasOptimizationResults = true;
+
+            this.CompareVM.NotifyResultAvailable(
+                this.CurrentContext.PeriodId,
+                this.CurrentContext.ScenarioId,
+                response.Data,
+                this.CurrentContext);
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.ServiceUnavailable)
+        {
+            this.ErrorMessage = "The optimization service is unavailable. Please try again in a moment.";
         }
         catch (Exception ex)
         {
@@ -190,6 +237,22 @@ public sealed partial class OptimizationViewModel : ViewModelBase
         throw new TimeoutException("Optimization service did not become available. Please try again in a moment.");
     }
 
+    private async Task<ApiResponseModel<OptimisationRunDto>?> PostOptimizationAsync(OptimizationRequestDto request)
+    {
+        try
+        {
+            return await this.apiService.PostAsync<OptimizationRequestDto, ApiResponseModel<OptimisationRunDto>>(
+                BackendService.Rdm, "optimisation", request);
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.ServiceUnavailable)
+        {
+            this.ErrorMessage = "Service is starting up, retrying in 5 seconds…";
+            await Task.Delay(5000);
+            return await this.apiService.PostAsync<OptimizationRequestDto, ApiResponseModel<OptimisationRunDto>>(
+                BackendService.Rdm, "optimisation", request);
+        }
+    }
+
     private bool CanRunOptimization()
     {
         var periodId = this.CurrentContext.PeriodId.ToString();
@@ -220,10 +283,36 @@ public sealed partial class OptimizationViewModel : ViewModelBase
     private void RefreshSourceCharts()
     {
         if (this.cachedSourceData.Count == 0)
-        {
             return;
-        }
 
         this.ChartsVM.LoadSourceData(this.cachedSourceData, this.CurrentContext);
+        this.CompareVM.UpdateSourceData(this.cachedSourceData, this.CurrentContext);
+    }
+
+    private void RestoreOrClearOptimizationResults()
+    {
+        var periodId = this.CurrentContext.PeriodId.ToString();
+        var scenarioId = this.CurrentContext.ScenarioId.ToString();
+
+        var schedule = MaintenanceStore.MaintenanceSchedules
+            .FirstOrDefault(s => s.Period == periodId && s.Scenario == scenarioId);
+
+        var lookupKey = (this.CurrentContext.PeriodId, this.CurrentContext.ScenarioId, schedule?.MaintenanceId ?? 0);
+
+        if (this.cachedOptimizationResults.TryGetValue(lookupKey, out var cached))
+        {
+            this.ChartsVM.LoadOptimizationResult(cached.Data, this.CurrentContext);
+            this.CompareVM.NotifyResultAvailable(
+                this.CurrentContext.PeriodId,
+                this.CurrentContext.ScenarioId,
+                cached.Data,
+                cached.Context);
+            this.HasOptimizationResults = true;
+        }
+        else
+        {
+            this.ChartsVM.ClearOptimizationCharts();
+            this.HasOptimizationResults = false;
+        }
     }
 }

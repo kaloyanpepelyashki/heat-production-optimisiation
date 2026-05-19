@@ -1,0 +1,82 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Dv.App.ViewModels"
+             xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.Avalonia;assembly=LiveChartsCore.SkiaSharpView.Avalonia"
+             x:Class="Dv.App.Views.Optimization.Components.CompareChartSlot"
+             x:DataType="vm:ChartSlotViewModel"
+             VerticalAlignment="Stretch">
+
+    <Border Background="{DynamicResource AppCard}"
+            BorderBrush="{DynamicResource AppBorder}"
+            BorderThickness="1"
+            CornerRadius="8"
+            Padding="12"
+            VerticalAlignment="Stretch">
+
+        <Grid RowDefinitions="Auto,*">
+
+            <!-- Series pickers -->
+            <Grid Grid.Row="0" ColumnDefinitions="*,Auto,*,Auto" Margin="0,0,0,8">
+
+                <ComboBox Grid.Column="0"
+                          ItemsSource="{Binding AvailableSeriesKeys}"
+                          SelectedItem="{Binding PrimarySeriesKey, Mode=TwoWay}"
+                          PlaceholderText="Primary series..."
+                          HorizontalAlignment="Stretch"
+                          FontSize="11"/>
+
+                <TextBlock Grid.Column="1"
+                           Text="+"
+                           FontSize="11"
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource AppTextMuted}"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Center"
+                           Margin="6,0"/>
+
+                <ComboBox Grid.Column="2"
+                          ItemsSource="{Binding AvailableSeriesKeys}"
+                          SelectedItem="{Binding OverlaySeriesKey, Mode=TwoWay}"
+                          PlaceholderText="Overlay (optional)"
+                          HorizontalAlignment="Stretch"
+                          FontSize="11"/>
+
+                <Button Grid.Column="3"
+                        Content="✕"
+                        Command="{Binding ClearOverlayCommand}"
+                        Width="22" Height="22"
+                        FontSize="9"
+                        Padding="0"
+                        HorizontalContentAlignment="Center"
+                        VerticalContentAlignment="Center"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Foreground="{DynamicResource AppTextMuted}"
+                        VerticalAlignment="Center"
+                        Margin="4,0,0,0"
+                        IsVisible="{Binding OverlaySeriesKey, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+            </Grid>
+
+            <!-- Chart / empty state — fills remaining height -->
+            <Grid Grid.Row="1" MinHeight="180">
+
+                <Border IsVisible="{Binding !HasData}"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+                    <TextBlock Text="Select a series above to plot"
+                               FontSize="13"
+                               Foreground="{DynamicResource AppTextMuted}"/>
+                </Border>
+
+                <lvc:CartesianChart IsVisible="{Binding HasData}"
+                                    Series="{Binding CompareSeries}"
+                                    XAxes="{Binding XAxes}"
+                                    YAxes="{Binding YAxes}"
+                                    LegendPosition="{Binding ChartLegendPosition}"
+                                    TooltipTextSize="11"
+                                    Background="{DynamicResource AppBackground}"
+                                    ZoomMode="X"/>
+            </Grid>
+        </Grid>
+    </Border>
+</UserControl>

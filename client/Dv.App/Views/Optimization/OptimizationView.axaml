@@ -2,16 +2,73 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:components="using:Dv.App.Views.Optimization.Components"
              xmlns:vm="using:Dv.App.ViewModels"
+             xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.Avalonia;assembly=LiveChartsCore.SkiaSharpView.Avalonia"
              x:Class="Dv.App.Views.OptimizationView"
              x:DataType="vm:OptimizationViewModel">
 
-    <ScrollViewer>
-        <StackPanel Margin="20" Spacing="20">
+    <Grid>
 
-            <components:OptimizerCard DataContext="{Binding}" />
+        <TabControl>
 
-            <components:GraphsCard DataContext="{Binding}" />
+            <TabItem Header="Optimize">
+                <ScrollViewer>
+                    <StackPanel Margin="20" Spacing="20">
+                        <components:OptimizerCard DataContext="{Binding}"/>
+                        <components:GraphsCard DataContext="{Binding}"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
 
-        </StackPanel>
-    </ScrollViewer>
+            <TabItem Header="Compare">
+                <components:OptimizationCompareView DataContext="{Binding}"/>
+            </TabItem>
+
+        </TabControl>
+
+        <!-- Fullscreen chart overlay — covers entire view when a chart is maximized -->
+        <Grid IsVisible="{Binding ChartsVM.IsMaximized}"
+              ZIndex="100"
+              Background="{DynamicResource AppBackground}">
+
+            <Grid Margin="24" RowDefinitions="Auto,*">
+
+                <!-- Header row -->
+                <Grid Grid.Row="0"
+                      ColumnDefinitions="*,Auto"
+                      Margin="0,0,0,16">
+
+                    <TextBlock Grid.Column="0"
+                               Text="{Binding ChartsVM.MaximizedTitle}"
+                               FontSize="22"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource AppTextPrimary}"
+                               VerticalAlignment="Center"/>
+
+                    <Button Grid.Column="1"
+                            Command="{Binding ChartsVM.CloseMaximizedCommand}"
+                            Content="✕"
+                            FontSize="16"
+                            Width="36" Height="36"
+                            Padding="0"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Foreground="{DynamicResource AppTextPrimary}"
+                            ToolTip.Tip="Close"/>
+                </Grid>
+
+                <!-- Maximized chart -->
+                <lvc:CartesianChart Grid.Row="1"
+                                    Series="{Binding ChartsVM.MaximizedSeries}"
+                                    XAxes="{Binding ChartsVM.MaximizedXAxes}"
+                                    YAxes="{Binding ChartsVM.MaximizedYAxes}"
+                                    Background="{DynamicResource AppBackground}"
+                                    TooltipTextSize="11"
+                                    ZoomMode="X"/>
+            </Grid>
+        </Grid>
+
+    </Grid>
+
 </UserControl>

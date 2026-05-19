@@ -1,168 +1,241 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:components="using:Dv.App.Views.Optimization.Components"
              xmlns:vm="using:Dv.App.ViewModels"
              x:Class="Dv.App.Views.Optimization.Components.GraphsCard"
              xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.Avalonia;assembly=LiveChartsCore.SkiaSharpView.Avalonia"
              x:DataType="vm:OptimizationViewModel"
              x:CompileBindings="True">
 
+    <UserControl.Styles>
+        <Style Selector="Button.icon-btn">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="Button.icon-btn:pointerover">
+            <Setter Property="Background" Value="{DynamicResource AppCardInner}"/>
+        </Style>
+        <Style Selector="Button.icon-btn:pressed">
+            <Setter Property="Background" Value="{DynamicResource AppBorder}"/>
+        </Style>
+    </UserControl.Styles>
+
     <StackPanel Spacing="16">
-        <Border
-            Margin="0,16,0,0"
-            Background="{DynamicResource AppCardInner}"
-            BorderBrush="{DynamicResource AppBorder}"
-            BorderThickness="1"
-            CornerRadius="8"
-            Padding="16">
-            
-            <StackPanel Spacing="12">
-                <TextBlock 
-                    Text="HeatDemand"
-                    FontSize="18"
-                    FontWeight="SemiBold"
-                    Foreground="{DynamicResource AppTextPrimary}" />
-                    
-                <Grid Height="260">
-                    <lvc:CartesianChart
-                        x:Name="HeatDemandChart"
-                        Background="{DynamicResource AppBackground}"
-                        ZoomMode="None"
-                        Margin="0">
-                    </lvc:CartesianChart>
+
+        <!-- Optimization results section: hidden until first run, animates in -->
+        <Border x:Name="OptimizationSection"
+                MaxHeight="0"
+                Opacity="0"
+                ClipToBounds="True">
+
+            <Border.Transitions>
+                <Transitions>
+                    <DoubleTransition Property="MaxHeight" Duration="0:0:0.5" Easing="CubicEaseOut"/>
+                    <DoubleTransition Property="Opacity" Duration="0:0:0.35"/>
+                </Transitions>
+            </Border.Transitions>
+
+            <StackPanel Spacing="16">
+
+                <!-- Hero: optimization results stacked area -->
+                <Border Background="{DynamicResource AppCardInner}"
+                        BorderBrush="{DynamicResource AppBorder}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="16">
+
+                    <StackPanel Spacing="12">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Text="Optimization Results"
+                                       FontSize="18" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource AppTextPrimary}"
+                                       VerticalAlignment="Center"/>
+                            <Button x:Name="MaximizeOptimizationResultsBtn"
+                                    Grid.Column="1"
+                                    Classes="icon-btn"
+                                    Width="32" Height="32"
+                                    Padding="0"
+                                    Foreground="{DynamicResource AppTextMuted}"
+                                    VerticalAlignment="Center"
+                                    ToolTip.Tip="Expand">
+                                <Viewbox Width="12" Height="12">
+                                    <Canvas Width="15" Height="15">
+                                        <Path Data="M5,0 L0,0 L0,5 M10,0 L15,0 L15,5 M0,10 L0,15 L5,15 M10,15 L15,15 L15,10"
+                                              Stroke="{DynamicResource AppTextMuted}" StrokeThickness="1.5" StrokeLineCap="Round"/>
+                                    </Canvas>
+                                </Viewbox>
+                            </Button>
+                        </Grid>
+
+                        <Grid Height="300">
+                            <lvc:CartesianChart x:Name="OptimizationResultsChart"
+                                                Background="{DynamicResource AppBackground}"
+                                                ZoomMode="X"
+                                                    TooltipTextSize="11"/>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Metrics row: Expenses | CO2 -->
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+
+                    <Border Grid.Column="0"
+                            Background="{DynamicResource AppCardInner}"
+                            BorderBrush="{DynamicResource AppBorder}"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="16">
+
+                        <StackPanel Spacing="12">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Text="Expenses"
+                                           FontSize="18" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource AppTextPrimary}"
+                                           VerticalAlignment="Center"/>
+                                <Button x:Name="MaximizeExpensesBtn"
+                                        Grid.Column="1"
+                                        Classes="icon-btn"
+                                        Width="32" Height="32" Padding="0"
+                                        Foreground="{DynamicResource AppTextMuted}"
+                                        VerticalAlignment="Center"
+                                        ToolTip.Tip="Expand">
+                                    <Viewbox Width="12" Height="12">
+                                        <Canvas Width="15" Height="15">
+                                            <Path Data="M5,0 L0,0 L0,5 M10,0 L15,0 L15,5 M0,10 L0,15 L5,15 M10,15 L15,15 L15,10"
+                                                  Stroke="{DynamicResource AppTextMuted}" StrokeThickness="1.5" StrokeLineCap="Round"/>
+                                        </Canvas>
+                                    </Viewbox>
+                                </Button>
+                            </Grid>
+                            <Grid Height="220">
+                                <lvc:CartesianChart x:Name="ExpensesChart"
+                                                    Background="{DynamicResource AppBackground}"
+                                                    ZoomMode="X"
+                                                    TooltipTextSize="11"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="1"
+                            Background="{DynamicResource AppCardInner}"
+                            BorderBrush="{DynamicResource AppBorder}"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="16">
+
+                        <StackPanel Spacing="12">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Text="CO2 Emissions"
+                                           FontSize="18" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource AppTextPrimary}"
+                                           VerticalAlignment="Center"/>
+                                <Button x:Name="MaximizeCo2Btn"
+                                        Grid.Column="1"
+                                        Classes="icon-btn"
+                                        Width="32" Height="32" Padding="0"
+                                        Foreground="{DynamicResource AppTextMuted}"
+                                        VerticalAlignment="Center"
+                                        ToolTip.Tip="Expand">
+                                    <Viewbox Width="12" Height="12">
+                                        <Canvas Width="15" Height="15">
+                                            <Path Data="M5,0 L0,0 L0,5 M10,0 L15,0 L15,5 M0,10 L0,15 L5,15 M10,15 L15,15 L15,10"
+                                                  Stroke="{DynamicResource AppTextMuted}" StrokeThickness="1.5" StrokeLineCap="Round"/>
+                                        </Canvas>
+                                    </Viewbox>
+                                </Button>
+                            </Grid>
+                            <Grid Height="220">
+                                <lvc:CartesianChart x:Name="Co2EmissionsChart"
+                                                    Background="{DynamicResource AppBackground}"
+                                                    ZoomMode="X"
+                                                    TooltipTextSize="11"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
                 </Grid>
+
             </StackPanel>
         </Border>
 
-        <Border
-            Margin="0,16,0,0"
-            Background="{DynamicResource AppCardInner}"
-            BorderBrush="{DynamicResource AppBorder}"
-            BorderThickness="1"
-            CornerRadius="8"
-            Padding="16">
-            
-            <StackPanel Spacing="12">
-                <TextBlock 
-                    Text="Electticity price"
-                    FontSize="18"
-                    FontWeight="SemiBold"
-                    Foreground="{DynamicResource AppTextPrimary}" />
-                    
-                <Grid Height="260">
-                    <lvc:CartesianChart
-                        x:Name="ElectricityPriceChart"
-                        Background="{DynamicResource AppBackground}"
-                        ZoomMode="None"
-                        Margin="0">
-                    </lvc:CartesianChart>
-                </Grid>
-            </StackPanel>
-        </Border>
-        
-        <Border
-            Margin="0,16,0,0"
-            Background="{DynamicResource AppCardInner}"
-            BorderBrush="{DynamicResource AppBorder}"
-            BorderThickness="1"
-            CornerRadius="8"
-            Padding="16">
-            
-            <StackPanel Spacing="12">
-                <TextBlock 
-                    Text="Optimization results"
-                    FontSize="18"
-                    FontWeight="SemiBold"
-                    Foreground="{DynamicResource AppTextPrimary}" />
-                    
-                <Grid Height="260">
-                    <lvc:CartesianChart
-                        x:Name="OptimizationResultsChart"
-                        Background="{DynamicResource AppBackground}"
-                        ZoomMode="None"
-                        Margin="0">
-                    </lvc:CartesianChart>
-                </Grid>
-            </StackPanel>
-        </Border>
+        <!-- Source data row: Heat Demand | Electricity Price & Consumption -->
+        <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
 
-        <Border
-            Margin="0,16,0,0"
-            Background="{DynamicResource AppCardInner}"
-            BorderBrush="{DynamicResource AppBorder}"
-            BorderThickness="1"
-            CornerRadius="8"
-            Padding="16">
-            
-            <StackPanel Spacing="12">
-                <TextBlock 
-                    Text="Electticity consumption"
-                    FontSize="18"
-                    FontWeight="SemiBold"
-                    Foreground="{DynamicResource AppTextPrimary}" />
-                    
-                <Grid Height="260">
-                    <lvc:CartesianChart
-                        x:Name="ElectricityConsumptionChart"
-                        Background="{DynamicResource AppBackground}"
-                        ZoomMode="None"
-                        Margin="0">
-                    </lvc:CartesianChart>
-                </Grid>
-            </StackPanel>
-        </Border>
-        
-        <Border
-            Margin="0,16,0,0"
-            Background="{DynamicResource AppCardInner}"
-            BorderBrush="{DynamicResource AppBorder}"
-            BorderThickness="1"
-            CornerRadius="8"
-            Padding="16">
-            
-            <StackPanel Spacing="12">
-                <TextBlock 
-                    Text="Expenses"
-                    FontSize="18"
-                    FontWeight="SemiBold"
-                    Foreground="{DynamicResource AppTextPrimary}" />
-                    
-                <Grid Height="260">
-                    <lvc:CartesianChart
-                        x:Name="ExpensesChart"
-                        Background="{DynamicResource AppBackground}"
-                        ZoomMode="None"
-                        Margin="0">
-                    </lvc:CartesianChart>
-                </Grid>
-            </StackPanel>
-        </Border>
-        
-        <Border
-            Margin="0,16,0,0"
-            Background="{DynamicResource AppCardInner}"
-            BorderBrush="{DynamicResource AppBorder}"
-            BorderThickness="1"
-            CornerRadius="8"
-            Padding="16">
-            
-            <StackPanel Spacing="12">
-                <TextBlock 
-                    Text="CO2 Emissions"
-                    FontSize="18"
-                    FontWeight="SemiBold"
-                    Foreground="{DynamicResource AppTextPrimary}" />
-                    
-                <Grid Height="260">
-                    <lvc:CartesianChart
-                        x:Name="Co2EmissionsChart"
-                        Background="{DynamicResource AppBackground}"
-                        ZoomMode="None"
-                        Margin="0">
-                    </lvc:CartesianChart>
-                </Grid>
-            </StackPanel>
-        </Border>
+            <Border Grid.Column="0"
+                    Background="{DynamicResource AppCardInner}"
+                    BorderBrush="{DynamicResource AppBorder}"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="16">
+
+                <StackPanel Spacing="12">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Text="Heat Demand"
+                                   FontSize="18" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource AppTextPrimary}"
+                                   VerticalAlignment="Center"/>
+                        <Button x:Name="MaximizeHeatDemandBtn"
+                                Grid.Column="1"
+                                Classes="icon-btn"
+                                Width="32" Height="32" Padding="0"
+                                Foreground="{DynamicResource AppTextMuted}"
+                                VerticalAlignment="Center"
+                                ToolTip.Tip="Expand">
+                            <Viewbox Width="12" Height="12">
+                                <Canvas Width="15" Height="15">
+                                    <Path Data="M5,0 L0,0 L0,5 M10,0 L15,0 L15,5 M0,10 L0,15 L5,15 M10,15 L15,15 L15,10"
+                                          Stroke="{DynamicResource AppTextMuted}" StrokeThickness="1.5" StrokeLineCap="Round"/>
+                                </Canvas>
+                            </Viewbox>
+                        </Button>
+                    </Grid>
+                    <Grid Height="260">
+                        <lvc:CartesianChart x:Name="HeatDemandChart"
+                                            Background="{DynamicResource AppBackground}"
+                                            ZoomMode="X"
+                                                    TooltipTextSize="11"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="1"
+                    Background="{DynamicResource AppCardInner}"
+                    BorderBrush="{DynamicResource AppBorder}"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="16">
+
+                <StackPanel Spacing="12">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Text="Electricity Price &amp; Consumption"
+                                   FontSize="18" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource AppTextPrimary}"
+                                   VerticalAlignment="Center"/>
+                        <Button x:Name="MaximizeElectricityPriceBtn"
+                                Grid.Column="1"
+                                Classes="icon-btn"
+                                Width="32" Height="32" Padding="0"
+                                Foreground="{DynamicResource AppTextMuted}"
+                                VerticalAlignment="Center"
+                                ToolTip.Tip="Expand">
+                            <Viewbox Width="12" Height="12">
+                                <Canvas Width="15" Height="15">
+                                    <Path Data="M5,0 L0,0 L0,5 M10,0 L15,0 L15,5 M0,10 L0,15 L5,15 M10,15 L15,15 L15,10"
+                                          Stroke="{DynamicResource AppTextMuted}" StrokeThickness="1.5" StrokeLineCap="Round"/>
+                                </Canvas>
+                            </Viewbox>
+                        </Button>
+                    </Grid>
+                    <Grid Height="260">
+                        <lvc:CartesianChart x:Name="ElectricityPriceChart"
+                                            Background="{DynamicResource AppBackground}"
+                                            ZoomMode="X"
+                                                    TooltipTextSize="11"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+        </Grid>
 
     </StackPanel>
 </UserControl>
