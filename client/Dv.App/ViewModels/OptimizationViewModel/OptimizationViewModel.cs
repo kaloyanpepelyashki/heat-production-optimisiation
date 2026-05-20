@@ -237,22 +237,23 @@ public sealed partial class OptimizationViewModel : ViewModelBase
     // A single retry after 5s isn't enough — Render cold starts take 30-60s.
     private async Task<ApiResponseModel<OptimisationRunDto>?> PostOptimizationAsync(OptimizationRequestDto request)
     {
-        var deadline = DateTime.UtcNow.AddSeconds(90);
+        var deadline = DateTime.UtcNow.AddSeconds(150);
 
-        while (true)
+        while (DateTime.UtcNow < deadline)
         {
             try
             {
                 return await this.apiService.PostAsync<OptimizationRequestDto, ApiResponseModel<OptimisationRunDto>>(
                     BackendService.Rdm, "optimisation", request);
             }
-            catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.ServiceUnavailable
-                                                   && DateTime.UtcNow < deadline)
+            catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.ServiceUnavailable)
             {
                 this.ErrorMessage = "Service is warming up, retrying…";
                 await Task.Delay(5000);
             }
         }
+
+        throw new TimeoutException("Optimization service did not become available. Please try again in a moment.");
     }
 
     private bool CanRunOptimization()
