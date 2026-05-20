@@ -33,30 +33,34 @@ public class OptimiserService : IOptimiserService
     {
         try
         {
-            bool wakeUpCallResponse = await WakeUpService();
-
-            if (!wakeUpCallResponse)
-            {
+            if (!await WakeUpService())
                 throw new Exception("Wake Up Failed");
-            }
-            
-            HttpClient client = new HttpClient();
 
             var json = JsonSerializer.Serialize(optimisationRequestDto);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var url = $"{OptimiserUrl}/api/OptimizationResults/optimize";
+            var deadline = DateTime.UtcNow.AddSeconds(60);
 
-            var response = await client.PostAsync($"{OptimiserUrl}/api/OptimizationResults/optimize", content);
+            using var client = new HttpClient();
 
-            if (!response.IsSuccessStatusCode)
+            while (true)
             {
-                _logger.LogError($"Optimiser responded with status code: {response.StatusCode}, {response.Content}, {response.ReasonPhrase}");
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+                var response = await client.PostAsync(url, content);
+
+                if ((int)response.StatusCode >= 500 && DateTime.UtcNow < deadline)
+                {
+                    _logger.LogWarning("Optimiser returned {StatusCode}, retrying…", response.StatusCode);
+                    await Task.Delay(5000);
+                    continue;
+                }
+
+                if (!response.IsSuccessStatusCode)
+                    _logger.LogError("Optimiser responded with status code: {StatusCode}, {ReasonPhrase}", response.StatusCode, response.ReasonPhrase);
+
+                response.EnsureSuccessStatusCode();
+                var responseBody = await response.Content.ReadAsStringAsync();
+                return JsonSerializer.Deserialize<OptimisationWrapperDto>(responseBody);
             }
-
-            response.EnsureSuccessStatusCode();
-            var responseBody = await response.Content.ReadAsStringAsync();
-            var result = JsonSerializer.Deserialize<OptimisationWrapperDto>(responseBody);
-
-            return result;
             
         }
         catch (HttpRequestException e)
