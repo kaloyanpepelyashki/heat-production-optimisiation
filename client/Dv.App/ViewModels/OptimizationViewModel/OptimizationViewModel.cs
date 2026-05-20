@@ -201,10 +201,6 @@ public sealed partial class OptimizationViewModel : ViewModelBase
                 response.Data,
                 this.CurrentContext);
         }
-        catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.ServiceUnavailable)
-        {
-            this.ErrorMessage = "The optimization service is unavailable. Please try again in a moment.";
-        }
         catch (Exception ex)
         {
             this.ErrorMessage = ex.Message;
@@ -237,19 +233,25 @@ public sealed partial class OptimizationViewModel : ViewModelBase
         throw new TimeoutException("Optimization service did not become available. Please try again in a moment.");
     }
 
+    // Polls until RDM (and its internal OPT dependency) are fully ready.
+    // A single retry after 5s isn't enough — Render cold starts take 30-60s.
     private async Task<ApiResponseModel<OptimisationRunDto>?> PostOptimizationAsync(OptimizationRequestDto request)
     {
-        try
+        var deadline = DateTime.UtcNow.AddSeconds(90);
+
+        while (true)
         {
-            return await this.apiService.PostAsync<OptimizationRequestDto, ApiResponseModel<OptimisationRunDto>>(
-                BackendService.Rdm, "optimisation", request);
-        }
-        catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.ServiceUnavailable)
-        {
-            this.ErrorMessage = "Service is starting up, retrying in 5 seconds…";
-            await Task.Delay(5000);
-            return await this.apiService.PostAsync<OptimizationRequestDto, ApiResponseModel<OptimisationRunDto>>(
-                BackendService.Rdm, "optimisation", request);
+            try
+            {
+                return await this.apiService.PostAsync<OptimizationRequestDto, ApiResponseModel<OptimisationRunDto>>(
+                    BackendService.Rdm, "optimisation", request);
+            }
+            catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.ServiceUnavailable
+                                                   && DateTime.UtcNow < deadline)
+            {
+                this.ErrorMessage = "Service is warming up, retrying…";
+                await Task.Delay(5000);
+            }
         }
     }
 
