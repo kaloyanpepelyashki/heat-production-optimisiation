@@ -106,7 +106,7 @@ public sealed class OptimizationChartsViewModel : ViewModelBase
             .ToArray();
 
         ConfigureDualAxisChart(this.electricityPriceChart, this.cachedElectricityPrices, electricityConsumption);
-        ConfigureSingleChart(this.expensesChart, "Expenses", "#F59E0B", "DKK", expenses);
+        ConfigureSingleChart(this.expensesChart, "Expenses", "#EF4444", "DKK", expenses);
         ConfigureSingleChart(this.co2EmissionsChart, "CO2 Emissions", "#DC2626", "kg/MWh", co2Emissions);
 
         BuildOptimizationStackedChart(orderedResults);

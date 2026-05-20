@@ -56,7 +56,7 @@ public sealed partial class ChartSlotViewModel : ObservableObject
     partial void OnPrimarySeriesKeyChanged(string? value) => Rebuild();
     partial void OnOverlaySeriesKeyChanged(string? value) => Rebuild();
 
-    private void Rebuild()
+    public void Rebuild()
     {
         this.dataStore.TryGetValue(this.PrimarySeriesKey ?? "", out var primary);
 
@@ -146,7 +146,6 @@ public sealed partial class ChartSlotViewModel : ObservableObject
             {
                 Name = primaryLabel,
                 NamePaint = GetAxisPaint(),
-                NameTextSize = 13,
                 LabelsPaint = GetAxisPaint(),
                 SeparatorsPaint = new SolidColorPaint(SKColor.Parse("#CBD5E1")) { StrokeThickness = 1 },
                 TextSize = 12,
@@ -159,7 +158,6 @@ public sealed partial class ChartSlotViewModel : ObservableObject
             {
                 Name = overlayLabel,
                 NamePaint = GetAxisPaint(),
-                NameTextSize = 13,
                 LabelsPaint = GetAxisPaint(),
                 SeparatorsPaint = new SolidColorPaint(SKColors.Transparent),
                 Position = LiveChartsCore.Measure.AxisPosition.End,

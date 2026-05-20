@@ -37,6 +37,8 @@ public sealed partial class OptimizationCompareViewModel : ObservableObject
     [RelayCommand]
     private void SetFourGridLayout() => this.SelectedLayout = Layout.FourGrid;
 
+    partial void OnSelectedLayoutChanged(Layout value) => this.PushDataToSlots();
+
     public ChartSlotViewModel Slot0 { get; } = new();
     public ChartSlotViewModel Slot1 { get; } = new();
     public ChartSlotViewModel Slot2 { get; } = new();
@@ -98,6 +100,27 @@ public sealed partial class OptimizationCompareViewModel : ObservableObject
             "CO2 Emissions",
             ordered.Select(h => new LiveChartsCore.Defaults.DateTimePoint(h.TimeFrom, h.Co2Emissions)).ToArray(),
             "kg / MWh");
+
+        var units = ordered
+            .SelectMany(h => h.ProductionUnits)
+            .GroupBy(u => new { u.ProductionUnitType, u.ProductionUnitId })
+            .Select(g => new { g.Key.ProductionUnitType, g.Key.ProductionUnitId })
+            .OrderBy(u => u.ProductionUnitId);
+
+        foreach (var unit in units)
+        {
+            var key = $"{unit.ProductionUnitType} {unit.ProductionUnitId}";
+            this.SetSeries(
+                key,
+                ordered.Select(h =>
+                {
+                    var pu = h.ProductionUnits.FirstOrDefault(u =>
+                        u.ProductionUnitId == unit.ProductionUnitId &&
+                        u.ProductionUnitType == unit.ProductionUnitType);
+                    return new LiveChartsCore.Defaults.DateTimePoint(h.TimeFrom, pu?.HeatProduction ?? 0);
+                }).ToArray(),
+                "MWh");
+        }
 
         var existing = this.AvailableResults
             .FirstOrDefault(e => e.PeriodId == periodId && e.ScenarioId == scenarioId);

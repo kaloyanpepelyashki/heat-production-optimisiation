@@ -182,7 +182,9 @@
 
                     <StackPanel Orientation="Horizontal" Spacing="8">
 
-                        <DatePicker SelectedDate="{Binding Maintenance.MaintenanceStartDate, Mode=TwoWay}"/>
+                        <CalendarDatePicker SelectedDate="{Binding Maintenance.MaintenanceStartDate, Mode=TwoWay}"
+                                            IsTodayHighlighted="True"
+                                            VerticalAlignment="Center"/>
 
                         <NumericUpDown Minimum="0"
                                        Maximum="23"

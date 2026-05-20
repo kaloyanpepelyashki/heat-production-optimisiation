@@ -26,7 +26,7 @@ public sealed partial class OptimizationMaintenanceViewModel : ObservableObject
     private BoilerStatusViewModel? selectedBoiler;
 
     [ObservableProperty]
-    private DateTimeOffset? maintenanceStartDate = new DateTimeOffset(DateTime.Today);
+    private DateTime? maintenanceStartDate = DateTime.Today;
 
     [ObservableProperty]
     private int maintenanceStartHour;
@@ -117,7 +117,7 @@ public sealed partial class OptimizationMaintenanceViewModel : ObservableObject
     public void ApplyContext(OptimizationContext context)
     {
         this.CurrentContext = context;
-        this.MaintenanceStartDate = new DateTimeOffset(context.StartDate.Date);
+        this.MaintenanceStartDate = context.StartDate.Date;
         this.MaintenanceStartHour = 0;
         this.MaintenanceDuration = 30;
 

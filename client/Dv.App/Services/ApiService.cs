@@ -113,9 +113,6 @@ public class ApiService : IApiService
         return false;
     }
 
-    /// Wakes all registered services concurrently.
-    /// OPT is woken as a side-effect (RDM depends on it internally) but only RDM, SDM, and AM
-    /// need to be ready for the client to function.
     public async Task<bool> WakeUpAllServices(CancellationToken token = default)
     {
         var tasks = ServiceUrls.Keys
