@@ -21,6 +21,7 @@ public class ApiService : IApiService
         { BackendService.Rdm, "https://rdm-api.onrender.com/" },
         { BackendService.Sdm, "https://sdm-api.onrender.com/" },
         { BackendService.Am, "https://heat-production-optimisiation.onrender.com/" },
+        { BackendService.Opt, "https://opt-api-7dj4.onrender.com/" },
     };
 
     public ApiService()
@@ -109,14 +110,18 @@ public class ApiService : IApiService
         return false;
     }
 
-    /// Wakes all registered services concurrently. Returns true only if every service becomes ready.
+    /// Wakes all registered services concurrently.
+    /// OPT is woken as a side-effect (RDM depends on it internally) but only RDM, SDM, and AM
+    /// need to be ready for the client to function.
     public async Task<bool> WakeUpAllServices(CancellationToken token = default)
     {
         var tasks = ServiceUrls.Keys
-            .Select(svc => WakeUpServiceSafe(svc, token))
-            .ToList();
-        bool[] results = await Task.WhenAll(tasks);
-        return results.All(success => success);
+            .ToDictionary(svc => svc, svc => WakeUpServiceSafe(svc, token));
+
+        await Task.WhenAll(tasks.Values);
+
+        return new[] { BackendService.Rdm, BackendService.Sdm, BackendService.Am }
+            .All(svc => tasks[svc].Result);
     }
 
     private async Task<bool> WakeUpServiceSafe(BackendService service, CancellationToken token)
