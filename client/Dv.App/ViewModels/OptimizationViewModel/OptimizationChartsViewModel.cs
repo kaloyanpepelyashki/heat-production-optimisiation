@@ -345,18 +345,6 @@ public sealed class OptimizationChartsViewModel : ViewModelBase
         };
     }
 
-    /// Re-assigns NamePaint on every visible axis so LiveCharts2 repaints the
-    /// rotated label after Skia canvas recreation (minimize/maximize/resize).
-    public void RefreshAxisLabels()
-    {
-        foreach (var chart in new[] { heatDemandChart, electricityPriceChart, optimizationResultsChart, expensesChart, co2EmissionsChart })
-        {
-            if (chart?.YAxes is null) continue;
-            foreach (var axis in chart.YAxes.OfType<Axis>())
-                axis.NamePaint = GetAxisNamePaint();
-        }
-    }
-
     // ── Maximize overlay ──────────────────────────────────────────────────────
 
     private IEnumerable<ISeries>? maximizedSeries;

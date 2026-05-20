@@ -11,11 +11,6 @@ public partial class GraphsCard : UserControl
 
         this.DataContextChanged += (_, _) => this.TryAttachCharts();
         this.AttachedToVisualTree += (_, _) => this.TryAttachCharts();
-        this.SizeChanged += (_, _) =>
-        {
-            if (this.DataContext is OptimizationViewModel vm)
-                vm.ChartsVM.RefreshAxisLabels();
-        };
     }
 
     private void TryAttachCharts()
