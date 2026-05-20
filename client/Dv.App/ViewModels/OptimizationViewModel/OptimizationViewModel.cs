@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -146,14 +148,7 @@ public sealed partial class OptimizationViewModel : ViewModelBase
             this.ErrorMessage = null;
 
             var request = this.BuildOptimizationRequest();
-
-            var response =
-                await this.apiService.PostAsync<
-                    OptimizationRequestDto,
-                    ApiResponseModel<OptimisationRunDto>>(
-                        BackendService.Rdm,
-                        "optimisation",
-                        request);
+            var response = await this.PostOptimizationAsync(request);
 
             if (response?.Data is null)
             {
@@ -171,6 +166,28 @@ public sealed partial class OptimizationViewModel : ViewModelBase
         {
             this.IsLoading = false;
         }
+    }
+    // Polls until RDM (and its internal OPT dependency) are fully ready.
+    // A single retry after 5s isn't enough — Render cold starts take 30-60s.
+    private async Task<ApiResponseModel<OptimisationRunDto>?> PostOptimizationAsync(OptimizationRequestDto request)
+    {
+        var deadline = DateTime.UtcNow.AddSeconds(150);
+
+        while (DateTime.UtcNow < deadline)
+        {
+            try
+            {
+                return await this.apiService.PostAsync<OptimizationRequestDto, ApiResponseModel<OptimisationRunDto>>(
+                    BackendService.Rdm, "optimisation", request);
+            }
+            catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.ServiceUnavailable)
+            {
+                this.ErrorMessage = "Service is warming up, retrying…";
+                await Task.Delay(5000);
+            }
+        }
+
+        throw new TimeoutException("Optimization service did not become available. Please try again in a moment.");
     }
 
     private bool CanRunOptimization()
