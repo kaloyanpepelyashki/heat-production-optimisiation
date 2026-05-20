@@ -161,7 +161,7 @@ public sealed class SettingsViewModel : ViewModelBase
         try
         {
             var response = await PingClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
-            online = response.IsSuccessStatusCode;
+            online = (int)response.StatusCode < 500;
         }
         catch
         {
