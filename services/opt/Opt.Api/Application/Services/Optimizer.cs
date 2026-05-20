@@ -217,14 +217,11 @@ public class Optimizer
             remainingHeatDemand -= dispatchedHeat;
         }
 
-        if (remainingHeatDemand > 0d)
-        {
-            throw new InvalidOperationException("Heat demand could not be fully covered with available boilers.");
-        }
+        var coveredHeat = point.HeatDemand - remainingHeatDemand;
 
         return new OptResultsHourlyDto
         {
-            HeatProduction = Math.Round(point.HeatDemand, 2),
+            HeatProduction = Math.Round(coveredHeat, 2),
             ElectricityConsumption = Math.Round(netElectricity, 2),
             Expenses = Math.Round(netCost, 2),
             Co2Emissions = Math.Round(co2, 2),
