@@ -13,7 +13,10 @@ using System.Threading;
 using Dv.App.Interfaces;
 public class ApiService : IApiService
 {
-    private static readonly HttpClient SharedHttpClient = new HttpClient();
+    private static readonly HttpClient SharedHttpClient = new HttpClient
+    {
+        Timeout = TimeSpan.FromMinutes(4),
+    };
     private readonly JsonSerializerOptions jsonOptions;
 
     public static readonly IReadOnlyDictionary<BackendService, string> ServiceUrls = new Dictionary<BackendService, string>
