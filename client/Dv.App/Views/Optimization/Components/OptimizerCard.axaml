@@ -180,26 +180,51 @@
                                FontWeight="SemiBold"
                                Foreground="{DynamicResource AppTextPrimary}"/>
 
-                    <StackPanel Orientation="Horizontal" Spacing="8">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
 
-                        <CalendarDatePicker SelectedDate="{Binding Maintenance.MaintenanceStartDate, Mode=TwoWay}"
-                                            IsTodayHighlighted="True"
-                                            VerticalAlignment="Center"/>
+                        <!-- DD -->
+                        <NumericUpDown Value="{Binding Maintenance.MaintenanceStartDay, Mode=TwoWay}"
+                                       Minimum="1" Maximum="31"
+                                       FormatString="00"
+                                       Width="62"
+                                       VerticalAlignment="Center"/>
 
+                        <TextBlock Text="/" VerticalAlignment="Center"
+                                   Foreground="{DynamicResource AppTextMuted}"/>
+
+                        <!-- MM -->
+                        <NumericUpDown Value="{Binding Maintenance.MaintenanceStartMonth, Mode=TwoWay}"
+                                       Minimum="1" Maximum="12"
+                                       FormatString="00"
+                                       Width="62"
+                                       VerticalAlignment="Center"/>
+
+                        <TextBlock Text="/" VerticalAlignment="Center"
+                                   Foreground="{DynamicResource AppTextMuted}"/>
+
+                        <!-- YYYY -->
+                        <NumericUpDown Value="{Binding Maintenance.MaintenanceStartYear, Mode=TwoWay}"
+                                       Minimum="2024" Maximum="2030"
+                                       Width="82"
+                                       VerticalAlignment="Center"/>
+
+                        <TextBlock Text=" at" VerticalAlignment="Center"
+                                   Foreground="{DynamicResource AppTextMuted}"
+                                   Margin="4,0,0,0"/>
+
+                        <!-- HH -->
                         <NumericUpDown Minimum="0"
                                        Maximum="23"
                                        Value="{Binding Maintenance.MaintenanceStartHour, Mode=TwoWay}"
                                        FormatString="00"
-                                       Width="70"
+                                       Width="62"
                                        VerticalAlignment="Center"
                                        ShowButtonSpinner="True"/>
 
-                        <TextBlock VerticalAlignment="Center"
+                        <TextBlock Text=": 00"
+                                   VerticalAlignment="Center"
                                    FontWeight="SemiBold"
-                                   Foreground="{DynamicResource AppTextPrimary}">
-                            <Run Text="{Binding Maintenance.MaintenanceStartHour, StringFormat={}{0:00}}"/>
-                            <Run Text=": 00"/>
-                        </TextBlock>
+                                   Foreground="{DynamicResource AppTextPrimary}"/>
                     </StackPanel>
                 </StackPanel>
 

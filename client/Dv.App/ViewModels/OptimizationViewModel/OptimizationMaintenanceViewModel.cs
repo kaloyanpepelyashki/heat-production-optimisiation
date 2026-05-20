@@ -25,8 +25,16 @@ public sealed partial class OptimizationMaintenanceViewModel : ObservableObject
     [ObservableProperty]
     private BoilerStatusViewModel? selectedBoiler;
 
+    private DateTime maintenanceStartDate = DateTime.Today;
+
     [ObservableProperty]
-    private DateTime? maintenanceStartDate = DateTime.Today;
+    private int maintenanceStartDay = DateTime.Today.Day;
+
+    [ObservableProperty]
+    private int maintenanceStartMonth = DateTime.Today.Month;
+
+    [ObservableProperty]
+    private int maintenanceStartYear = DateTime.Today.Year;
 
     [ObservableProperty]
     private int maintenanceStartHour;
@@ -51,18 +59,28 @@ public sealed partial class OptimizationMaintenanceViewModel : ObservableObject
     partial void OnSelectedBoilerChanged(BoilerStatusViewModel? value) =>
         this.OnPropertyChanged(nameof(this.HasSelectedBoiler));
 
+    partial void OnMaintenanceStartDayChanged(int value) => this.SyncStartDate();
+    partial void OnMaintenanceStartMonthChanged(int value) => this.SyncStartDate();
+    partial void OnMaintenanceStartYearChanged(int value) => this.SyncStartDate();
+
+    private void SyncStartDate()
+    {
+        try
+        {
+            var year = this.MaintenanceStartYear;
+            var month = Math.Clamp(this.MaintenanceStartMonth, 1, 12);
+            var day = Math.Clamp(this.MaintenanceStartDay, 1, DateTime.DaysInMonth(year, month));
+            this.maintenanceStartDate = new DateTime(year, month, day);
+        }
+        catch { }
+    }
+
     [RelayCommand]
     private async Task ScheduleMaintenanceAsync()
     {
         if (this.SelectedBoiler is null)
         {
             await this.dialogService.ShowValidationDialogAsync("Please select a boiler first.");
-            return;
-        }
-
-        if (!this.MaintenanceStartDate.HasValue)
-        {
-            await this.dialogService.ShowValidationDialogAsync("Please completely fill out the Date/Time fields.");
             return;
         }
 
@@ -73,7 +91,7 @@ public sealed partial class OptimizationMaintenanceViewModel : ObservableObject
             return;
         }
 
-        var startDateTime = this.MaintenanceStartDate.Value.Date.AddHours(this.MaintenanceStartHour);
+        var startDateTime = this.maintenanceStartDate.Date.AddHours(this.MaintenanceStartHour);
         var endDateTime = startDateTime.AddHours(this.MaintenanceDuration);
 
         if (startDateTime < this.CurrentContext.StartDate || endDateTime > this.CurrentContext.EndDate)
@@ -117,7 +135,9 @@ public sealed partial class OptimizationMaintenanceViewModel : ObservableObject
     public void ApplyContext(OptimizationContext context)
     {
         this.CurrentContext = context;
-        this.MaintenanceStartDate = context.StartDate.Date;
+        this.MaintenanceStartYear = context.StartDate.Year;
+        this.MaintenanceStartMonth = context.StartDate.Month;
+        this.MaintenanceStartDay = context.StartDate.Day;
         this.MaintenanceStartHour = 0;
         this.MaintenanceDuration = 30;
 

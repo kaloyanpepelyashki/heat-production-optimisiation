@@ -45,10 +45,22 @@ public sealed partial class ChartSlotViewModel : ObservableObject
     {
         this.dataStore = store;
 
-        var keys = store.Keys.OrderBy(k => k).ToList();
-        this.AvailableSeriesKeys.Clear();
-        foreach (var key in keys)
-            this.AvailableSeriesKeys.Add(key);
+        var sorted = store.Keys.OrderBy(k => k).ToList();
+        var current = this.AvailableSeriesKeys.ToHashSet();
+
+        // Remove keys no longer in the store (never clears whole collection,
+        // so ComboBox selections are preserved)
+        foreach (var key in current.Except(sorted).ToList())
+            this.AvailableSeriesKeys.Remove(key);
+
+        // Insert any new keys at their sorted position
+        for (var i = 0; i < sorted.Count; i++)
+        {
+            if (i < this.AvailableSeriesKeys.Count && this.AvailableSeriesKeys[i] == sorted[i])
+                continue;
+            if (!this.AvailableSeriesKeys.Contains(sorted[i]))
+                this.AvailableSeriesKeys.Insert(i, sorted[i]);
+        }
 
         Rebuild();
     }
