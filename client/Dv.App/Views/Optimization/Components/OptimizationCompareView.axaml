@@ -30,15 +30,9 @@
 
         <!-- Header row -->
         <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
-
             <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
-                <TextBlock Text="Compare"
-                           FontSize="20"
-                           FontWeight="SemiBold"
-                           Foreground="{DynamicResource AppTextPrimary}"
-                           VerticalAlignment="Center"/>
                 <TextBlock IsVisible="{Binding CompareVM.HasNoResults}"
-                           Text="- run an optimization first to populate series"
+                           Text="Run an optimization first to populate series"
                            FontSize="13"
                            Foreground="{DynamicResource AppTextMuted}"
                            VerticalAlignment="Center"/>
