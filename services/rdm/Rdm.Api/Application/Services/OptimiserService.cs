@@ -82,41 +82,39 @@ public class OptimiserService : IOptimiserService
         }
     }
 
-    /// <summary>
-    /// Send a GET request to the optimiser service, to wake it up. 
-    /// </summary>
-    /// <returns></returns>
-    /// <exception cref="Exception"></exception>
+    /// Polls the optimiser health endpoint every 5 seconds for up to 85 seconds.
+    /// Render.com free-tier returns 503 immediately during cold start; a single request is never enough.
     public async Task<bool> WakeUpService()
     {
-        try
-        {
-            HttpClient client = new HttpClient();
-            
-            var response = await client.GetAsync($"{OptimiserUrl}/api/Health/wakeup");
+        using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(10) };
+        var endpoint = $"{OptimiserUrl}/api/Health/wakeup";
+        var deadline = DateTime.UtcNow.AddSeconds(85);
 
-            if (response.IsSuccessStatusCode)
+        while (DateTime.UtcNow < deadline)
+        {
+            try
             {
-                return true;
-            } 
-            
-            return false;
-            
-            
-        }  catch (HttpRequestException e)
-        {
-            _logger.LogError($"Error in OptimiserService. Connectivity error when waking up optimiser: {e.Message} {e.GetType()} Status Code: {e.StatusCode}, {e.HttpRequestError}");
-            throw;
+                var response = await client.GetAsync(endpoint);
+
+                if ((int)response.StatusCode < 500)
+                    return true;
+
+                _logger.LogInformation("WakeUp: Optimiser returned {StatusCode}, retrying…", response.StatusCode);
+                await Task.Delay(5000);
+            }
+            catch (TaskCanceledException)
+            {
+                _logger.LogWarning("WakeUp: Optimiser request timed out, retrying…");
+                await Task.Delay(5000);
+            }
+            catch (Exception e)
+            {
+                _logger.LogWarning("WakeUp: Optimiser error: {Message}, retrying…", e.Message);
+                await Task.Delay(5000);
+            }
         }
-        catch (TaskCanceledException e)
-        {
-            _logger.LogError($"Error in OptimiserService when waking up optimiser service. Request timed out: {e.Message} {e.GetType()}");
-            return false;
-        }
-        catch (Exception e)
-        {
-            _logger.LogError($"Error in OptimiserService in wake up call: {e.Message} {e.GetType()}");
-            throw e;
-        }
+
+        _logger.LogError("WakeUp: Optimiser timed out after 85s.");
+        return false;
     }
 }
