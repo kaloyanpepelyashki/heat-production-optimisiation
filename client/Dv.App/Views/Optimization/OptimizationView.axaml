@@ -19,10 +19,6 @@
                 </ScrollViewer>
             </TabItem>
 
-            <TabItem Header="Compare">
-                <components:OptimizationCompareView DataContext="{Binding}"/>
-            </TabItem>
-
         </TabControl>
 
         <!-- Fullscreen chart overlay — covers entire view when a chart is maximized -->

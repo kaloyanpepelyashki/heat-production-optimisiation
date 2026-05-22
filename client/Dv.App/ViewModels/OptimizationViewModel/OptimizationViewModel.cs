@@ -20,8 +20,7 @@ public sealed partial class OptimizationViewModel : ViewModelBase
     private readonly SemaphoreSlim loadLock = new(1, 1);
     private List<SourceDataDto> cachedSourceData = [];
 
-    private readonly Dictionary<(int, int, int), (OptimisationRunDto Data, OptimizationContext Context)>
-        cachedOptimizationResults = new();
+    private readonly Dictionary<(int, int, int), OptimisationRunDto> cachedOptimizationResults = new();
 
     [ObservableProperty]
     private string selectedPeriod = "Winter";
@@ -45,15 +44,12 @@ public sealed partial class OptimizationViewModel : ViewModelBase
         this.Maintenance = new OptimizationMaintenanceViewModel(maintenanceService, dialogService);
         this.Maintenance.ApplyContext(this.currentContext);
 
-        this.CompareVM = new OptimizationCompareViewModel();
-
         MaintenanceStore.MaintenanceSchedules.CollectionChanged += (_, _) =>
             this.RunOptimizationCommand.NotifyCanExecuteChanged();
     }
 
     public OptimizationChartsViewModel ChartsVM { get; } = new();
     public OptimizationMaintenanceViewModel Maintenance { get; }
-    public OptimizationCompareViewModel CompareVM { get; }
 
     public ObservableCollection<string> Periods { get; } = ["Summer", "Winter"];
     public ObservableCollection<string> Scenarios { get; } = ["Scenario 1", "Scenario 2"];
@@ -151,7 +147,6 @@ public sealed partial class OptimizationViewModel : ViewModelBase
 
             this.cachedSourceData = sourceData;
             this.ChartsVM.LoadSourceData(this.cachedSourceData, this.CurrentContext);
-            this.CompareVM.UpdateSourceData(this.cachedSourceData, this.CurrentContext);
             this.RestoreOrClearOptimizationResults();
         }
         catch (Exception ex)
@@ -178,7 +173,7 @@ public sealed partial class OptimizationViewModel : ViewModelBase
 
             if (this.cachedOptimizationResults.TryGetValue(cacheKey, out var cached))
             {
-                this.ChartsVM.LoadOptimizationResult(cached.Data, this.CurrentContext);
+                this.ChartsVM.LoadOptimizationResult(cached, this.CurrentContext);
                 this.HasOptimizationResults = true;
                 return;
             }
@@ -191,15 +186,9 @@ public sealed partial class OptimizationViewModel : ViewModelBase
                 return;
             }
 
-            this.cachedOptimizationResults[cacheKey] = (response.Data, this.CurrentContext);
+            this.cachedOptimizationResults[cacheKey] = response.Data;
             this.ChartsVM.LoadOptimizationResult(response.Data, this.CurrentContext);
             this.HasOptimizationResults = true;
-
-            this.CompareVM.NotifyResultAvailable(
-                this.CurrentContext.PeriodId,
-                this.CurrentContext.ScenarioId,
-                response.Data,
-                this.CurrentContext);
         }
         catch (Exception ex)
         {
@@ -266,7 +255,6 @@ public sealed partial class OptimizationViewModel : ViewModelBase
             return;
 
         this.ChartsVM.LoadSourceData(this.cachedSourceData, this.CurrentContext);
-        this.CompareVM.UpdateSourceData(this.cachedSourceData, this.CurrentContext);
     }
 
     private void RestoreOrClearOptimizationResults()
@@ -281,12 +269,7 @@ public sealed partial class OptimizationViewModel : ViewModelBase
 
         if (this.cachedOptimizationResults.TryGetValue(lookupKey, out var cached))
         {
-            this.ChartsVM.LoadOptimizationResult(cached.Data, this.CurrentContext);
-            this.CompareVM.NotifyResultAvailable(
-                this.CurrentContext.PeriodId,
-                this.CurrentContext.ScenarioId,
-                cached.Data,
-                cached.Context);
+            this.ChartsVM.LoadOptimizationResult(cached, this.CurrentContext);
             this.HasOptimizationResults = true;
         }
         else

@@ -5,6 +5,8 @@ namespace Dv.App.Views.Optimization.Components;
 
 public partial class GraphsCard : UserControl
 {
+    private bool attached;
+
     public GraphsCard()
     {
         InitializeComponent();
@@ -15,8 +17,10 @@ public partial class GraphsCard : UserControl
 
     private void TryAttachCharts()
     {
-        if (this.DataContext is not OptimizationViewModel vm)
+        if (this.attached || this.DataContext is not OptimizationViewModel vm)
             return;
+
+        this.attached = true;
 
         vm.ChartsVM.AttachCharts(
             this.HeatDemandChart,
