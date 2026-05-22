@@ -2,9 +2,9 @@
 
 namespace Rdm.Api.Inrastructure.DTOs;
 
-/// <summary>
+
 /// Data transfer object, encapsulating the whole optimisation object. Used to send/receive optimisation from API.
-/// </summary>
+
 /// 
 public class OptimisationRunDto
 {

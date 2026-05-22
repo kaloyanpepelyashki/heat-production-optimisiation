@@ -4,9 +4,9 @@ using Newtonsoft.Json;
 namespace Rdm.Api.Inrastructure.DTOs;
 
 
-/// <summary>
+
 /// Data transfer object - nested in the optimisation run object. 
-/// </summary>
+
 public class OptimisationResultHourlyDto
 {
     //Currently looks the same as the domain model, but can give flexibility later. Can allow for data transofrmations etc.

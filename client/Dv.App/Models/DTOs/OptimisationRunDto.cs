@@ -4,9 +4,9 @@ using System.Collections.Generic;
 
 namespace Dv.App.Models;
 
-/// <summary>
+
 /// Data transfer object, encapsulating the whole optimisation object. Used to send/receive optimisation from API.
-/// </summary>
+
 /// 
 public class OptimisationRunDto
 {

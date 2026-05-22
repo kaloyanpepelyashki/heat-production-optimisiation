@@ -70,9 +70,9 @@ public class ElectricBoilerRepository: IProductionUnitRepository<ElectricBoiler>
             }
     }
 
-    /// <summary>
+    
     /// Turns Persistance Model into a Domain model.
-    /// </summary>
+    
     /// <param name="p">The Persistance model.</param>
     /// <returns>A domain model.</returns>
     public static ElectricBoiler ToDomain(ElectricBoilerPersistence p)
