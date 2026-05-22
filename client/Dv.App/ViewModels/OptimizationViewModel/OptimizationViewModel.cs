@@ -224,7 +224,9 @@ public sealed partial class OptimizationViewModel : ViewModelBase
                 return await this.apiService.PostAsync<OptimizationRequestDto, ApiResponseModel<OptimisationRunDto>>(
                     BackendService.Rdm, "optimisation", request);
             }
-            catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.ServiceUnavailable)
+            catch (HttpRequestException ex) when (
+                ex.StatusCode == HttpStatusCode.ServiceUnavailable ||
+                ex.StatusCode == HttpStatusCode.BadGateway)
             {
                 this.ErrorMessage = "Service is warming up, retrying…";
                 await Task.Delay(5000);
