@@ -65,7 +65,7 @@ public class Optimizer
             OptResultsHourly = hourlyResults,
         };
         } 
-        catch (Exception ex) when (ex is not OperationCanceledException)
+        catch (Exception ex) when (ex is not OperationCanceledException and not InvalidOperationException)
         {
             throw new ExternalDataFetchException("Optimization failed.", ex);
         }
@@ -217,11 +217,13 @@ public class Optimizer
             remainingHeatDemand -= dispatchedHeat;
         }
 
-        var coveredHeat = point.HeatDemand - remainingHeatDemand;
+        if (remainingHeatDemand > 0.001)
+            throw new InvalidOperationException(
+                "Heat demand cannot be fully covered by the available production units.");
 
         return new OptResultsHourlyDto
         {
-            HeatProduction = Math.Round(coveredHeat, 2),
+            HeatProduction = Math.Round(point.HeatDemand, 2),
             ElectricityConsumption = Math.Round(netElectricity, 2),
             Expenses = Math.Round(netCost, 2),
             Co2Emissions = Math.Round(co2, 2),

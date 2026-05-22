@@ -54,6 +54,12 @@ public class OptimiserService : IOptimiserService
                     continue;
                 }
 
+                if ((int)response.StatusCode == 422)
+                {
+                    var body = await response.Content.ReadAsStringAsync();
+                    throw new InvalidOperationException(body);
+                }
+
                 if (!response.IsSuccessStatusCode)
                     _logger.LogError("Optimiser responded with status code: {StatusCode}, {ReasonPhrase}", response.StatusCode, response.ReasonPhrase);
 
