@@ -42,7 +42,7 @@ public class Optimizer
         
         var createdAt = DateTime.UtcNow;
         var hourlyResults = sourceData
-            .Select(point => BuildHourlyResult(point, assets, boilers, createdAt))
+            .Select(point => BuildHourlyResult(point, assets, boilers))
             .ToList(); 
 
         var runFrom = sourceData.Count == 0 ? createdAt : sourceData.Min(x => x.TimeFrom);
@@ -144,8 +144,7 @@ public class Optimizer
     private static OptResultsHourlyDto BuildHourlyResult(
         SourceDataPoint point,
         AssetDataBundle assets,
-        IReadOnlyList<DispatchUnit> boilers,
-        DateTime createdAt)
+        IReadOnlyList<DispatchUnit> boilers)
     {
         var maintenance = assets.MaintenanceSchedule;
         
