@@ -8,9 +8,7 @@ using Rdm.Api.Inrastructure.DTOs;
 
 namespace Rdm.Api.Application.Services;
 
-/// <summary>
-/// The serivce is responsible for handling all interactions with the Optimiser module.
-/// </summary>
+
 public class OptimiserService : IOptimiserService
 {
     private ILogger<OptimiserService> _logger;
@@ -23,12 +21,6 @@ public class OptimiserService : IOptimiserService
         _logger = logger;
     }
     
-    /// <summary>
-    /// Sends an optimisation request to the optimiser module via a HTTP client and returns the optimisation result.
-    /// Handles request serialization, HTTP communication, response deserialization, and logs any request or JSON errors.
-    /// </summary>
-    /// <param name="optimisationRequestDto">The optimisation input data used by the Optimiser.</param>
-    /// <returns>The optimisation result returned from the Optimiser service.</returns>
     public async Task<OptimisationWrapperDto> RequestOptimisation(OptimisationRequestDto optimisationRequestDto)
     {
         try
@@ -52,6 +44,12 @@ public class OptimiserService : IOptimiserService
                     _logger.LogWarning("Optimiser returned {StatusCode}, retrying…", response.StatusCode);
                     await Task.Delay(5000);
                     continue;
+                }
+
+                if ((int)response.StatusCode == 422)
+                {
+                    var body = await response.Content.ReadAsStringAsync();
+                    throw new InvalidOperationException(body);
                 }
 
                 if (!response.IsSuccessStatusCode)
@@ -86,41 +84,38 @@ public class OptimiserService : IOptimiserService
         }
     }
 
-    /// <summary>
-    /// Send a GET request to the optimiser service, to wake it up. 
-    /// </summary>
-    /// <returns></returns>
-    /// <exception cref="Exception"></exception>
+    // Polls until the optimiser is ready — Render cold starts return 503 for up to 85 seconds.
     public async Task<bool> WakeUpService()
     {
-        try
-        {
-            HttpClient client = new HttpClient();
-            
-            var response = await client.GetAsync($"{OptimiserUrl}/api/Health/wakeup");
+        using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(10) };
+        var endpoint = $"{OptimiserUrl}/api/Health/wakeup";
+        var deadline = DateTime.UtcNow.AddSeconds(85);
 
-            if (response.IsSuccessStatusCode)
+        while (DateTime.UtcNow < deadline)
+        {
+            try
             {
-                return true;
-            } 
-            
-            return false;
-            
-            
-        }  catch (HttpRequestException e)
-        {
-            _logger.LogError($"Error in OptimiserService. Connectivity error when waking up optimiser: {e.Message} {e.GetType()} Status Code: {e.StatusCode}, {e.HttpRequestError}");
-            throw;
+                var response = await client.GetAsync(endpoint);
+
+                if ((int)response.StatusCode < 500)
+                    return true;
+
+                _logger.LogInformation("WakeUp: Optimiser returned {StatusCode}, retrying…", response.StatusCode);
+                await Task.Delay(5000);
+            }
+            catch (TaskCanceledException)
+            {
+                _logger.LogWarning("WakeUp: Optimiser request timed out, retrying…");
+                await Task.Delay(5000);
+            }
+            catch (Exception e)
+            {
+                _logger.LogWarning("WakeUp: Optimiser error: {Message}, retrying…", e.Message);
+                await Task.Delay(5000);
+            }
         }
-        catch (TaskCanceledException e)
-        {
-            _logger.LogError($"Error in OptimiserService when waking up optimiser service. Request timed out: {e.Message} {e.GetType()}");
-            return false;
-        }
-        catch (Exception e)
-        {
-            _logger.LogError($"Error in OptimiserService in wake up call: {e.Message} {e.GetType()}");
-            throw e;
-        }
+
+        _logger.LogError("WakeUp: Optimiser timed out after 85s.");
+        return false;
     }
 }

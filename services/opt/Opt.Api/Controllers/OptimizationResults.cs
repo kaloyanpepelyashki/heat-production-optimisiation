@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using Opt.Api.Application.Exceptions;
 using Opt.Api.Application.Services;
 using Opt.Api.DTOs;
 
@@ -30,10 +29,10 @@ public class OptimizationResults : Controller
             var result = await _optimizer.OptimizeAsync(request, cancellationToken);
             return Ok(result);
         }
-        catch (ExternalDataFetchException e)
+        catch (InvalidOperationException e)
         {
-            _logger.LogError(e, "Failed to fetch external data in Controller/optimize");
-            return StatusCode(502, "Bad Gateway: could not retrieve required data from upstream service.");
+            _logger.LogWarning(e, "Insufficient capacity in Controller/optimize");
+            return UnprocessableEntity(e.Message);
         }
         catch (ArgumentException e)
         {
