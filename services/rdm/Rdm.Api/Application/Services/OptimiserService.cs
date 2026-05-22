@@ -9,8 +9,6 @@ using Rdm.Api.Inrastructure.DTOs;
 namespace Rdm.Api.Application.Services;
 
 
-/// The serivce is responsible for handling all interactions with the Optimiser module.
-
 public class OptimiserService : IOptimiserService
 {
     private ILogger<OptimiserService> _logger;
@@ -23,12 +21,6 @@ public class OptimiserService : IOptimiserService
         _logger = logger;
     }
     
-    
-    /// Sends an optimisation request to the optimiser module via a HTTP client and returns the optimisation result.
-    /// Handles request serialization, HTTP communication, response deserialization, and logs any request or JSON errors.
-    
-    /// <param name="optimisationRequestDto">The optimisation input data used by the Optimiser.</param>
-    /// <returns>The optimisation result returned from the Optimiser service.</returns>
     public async Task<OptimisationWrapperDto> RequestOptimisation(OptimisationRequestDto optimisationRequestDto)
     {
         try
@@ -92,8 +84,7 @@ public class OptimiserService : IOptimiserService
         }
     }
 
-    /// Polls the optimiser health endpoint every 5 seconds for up to 85 seconds.
-    /// Render.com free-tier returns 503 immediately during cold start; a single request is never enough.
+    // Polls until the optimiser is ready — Render cold starts return 503 for up to 85 seconds.
     public async Task<bool> WakeUpService()
     {
         using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(10) };

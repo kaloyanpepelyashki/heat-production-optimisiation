@@ -66,8 +66,7 @@ public sealed partial class MainWindowViewModel : ViewModelBase
 		this.selectedNavigationItem = this.NavigationItems[0];
 	}
 	
-	
-	//Calls the WakeUpAllServices from the ApiClient, to send a health check to all the services and wake them up
+
 	private async Task WakeUpServices(CancellationToken ct)
 	{
 		IsWakingUp = true;

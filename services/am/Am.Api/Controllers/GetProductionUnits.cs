@@ -18,7 +18,6 @@ public class GetProductionUnits : Controller
     }
     
     [HttpGet("allGasBoilers")]
-    //TODO - A more in depth error handling must be implemented
     public async Task<IActionResult> GetAllGasBoilers()
     {
         try
@@ -44,7 +43,6 @@ public class GetProductionUnits : Controller
         }
     }
     
-    //TODO - A more in depth error handling must be implemented here (different types of exceptions coming from the layers below must be handled differently)
     [HttpGet("allOilBoilers")]
     public async Task<IActionResult> GetAllOilBoilers()
     {
@@ -72,7 +70,6 @@ public class GetProductionUnits : Controller
     }
     
     [HttpGet("allElectricBoilers")]
-    //TODO - A more in depth error handling must be implemented here (different types of exceptions coming from the layers below must be handled differently)
     public async Task<IActionResult> GetAllElectricBoilers()
     {
         try

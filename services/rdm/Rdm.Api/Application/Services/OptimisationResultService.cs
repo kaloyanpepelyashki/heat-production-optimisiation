@@ -8,8 +8,6 @@ using Rdm.Api.Inrastructure.Persistence.PersistenceModels;
 namespace Rdm.Api.Application.Services;
 
 
-/// Provides all methods needed for working with the result object
-
 public class OptimisationResultService : IOptimisationResultService
 {
     private IResultRepository _resultRepository;
@@ -21,18 +19,10 @@ public class OptimisationResultService : IOptimisationResultService
         _logger = logger;
     }
     
-    
-    /// Gets all the optimisation results present in the database and the production unit objects associated with them.
-    /// Calls the GetAllOptimisationResults method from the ResultRepository class.
-    /// Maps the persistence models coming from database to abase domain model. Nests the models in the OptimisationRun returned. Countains information about the hourly optimisation and the production units
-    /// used for each hour.
-    
-    /// <returns>A list of all optimisation results present</returns>
     public async Task<List<OptimisationRun>> GetAllOptimisationResults()
     {
         try
         {
-            // Maps the persistence models coming from database to abase domain model
             List<OptimisationRunWithHourlyResultsPersistence> persistenceModel = await _resultRepository.GetAllOptimisationResults();
             List<OptimisationRun> optimisationResultsModels = persistenceModel.Select(obj => new OptimisationRun
             {
@@ -77,13 +67,8 @@ public class OptimisationResultService : IOptimisationResultService
         }
     }
 
-    
-    
-    /// In charge of saving a new optimisation run object to the database.
-    /// Utilises the Result repository to handle the database entry creation
-    
-    /// <param name="optimisationRun"></param>
-    /// <returns></returns>
+
+
     public async Task<bool> SaveOptimisationRun(OptimisationRun optimisationRun)
     {
         try

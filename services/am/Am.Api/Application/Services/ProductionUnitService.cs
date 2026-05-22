@@ -7,9 +7,6 @@ using Am.Api.Domain.Models;
 namespace Am.Api.Application.Services;
 
 
-/// In charge of handling all operations in relation to a production unit. Maps the functionality to specific use cases.
-/// The class stores methods about retrieval of different production units.
-
 public class ProductionUnitService: IProductionUnitService
 {   
     private IProductionUnitRepository<GasBoiler> _gasBoilerRepository;

@@ -1,9 +1,6 @@
 namespace Am.Api.Domain.Models;
 
 
-/// Parent class for Production units.
-n
-
 public abstract class ProductionUnit
 {
     public int Id;
