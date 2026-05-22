@@ -194,6 +194,14 @@ public sealed partial class OptimizationViewModel : ViewModelBase
         {
             this.ErrorMessage = "Boiler capacity is insufficient to cover heat demand for the selected maintenance period.";
         }
+        catch (HttpRequestException)
+        {
+            this.ErrorMessage = "Optimization failed. Please try again.";
+        }
+        catch (TimeoutException)
+        {
+            this.ErrorMessage = "Optimization timed out. The service may still be starting up — please try again in a moment.";
+        }
         catch (Exception ex)
         {
             this.ErrorMessage = ex.Message;
