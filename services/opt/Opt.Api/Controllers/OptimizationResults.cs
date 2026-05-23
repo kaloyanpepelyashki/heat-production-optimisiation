@@ -29,11 +29,6 @@ public class OptimizationResults : Controller
             var result = await _optimizer.OptimizeAsync(request, cancellationToken);
             return Ok(result);
         }
-        catch (InvalidOperationException e)
-        {
-            _logger.LogWarning(e, "Insufficient capacity in Controller/optimize");
-            return UnprocessableEntity(e.Message);
-        }
         catch (ArgumentException e)
         {
             _logger.LogWarning(e, "Invalid optimization request in Controller/optimize");

@@ -42,7 +42,7 @@ public class Optimizer
         
         var createdAt = DateTime.UtcNow;
         var hourlyResults = sourceData
-            .Select(point => BuildHourlyResult(point, assets, boilers, createdAt))
+            .Select(point => BuildHourlyResult(point, assets, boilers))
             .ToList(); 
 
         var runFrom = sourceData.Count == 0 ? createdAt : sourceData.Min(x => x.TimeFrom);
@@ -65,7 +65,7 @@ public class Optimizer
             OptResultsHourly = hourlyResults,
         };
         } 
-        catch (Exception ex) when (ex is not OperationCanceledException and not InvalidOperationException)
+        catch (Exception ex) when (ex is not OperationCanceledException)
         {
             throw new ExternalDataFetchException("Optimization failed.", ex);
         }
@@ -144,8 +144,7 @@ public class Optimizer
     private static OptResultsHourlyDto BuildHourlyResult(
         SourceDataPoint point,
         AssetDataBundle assets,
-        IReadOnlyList<DispatchUnit> boilers,
-        DateTime createdAt)
+        IReadOnlyList<DispatchUnit> boilers)
     {
         var maintenance = assets.MaintenanceSchedule;
         
@@ -217,13 +216,11 @@ public class Optimizer
             remainingHeatDemand -= dispatchedHeat;
         }
 
-        if (remainingHeatDemand > 0.001)
-            throw new InvalidOperationException(
-                "Heat demand cannot be fully covered by the available production units.");
+        var coveredHeat = point.HeatDemand - remainingHeatDemand;
 
         return new OptResultsHourlyDto
         {
-            HeatProduction = Math.Round(point.HeatDemand, 2),
+            HeatProduction = Math.Round(coveredHeat, 2),
             ElectricityConsumption = Math.Round(netElectricity, 2),
             Expenses = Math.Round(netCost, 2),
             Co2Emissions = Math.Round(co2, 2),
