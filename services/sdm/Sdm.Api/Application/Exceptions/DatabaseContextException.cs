@@ -3,6 +3,13 @@
 [Serializable]
 public class DatabaseContextException : Exception
 {
-    public DatabaseContextException(string message) : base(message) {}
-    public DatabaseContextException(string message, Exception innerException) : base(message, innerException) {}
+    public DatabaseContextException(string message)
+        : base(message)
+    {
+    }
+
+    public DatabaseContextException(string message, Exception innerException)
+        : base(message, innerException)
+    {
+    }
 }

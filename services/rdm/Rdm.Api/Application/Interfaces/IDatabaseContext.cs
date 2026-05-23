@@ -2,5 +2,5 @@
 
 public interface IDatabaseContext<T>
 {
-    T GetClient(); 
+    T GetClient();
 }

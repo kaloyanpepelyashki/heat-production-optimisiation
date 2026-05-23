@@ -1,11 +1,11 @@
-﻿using Am.Api.Application.Exceptions;
+﻿namespace Am.Api.Infrastructure.Presistence;
+
+using Am.Api.Application.Exceptions;
 using Am.Api.Application.Interfaces;
-using Am.Api.Model.DTOs;
 using Am.Api.Domain.Models;
+using Am.Api.Model.DTOs;
 using Supabase;
 using Supabase.Postgrest.Responses;
-
-namespace Am.Api.Infrastructure.Presistence;
 
 public class GasMotorRepository : IProductionUnitRepository<GasMotor>
 {
@@ -15,19 +15,18 @@ public class GasMotorRepository : IProductionUnitRepository<GasMotor>
 
     public GasMotorRepository(DatabaseContext context, ILogger<GasMotorRepository> logger)
     {
-        _context = context;
-        _client = _context.GetClient();
-        _logger = logger;
+        this._context = context;
+        this._client = this._context.GetClient();
+        this._logger = logger;
     }
 
     public async Task<List<GasMotor>> GetAllAsync()
     {
         try
         {
-            ModeledResponse<GasMotorPersistence> result = await _client.From<GasMotorPersistence>().Get();
+            ModeledResponse<GasMotorPersistence> result = await this._client.From<GasMotorPersistence>().Get();
             List<GasMotorPersistence> gasMotorsPersistence = result.Models;
-            _logger.LogInformation($"Request GetAllAsync for GasMotors. Returned:  {gasMotorsPersistence}");
-            
+            this._logger.LogInformation($"Request GetAllAsync for GasMotors. Returned:  {gasMotorsPersistence}");
 
             if (gasMotorsPersistence == null || gasMotorsPersistence.Count == 0)
             {
@@ -40,12 +39,13 @@ public class GasMotorRepository : IProductionUnitRepository<GasMotor>
             {
                 gasMotors.Add(ToDomain(gasMotor));
             }
+
             return gasMotors;
         }
         catch (Exception e)
         {
             Console.WriteLine($"Error fetching all in GasMotorRepository: {e.GetType()} {e.Message}");
-            _logger.LogError($"Error fetching all in GasMotorRepository: {e.GetType()} {e.Message}");
+            this._logger.LogError($"Error fetching all in GasMotorRepository: {e.GetType()} {e.Message}");
             throw;
         }
     }
@@ -55,17 +55,17 @@ public class GasMotorRepository : IProductionUnitRepository<GasMotor>
         try
         {
             ModeledResponse<GasMotorPersistence> result =
-                await _client.From<GasMotorPersistence>().Select(motor => new object[] { motor.Id }).Get();
+                await this._client.From<GasMotorPersistence>().Select(motor => new object[] { motor.Id }).Get();
 
             GasMotorPersistence gasMotorPersistence = result.Model;
-            _logger.LogInformation($"Request GetByIdAsync for GasMotor: {gasMotorPersistence}");
+            this._logger.LogInformation($"Request GetByIdAsync for GasMotor: {gasMotorPersistence}");
 
             return ToDomain(gasMotorPersistence);
         }
         catch (Exception e)
         {
             Console.WriteLine($"Error fetching specific item {id} in GasMotorRepository: {e.GetType()} {e.Message}");
-            _logger.LogError($"Error fetching specific item {id} in GasMotorRepository: {e.GetType()} {e.Message}");
+            this._logger.LogError($"Error fetching specific item {id} in GasMotorRepository: {e.GetType()} {e.Message}");
             throw;
         }
     }

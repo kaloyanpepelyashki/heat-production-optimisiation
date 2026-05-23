@@ -1,8 +1,8 @@
+namespace Am.Api.Model.DTOs;
+
 using System;
 using Supabase.Postgrest.Attributes;
 using Supabase.Postgrest.Models;
-
-namespace Am.Api.Model.DTOs;
 
 /// <summary>
 /// Represents the Maintenance Period entity.

@@ -5,7 +5,6 @@ using System.Drawing;
 /// <summary>
 /// Strores information about the heating grid.
 /// </summary>
-
 public class HeatingGrid
 {
     public string Architecture;

@@ -1,11 +1,11 @@
+namespace Opt.Api.Infrastructure.Clients;
+
 using Microsoft.Extensions.Caching.Memory;
 using Opt.Api.Application.Exceptions;
 using Opt.Api.Application.Interfaces;
 using Opt.Api.Domain.Models;
 using Opt.Api.DTOs;
 using Opt.Api.Infrastructure.Options;
-
-namespace Opt.Api.Infrastructure.Clients;
 
 public sealed class SdmDataProvider : ISourceDataProvider
 {
@@ -22,14 +22,14 @@ public sealed class SdmDataProvider : ISourceDataProvider
         Microsoft.Extensions.Options.IOptions<ExternalApiOptions> options,
         IMemoryCache cache)
     {
-        _httpClient = httpClient;
-        _options = options.Value;
-        _cache = cache;
+        this._httpClient = httpClient;
+        this._options = options.Value;
+        this._cache = cache;
     }
 
     public async Task<IReadOnlyList<SourceDataPoint>> GetSourceDataAsync(CancellationToken cancellationToken)
     {
-        if (_cache.TryGetValue(CacheKey, out IReadOnlyList<SourceDataPoint>? cached))
+        if (this._cache.TryGetValue(CacheKey, out IReadOnlyList<SourceDataPoint>? cached))
         {
             return cached!;
         }
@@ -37,13 +37,13 @@ public sealed class SdmDataProvider : ISourceDataProvider
         await FetchLock.WaitAsync(cancellationToken);
         try
         {
-            if (_cache.TryGetValue(CacheKey, out cached))
+            if (this._cache.TryGetValue(CacheKey, out cached))
             {
                 return cached!;
             }
 
-            var result = await FetchAsync(cancellationToken);
-            _cache.Set(CacheKey, result, CacheTtl);
+            var result = await this.FetchAsync(cancellationToken);
+            this._cache.Set(CacheKey, result, CacheTtl);
             return result;
         }
         finally
@@ -57,8 +57,8 @@ public sealed class SdmDataProvider : ISourceDataProvider
         try
         {
             var sourceData = await HttpRetryHelper.GetWithRetryAsync<List<SdmSourceDataResponseDto>>(
-                _httpClient,
-                _options.Sdm.SourceDataEndpoint,
+                this._httpClient,
+                this._options.Sdm.SourceDataEndpoint,
                 cancellationToken) ?? [];
 
             return sourceData.Select(x => new SourceDataPoint

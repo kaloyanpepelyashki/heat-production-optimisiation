@@ -13,23 +13,24 @@ public class OptimiserService : IOptimiserService
 {
     private ILogger<OptimiserService> _logger;
     private string? OptimiserUrl;
-    
+
     public OptimiserService(IOptions<ServiceUrlProvider> serviceUrlProvider, ILogger<OptimiserService> logger)
     {
-        OptimiserUrl = serviceUrlProvider.Value.OptimiserUrl;
-        
-        _logger = logger;
+        this.OptimiserUrl = serviceUrlProvider.Value.OptimiserUrl;
+        this._logger = logger;
     }
-    
+
     public async Task<OptimisationWrapperDto> RequestOptimisation(OptimisationRequestDto optimisationRequestDto)
     {
         try
         {
-            if (!await WakeUpService())
+            if (!await this.WakeUpService())
+            {
                 throw new Exception("Wake Up Failed");
+            }
 
             var json = JsonSerializer.Serialize(optimisationRequestDto);
-            var url = $"{OptimiserUrl}/api/OptimizationResults/optimize";
+            var url = $"{this.OptimiserUrl}/api/OptimizationResults/optimize";
             var deadline = DateTime.UtcNow.AddSeconds(60);
 
             using var client = new HttpClient();
@@ -41,7 +42,7 @@ public class OptimiserService : IOptimiserService
 
                 if ((int)response.StatusCode >= 500 && DateTime.UtcNow < deadline)
                 {
-                    _logger.LogWarning("Optimiser returned {StatusCode}, retrying…", response.StatusCode);
+                    this._logger.LogWarning("Optimiser returned {StatusCode}, retrying…", response.StatusCode);
                     await Task.Delay(5000);
                     continue;
                 }
@@ -53,34 +54,35 @@ public class OptimiserService : IOptimiserService
                 }
 
                 if (!response.IsSuccessStatusCode)
-                    _logger.LogError("Optimiser responded with status code: {StatusCode}, {ReasonPhrase}", response.StatusCode, response.ReasonPhrase);
+                {
+                    this._logger.LogError("Optimiser responded with status code: {StatusCode}, {ReasonPhrase}", response.StatusCode, response.ReasonPhrase);
+                }
 
                 response.EnsureSuccessStatusCode();
                 var responseBody = await response.Content.ReadAsStringAsync();
                 return JsonSerializer.Deserialize<OptimisationWrapperDto>(responseBody);
             }
-            
         }
         catch (HttpRequestException e)
         {
-            _logger.LogError(
+            this._logger.LogError(
                 $"Error in OptimiserService. Connectivity error when requesting optimisation: {e.Message} {e.GetType()} Status Code: {e.StatusCode}, {e.HttpRequestError}");
             throw;
         }
         catch (TaskCanceledException e)
         {
-            _logger.LogError($"Error in OptimiserService. Request timed out: {e.Message} {e.GetType()}");
+            this._logger.LogError($"Error in OptimiserService. Request timed out: {e.Message} {e.GetType()}");
             throw;
         }
         catch (JsonException e)
         {
-            _logger.LogError($"Error in OptimiserService. Json serialization exception: {e.Message} {e.GetType()}");
+            this._logger.LogError($"Error in OptimiserService. Json serialization exception: {e.Message} {e.GetType()}");
             throw;
         }
         catch (Exception e)
         {
-            _logger.LogError($"Error in OptimiserService: {e.Message} {e.GetType()}");
-            throw e;
+            this._logger.LogError($"Error in OptimiserService: {e.Message} {e.GetType()}");
+            throw;
         }
     }
 
@@ -88,7 +90,7 @@ public class OptimiserService : IOptimiserService
     public async Task<bool> WakeUpService()
     {
         using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(10) };
-        var endpoint = $"{OptimiserUrl}/api/Health/wakeup";
+        var endpoint = $"{this.OptimiserUrl}/api/Health/wakeup";
         var deadline = DateTime.UtcNow.AddSeconds(85);
 
         while (DateTime.UtcNow < deadline)
@@ -98,24 +100,26 @@ public class OptimiserService : IOptimiserService
                 var response = await client.GetAsync(endpoint);
 
                 if ((int)response.StatusCode < 500)
+                {
                     return true;
+                }
 
-                _logger.LogInformation("WakeUp: Optimiser returned {StatusCode}, retrying…", response.StatusCode);
+                this._logger.LogInformation("WakeUp: Optimiser returned {StatusCode}, retrying…", response.StatusCode);
                 await Task.Delay(5000);
             }
             catch (TaskCanceledException)
             {
-                _logger.LogWarning("WakeUp: Optimiser request timed out, retrying…");
+                this._logger.LogWarning("WakeUp: Optimiser request timed out, retrying…");
                 await Task.Delay(5000);
             }
             catch (Exception e)
             {
-                _logger.LogWarning("WakeUp: Optimiser error: {Message}, retrying…", e.Message);
+                this._logger.LogWarning("WakeUp: Optimiser error: {Message}, retrying…", e.Message);
                 await Task.Delay(5000);
             }
         }
 
-        _logger.LogError("WakeUp: Optimiser timed out after 85s.");
+        this._logger.LogError("WakeUp: Optimiser timed out after 85s.");
         return false;
     }
 }

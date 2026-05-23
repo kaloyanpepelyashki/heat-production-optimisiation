@@ -10,5 +10,4 @@ public class ProductionUnitMaintenance
     public DateTime ToDate;
     public int PeriodId;
     public int ScenarioId;
-
 }

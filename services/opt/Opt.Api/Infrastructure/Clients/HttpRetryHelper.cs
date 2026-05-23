@@ -1,7 +1,7 @@
+namespace Opt.Api.Infrastructure.Clients;
+
 using System.Net;
 using System.Net.Http.Json;
-
-namespace Opt.Api.Infrastructure.Clients;
 
 internal static class HttpRetryHelper
 {

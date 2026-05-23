@@ -1,11 +1,11 @@
-﻿using Rdm.Api.Application.Exceptions;
+﻿namespace Rdm.Api.Application.Services;
+
+using Rdm.Api.Application.Exceptions;
 using Rdm.Api.Application.Interfaces;
 using Rdm.Api.Application.Model;
 using Rdm.Api.Application.Services.Helpers;
 using Rdm.Api.Inrastructure.Persistence;
 using Rdm.Api.Inrastructure.Persistence.PersistenceModels;
-
-namespace Rdm.Api.Application.Services;
 
 /// <summary>
 /// Provides all methods needed for working with the result object
@@ -17,10 +17,10 @@ public class OptimisationResultService : IOptimisationResultService
 
     public OptimisationResultService(IResultRepository resultRepository, ILogger<OptimisationResultService> logger)
     {
-        _resultRepository = resultRepository;
-        _logger = logger;
+        this._resultRepository = resultRepository;
+        this._logger = logger;
     }
-    
+
     /// <summary>
     /// Gets all the optimisation results present in the database and the production unit objects associated with them.
     /// Calls the GetAllOptimisationResults method from the ResultRepository class.
@@ -61,27 +61,26 @@ public class OptimisationResultService : IOptimisationResultService
                         ElectricityConsumption = opu.ElectricityConsumption,
                         Co2Emissions = opu.Co2Emissions,
                         Expenses = opu.Expenses,
-                        Capacity = opu.Capacity
-                    }).ToList()
-                }).ToList()
+                        Capacity = opu.Capacity,
+                    }).ToList(),
+                }).ToList(),
             }).ToList();
 
             return optimisationResultsModels;
         }
         catch (DatabaseOperationException e)
         {
-            _logger.LogError(
+            this._logger.LogError(
                 $"Error in OptimisationResultService. Database operation error. Failed to get all optimisation results due to a database born error : {e.Message}, {e.GetType()}");
             throw;
         }
         catch (Exception e)
         {
-            _logger.LogError($"Error in OptimisationResultService. Failed to get all optimisations Error: {e.Message}, {e.GetType()}");
+            this._logger.LogError($"Error in OptimisationResultService. Failed to get all optimisations Error: {e.Message}, {e.GetType()}");
             throw;
         }
     }
 
-    
     /// <summary>
     /// In charge of saving a new optimisation run object to the database.
     /// Utilises the Result repository to handle the database entry creation
@@ -94,23 +93,23 @@ public class OptimisationResultService : IOptimisationResultService
         {
             OptimisationRunPersistenceWrapper optimisationRunPersistence =
                 OptimisationModelsMapper.ToPersistenceWrapper(optimisationRun);
-            var creationResult = await _resultRepository.SaveOptimisationResult(optimisationRunPersistence);
+            var creationResult = await this._resultRepository.SaveOptimisationResult(optimisationRunPersistence);
 
             return creationResult;
         }
         catch (ArgumentException e)
         {
-            _logger.LogError($"Error translating domain to persistence model: {e.Message} ");
-            throw e;
+            this._logger.LogError($"Error translating domain to persistence model: {e.Message} ");
+            throw;
         }
         catch (DatabaseOperationException e)
         {
-            _logger.LogError($"Error in OptimisationResultService. Database operation error. Failed to create a new optimisation run due to a database born error: {e.Message}, {e.GetType()}");
+            this._logger.LogError($"Error in OptimisationResultService. Database operation error. Failed to create a new optimisation run due to a database born error: {e.Message}, {e.GetType()}");
             throw;
         }
         catch (Exception e)
         {
-            _logger.LogError($"Error in OptimisationResultService. Failed to get all optimisations Error: {e.Message}, {e.GetType()}");
+            this._logger.LogError($"Error in OptimisationResultService. Failed to get all optimisations Error: {e.Message}, {e.GetType()}");
             throw;
         }
     }

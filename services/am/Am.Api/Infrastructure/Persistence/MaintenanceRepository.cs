@@ -1,10 +1,10 @@
+namespace Am.Api.Infrastructure.Presistence;
+
 using Am.Api.Application.Interfaces;
 using Am.Api.Domain.Models;
 using Am.Api.Model.DTOs;
 using Supabase;
 using Supabase.Postgrest.Responses;
-
-namespace Am.Api.Infrastructure.Presistence;
 
 public sealed class MaintenanceRepository : IMaintenanceRepository
 {
@@ -13,15 +13,15 @@ public sealed class MaintenanceRepository : IMaintenanceRepository
 
     public MaintenanceRepository(DatabaseContext context, ILogger<MaintenanceRepository> logger)
     {
-        _client = context.GetClient();
-        _logger = logger;
+        this._client = context.GetClient();
+        this._logger = logger;
     }
 
     public async Task<List<ProductionUnitMaintenance>> GetAllProductionUnitMaintenanceAsync()
     {
         try
         {
-            ModeledResponse<ProductionUnitMaintenancePersistence> result = await _client
+            ModeledResponse<ProductionUnitMaintenancePersistence> result = await this._client
                 .From<ProductionUnitMaintenancePersistence>()
                 .Get();
 
@@ -43,11 +43,12 @@ public sealed class MaintenanceRepository : IMaintenanceRepository
                     ScenarioId = p.ScenarioId,
                 });
             }
+
             return productionUnitMaintenances;
         }
         catch (Exception e)
         {
-            _logger.LogError($"Error fetching all in MaintenanceRepository {e.GetType()} {e.Message}");
+            this._logger.LogError($"Error fetching all in MaintenanceRepository {e.GetType()} {e.Message}");
             throw;
         }
     }
@@ -72,7 +73,7 @@ public sealed class MaintenanceRepository : IMaintenanceRepository
                 ScenarioId = maintenance.ScenarioId,
             };
 
-            ModeledResponse<ProductionUnitMaintenancePersistence> result = await _client
+            ModeledResponse<ProductionUnitMaintenancePersistence> result = await this._client
                 .From<ProductionUnitMaintenancePersistence>()
                 .Insert(persistence);
 
@@ -80,7 +81,7 @@ public sealed class MaintenanceRepository : IMaintenanceRepository
         }
         catch (Exception e)
         {
-            _logger.LogError($"Error inserting ProductionUnitMaintenance in MaintenanceRepository {e.GetType()} {e.Message}");
+            this._logger.LogError($"Error inserting ProductionUnitMaintenance in MaintenanceRepository {e.GetType()} {e.Message}");
             throw;
         }
     }
