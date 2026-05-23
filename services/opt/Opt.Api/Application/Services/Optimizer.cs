@@ -65,7 +65,7 @@ public class Optimizer
             OptResultsHourly = hourlyResults,
         };
         } 
-        catch (Exception ex) when (ex is not OperationCanceledException and not InvalidOperationException)
+        catch (Exception ex) when (ex is not OperationCanceledException)
         {
             throw new ExternalDataFetchException("Optimization failed.", ex);
         }
@@ -205,20 +205,21 @@ public class Optimizer
             {
                 UnitType = boiler.UnitType,
                 UnitId = boiler.UnitId,
-                HeatProductionPerUnit = Math.Round(dispatchedHeat, 2),
-                ElectricityConsumptionPerUnit = Math.Round(
+                HeatProduction = Math.Round(dispatchedHeat, 2),
+                ElectricityConsumption = Math.Round(
                     (boiler.UnitType == "EB" || boiler.UnitType == "GM") ? boiler.MaxElectricity * loadRatio * -1 : 0d, 2),
-                ExpensesPerUnit = Math.Round(boiler.GetExpensesAtFull(point.ElectricityPrice) * loadRatio, 2),
-                Co2EmissionsPerUnit = Math.Round(boiler.Co2PerMWh * dispatchedHeat, 2),
+                Expenses = Math.Round(boiler.GetExpensesAtFull(point.ElectricityPrice) * loadRatio, 2),
+                Co2Emissions = Math.Round(boiler.Co2PerMWh * dispatchedHeat, 2),
                 CapacityOutput = Math.Round(loadRatio * 100d, 2),
             });
 
             remainingHeatDemand -= dispatchedHeat;
         }
 
-        if (remainingHeatDemand > 0.001)
-            throw new InvalidOperationException(
-                "Heat demand cannot be fully covered by the available production units.");
+        if (remainingHeatDemand > 0d)
+        {
+            throw new InvalidOperationException("Heat demand could not be fully covered with available boilers.");
+        }
 
         return new OptResultsHourlyDto
         {

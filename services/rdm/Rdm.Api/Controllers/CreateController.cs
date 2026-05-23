@@ -1,6 +1,7 @@
 ﻿using System.Net.Http;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
+using Rdm.Api.Application.Exceptions;
 using Rdm.Api.Application.Interfaces;
 using Rdm.Api.Application.Model;
 using Rdm.Api.Application.Services.Helpers;
@@ -53,11 +54,6 @@ public class CreateController : Controller
                 return Ok(returnObject);
             }
             
-        }
-        catch (InvalidOperationException ex)
-        {
-            _logger.LogWarning(ex, "Insufficient boiler capacity");
-            return UnprocessableEntity(new ApiResponseModel<OptimisationRun>(ex.Message, null, 0, ex.Message));
         }
         catch (HttpRequestException ex)
         {
