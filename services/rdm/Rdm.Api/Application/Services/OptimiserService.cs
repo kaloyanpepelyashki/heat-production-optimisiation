@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using System.Text.Json;
 using Microsoft.Extensions.Options;
 using Rdm.Api.Application.Interfaces;
@@ -12,14 +12,14 @@ public class OptimiserService : IOptimiserService
 {
     private ILogger<OptimiserService> _logger;
     private string? OptimiserUrl;
-
+    
     public OptimiserService(IOptions<ServiceUrlProvider> serviceUrlProvider, ILogger<OptimiserService> logger)
     {
         OptimiserUrl = serviceUrlProvider.Value.OptimiserUrl;
-
+        
         _logger = logger;
     }
-
+    
     public async Task<OptimisationWrapperDto> RequestOptimisation(OptimisationRequestDto optimisationRequestDto)
     {
         try
@@ -30,7 +30,7 @@ public class OptimiserService : IOptimiserService
             {
                 throw new Exception("Wake Up Failed");
             }
-
+            
             HttpClient client = new HttpClient();
 
             var json = JsonSerializer.Serialize(optimisationRequestDto);
@@ -54,7 +54,7 @@ public class OptimiserService : IOptimiserService
             var result = JsonSerializer.Deserialize<OptimisationWrapperDto>(responseBody);
 
             return result;
-
+            
         }
         catch (HttpRequestException e)
         {
@@ -84,17 +84,17 @@ public class OptimiserService : IOptimiserService
         try
         {
             HttpClient client = new HttpClient();
-
+            
             var response = await client.GetAsync($"{OptimiserUrl}/api/Health/wakeup");
 
             if (response.IsSuccessStatusCode)
             {
                 return true;
-            }
-
+            } 
+            
             return false;
-
-
+            
+            
         }  catch (HttpRequestException e)
         {
             _logger.LogError($"Error in OptimiserService. Connectivity error when waking up optimiser: {e.Message} {e.GetType()} Status Code: {e.StatusCode}, {e.HttpRequestError}");
