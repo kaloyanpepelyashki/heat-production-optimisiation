@@ -15,7 +15,7 @@
             </StackPanel>
         </ScrollViewer>
 
-        <!-- Fullscreen chart overlay — covers entire view when a chart is maximized -->
+        <!-- Fullscreen chart overlay - covers entire view when a chart is maximized -->
         <Grid IsVisible="{Binding ChartsVM.IsMaximized}"
               ZIndex="100"
               Background="{DynamicResource AppBackground}">

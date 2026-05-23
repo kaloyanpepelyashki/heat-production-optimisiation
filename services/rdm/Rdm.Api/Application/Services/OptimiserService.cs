@@ -84,7 +84,7 @@ public class OptimiserService : IOptimiserService
         }
     }
 
-    // Polls until the optimiser is ready — Render cold starts return 503 for up to 85 seconds.
+    // Polls until the optimiser is ready - Render cold starts return 503 for up to 85 seconds.
     public async Task<bool> WakeUpService()
     {
         using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(10) };

@@ -56,7 +56,7 @@
                                FontSize="12"
                                Foreground="{DynamicResource AppTextMuted}"/>
 
-                    <TextBlock Text="–"
+                    <TextBlock Text="-"
                                FontSize="12"
                                Foreground="{DynamicResource AppTextMuted}"/>
 

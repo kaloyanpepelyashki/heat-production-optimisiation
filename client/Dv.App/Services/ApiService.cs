@@ -94,7 +94,7 @@ public class ApiService : IApiService
                     continue;
                 }
 
-                // 2xx or 4xx — the server is handling requests
+                // 2xx or 4xx - the server is handling requests
                 return true;
             }
             catch (OperationCanceledException) when (token.IsCancellationRequested)

@@ -95,7 +95,7 @@ public sealed partial class OptimizationViewModel : ViewModelBase
         $"to {this.CurrentContext.EndDate:dd.MM.yyyy HH:mm}).";
 
     public string DateRangeText =>
-        $"{this.CurrentContext.StartDate:dd MMM yyyy} – {this.CurrentContext.EndDate:dd MMM yyyy}";
+        $"{this.CurrentContext.StartDate:dd MMM yyyy} - {this.CurrentContext.EndDate:dd MMM yyyy}";
 
     partial void OnSelectedPeriodChanged(string value)
     {
@@ -200,7 +200,7 @@ public sealed partial class OptimizationViewModel : ViewModelBase
         }
         catch (TimeoutException)
         {
-            this.ErrorMessage = "Optimization timed out. The service may still be starting up — please try again in a moment.";
+            this.ErrorMessage = "Optimization timed out. The service may still be starting up - please try again in a moment.";
         }
         catch (Exception ex)
         {
@@ -212,7 +212,7 @@ public sealed partial class OptimizationViewModel : ViewModelBase
         }
     }
     // Polls until RDM (and its internal OPT dependency) are fully ready.
-    // A single retry after 5s isn't enough — Render cold starts take 30-60s.
+    // A single retry after 5s isn't enough - Render cold starts take 30-60s.
     private async Task<ApiResponseModel<OptimisationRunDto>?> PostOptimizationAsync(OptimizationRequestDto request)
     {
         var deadline = DateTime.UtcNow.AddSeconds(150);
