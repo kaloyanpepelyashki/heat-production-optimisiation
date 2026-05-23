@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using System.Text.Json;
 using Microsoft.Extensions.Options;
 using Rdm.Api.Application.Interfaces;
@@ -8,32 +8,35 @@ using Rdm.Api.Inrastructure.DTOs;
 
 namespace Rdm.Api.Application.Services;
 
-
 public class OptimiserService : IOptimiserService
 {
     private ILogger<OptimiserService> _logger;
     private string? OptimiserUrl;
-    
+
     public OptimiserService(IOptions<ServiceUrlProvider> serviceUrlProvider, ILogger<OptimiserService> logger)
     {
         OptimiserUrl = serviceUrlProvider.Value.OptimiserUrl;
-        
+
         _logger = logger;
     }
-    
+
     public async Task<OptimisationWrapperDto> RequestOptimisation(OptimisationRequestDto optimisationRequestDto)
     {
         try
         {
-            if (!await WakeUpService())
+            bool wakeUpCallResponse = await WakeUpService();
+
+            if (!wakeUpCallResponse)
+            {
                 throw new Exception("Wake Up Failed");
+            }
+
+            HttpClient client = new HttpClient();
 
             var json = JsonSerializer.Serialize(optimisationRequestDto);
-            var url = $"{OptimiserUrl}/api/OptimizationResults/optimize";
-
-            using var client = new HttpClient();
             var content = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = await client.PostAsync(url, content);
+
+            var response = await client.PostAsync($"{OptimiserUrl}/api/OptimizationResults/optimize", content);
 
             if ((int)response.StatusCode == 422)
             {
@@ -42,12 +45,16 @@ public class OptimiserService : IOptimiserService
             }
 
             if (!response.IsSuccessStatusCode)
-                _logger.LogError("Optimiser responded with status code: {StatusCode}, {ReasonPhrase}", response.StatusCode, response.ReasonPhrase);
+            {
+                _logger.LogError($"Optimiser responded with status code: {response.StatusCode}, {response.Content}, {response.ReasonPhrase}");
+            }
 
             response.EnsureSuccessStatusCode();
             var responseBody = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<OptimisationWrapperDto>(responseBody);
-            
+            var result = JsonSerializer.Deserialize<OptimisationWrapperDto>(responseBody);
+
+            return result;
+
         }
         catch (HttpRequestException e)
         {
@@ -74,17 +81,34 @@ public class OptimiserService : IOptimiserService
 
     public async Task<bool> WakeUpService()
     {
-        using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(10) };
-        var endpoint = $"{OptimiserUrl}/api/Health/wakeup";
         try
         {
-            var response = await client.GetAsync(endpoint);
-            return response.IsSuccessStatusCode;
+            HttpClient client = new HttpClient();
+
+            var response = await client.GetAsync($"{OptimiserUrl}/api/Health/wakeup");
+
+            if (response.IsSuccessStatusCode)
+            {
+                return true;
+            }
+
+            return false;
+
+
+        }  catch (HttpRequestException e)
+        {
+            _logger.LogError($"Error in OptimiserService. Connectivity error when waking up optimiser: {e.Message} {e.GetType()} Status Code: {e.StatusCode}, {e.HttpRequestError}");
+            throw;
+        }
+        catch (TaskCanceledException e)
+        {
+            _logger.LogError($"Error in OptimiserService when waking up optimiser service. Request timed out: {e.Message} {e.GetType()}");
+            return false;
         }
         catch (Exception e)
         {
-            _logger.LogError("WakeUp: {Message}", e.Message);
-            return false;
+            _logger.LogError($"Error in OptimiserService in wake up call: {e.Message} {e.GetType()}");
+            throw e;
         }
     }
 }
