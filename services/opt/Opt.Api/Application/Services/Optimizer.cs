@@ -216,9 +216,10 @@ public class Optimizer
             remainingHeatDemand -= dispatchedHeat;
         }
 
-        if (remainingHeatDemand > 0.001)
-            throw new InvalidOperationException(
-                "Heat demand cannot be fully covered by the available production units.");
+        if (remainingHeatDemand > 0d)
+        {
+            throw new InvalidOperationException("Heat demand could not be fully covered with available boilers.");
+        }
 
         return new OptResultsHourlyDto
         {
