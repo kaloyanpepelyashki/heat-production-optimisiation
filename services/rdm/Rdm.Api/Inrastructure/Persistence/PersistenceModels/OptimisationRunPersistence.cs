@@ -3,9 +3,6 @@ using Supabase.Postgrest.Models;
 
 namespace Rdm.Api.Inrastructure.Persistence.PersistenceModels;
 
-
-/// Represents a whole optimisation run. 
-
 [Table("optimisation_run")]
 public class OptimisationRunPersistence: BaseModel
 {

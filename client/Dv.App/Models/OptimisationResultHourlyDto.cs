@@ -4,13 +4,8 @@ using System.Collections.Generic;
 
 namespace Dv.App.Models;
 
-
-
-/// Data transfer object - nested in the optimisation run object. 
-
 public class OptimisationResultsHourlyDto
 {
-    //Currently looks the same as the domain model, but can give flexibility later. Can allow for data transofrmations etc.
     [JsonPropertyName("id")]
     public int? Id { get; set; }
     [JsonPropertyName("optimisation_run_id")]

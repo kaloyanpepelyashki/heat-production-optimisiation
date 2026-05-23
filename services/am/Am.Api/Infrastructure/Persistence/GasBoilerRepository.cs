@@ -7,10 +7,6 @@ using Supabase.Postgrest.Responses;
 
 namespace Am.Api.Infrastructure.Presistence;
 
-
-/// Repository responsible for retrieving GasBoilerPersistence data from the database
-/// using the configured database client.
-
 public class GasBoilerRepository: IProductionUnitRepository<GasBoiler>
 {
     private readonly DatabaseContext _context;
@@ -25,11 +21,6 @@ public class GasBoilerRepository: IProductionUnitRepository<GasBoiler>
         _logger = logger;
     }
     
-    
-    /// Retrieves all gas boiler records from the database.
-    /// Throws an exception if no data is returned.
-    
-    /// <returns>A list of GasBoilerPersistence entities.</returns>
     public async Task<List<GasBoiler>> GetAllAsync()
     {
         try
@@ -59,11 +50,6 @@ public class GasBoilerRepository: IProductionUnitRepository<GasBoiler>
             throw;
         }
     }
-    
-    /// Retrieves a gas boiler record by its identifier.
-    
-    /// <param name="id">The identifier of the gas boiler.</param>
-    /// <returns>A GasBoilerPersistence entity matching the given id.</returns>
     public async  Task<GasBoiler> GetByIdAsync(int id)
     {
         try
@@ -84,11 +70,6 @@ public class GasBoilerRepository: IProductionUnitRepository<GasBoiler>
         }
     }
 
-    
-    /// Turns Persistance Model into a Domain model.
-    
-    /// <param name="p">The Persistance model.</param>
-    /// <returns>A domain model.</returns>
     public static GasBoiler ToDomain(GasBoilerPersistence p)
     {
         return new GasBoiler

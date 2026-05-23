@@ -4,14 +4,8 @@ using System.Collections.Generic;
 
 namespace Dv.App.Models;
 
-
-/// Data transfer object, encapsulating the whole optimisation object. Used to send/receive optimisation from API.
-
-/// 
 public class OptimisationRunDto
 {
-    //Currently looks the same as the domain model, but can give flexibility later. Can allow for data transformations etc.
-    
     //The Id will stay, as the same DTO is used for transfer to DV
     [JsonPropertyName("id")]
     public int? Id { get; set; }

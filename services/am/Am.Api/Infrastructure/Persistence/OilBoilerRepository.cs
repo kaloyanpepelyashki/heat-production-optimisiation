@@ -21,11 +21,6 @@ public class OilBoilerRepository : IProductionUnitRepository<OilBoiler>
         _logger = logger;
     }
     
-    
-    /// Retrieves all oil boiler records from the database.
-    /// Throws an exception if no data is returned.
-    
-    /// <returns>A list of OilBoiler entities (should be domain model that is returned).</returns>
     public async Task<List<OilBoiler>> GetAllAsync()
     {
         try
@@ -55,11 +50,6 @@ public class OilBoilerRepository : IProductionUnitRepository<OilBoiler>
             throw;
         }
     }
-    
-    /// Retrieves an oil boiler record by its identifier.
-    
-    /// <param name="id">The identifier of the gas boiler.</param>
-    /// <returns>A OilBoiler entity matching the given id.</returns>
     public async  Task<OilBoiler> GetByIdAsync(int id)
     {
         try
@@ -80,11 +70,6 @@ public class OilBoilerRepository : IProductionUnitRepository<OilBoiler>
         }
     }
 
-    
-    /// Turns Persistance Model into a Domain model.
-    
-    /// <param name="p">The Persistance model.</param>
-    /// <returns>A domain model.</returns>
     public static OilBoiler ToDomain(OilBoilerPersistence p)
     {
         return new OilBoiler
