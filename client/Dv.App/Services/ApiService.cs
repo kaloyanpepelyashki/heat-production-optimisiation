@@ -74,61 +74,13 @@ public class ApiService : IApiService
     }
     
     
-    /// Polls service/api/Health/wakeup until it responds with a non-5xx status or 90 seconds elapse.
-    /// Render.com free-tier services return 5xx during cold start; a single request is not enough.
     public async Task<bool> WakeUpService(BackendService service, CancellationToken token)
     {
         var endpoint = this.BuildUrl(service, "api/Health/wakeup");
-        var deadline = DateTime.UtcNow.AddSeconds(90);
-
-        while (DateTime.UtcNow < deadline)
-        {
-            try
-            {
-                var response = await SharedHttpClient.GetAsync(endpoint, token);
-
-                if ((int)response.StatusCode >= 500)
-                {
-                    Debug.WriteLine($"WakeUp: {service} returned {(int)response.StatusCode}, retrying…");
-                    await Task.Delay(5000, token);
-                    continue;
-                }
-
-                // 2xx or 4xx - the server is handling requests
-                return true;
-            }
-            catch (OperationCanceledException) when (token.IsCancellationRequested)
-            {
-                Debug.WriteLine($"WakeUp: {service} cancelled.");
-                throw;
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine($"WakeUp: {service} error: {e.Message}, retrying…");
-                await Task.Delay(5000, token);
-            }
-        }
-
-        Debug.WriteLine($"WakeUp: {service} timed out after 90s.");
-        return false;
-    }
-
-    public async Task<bool> WakeUpAllServices(CancellationToken token = default)
-    {
-        var tasks = ServiceUrls.Keys
-            .ToDictionary(svc => svc, svc => WakeUpServiceSafe(svc, token));
-
-        await Task.WhenAll(tasks.Values);
-
-        return new[] { BackendService.Rdm, BackendService.Sdm, BackendService.Am }
-            .All(svc => tasks[svc].Result);
-    }
-
-    private async Task<bool> WakeUpServiceSafe(BackendService service, CancellationToken token)
-    {
         try
         {
-            return await WakeUpService(service, token);
+            var response = await SharedHttpClient.GetAsync(endpoint, token);
+            return response.IsSuccessStatusCode;
         }
         catch (OperationCanceledException) when (token.IsCancellationRequested)
         {
@@ -136,10 +88,15 @@ public class ApiService : IApiService
         }
         catch (Exception e)
         {
-            Debug.WriteLine($"WakeUp failed for {service}: {e.Message}");
+            Debug.WriteLine($"WakeUp: {service} error: {e.Message}");
             return false;
         }
     }
-    
-    
+
+    public async Task<bool> WakeUpAllServices(CancellationToken token = default)
+    {
+        var tasks = ServiceUrls.Keys.Select(svc => WakeUpService(svc, token));
+        var results = await Task.WhenAll(tasks);
+        return results.All(r => r);
+    }
 }

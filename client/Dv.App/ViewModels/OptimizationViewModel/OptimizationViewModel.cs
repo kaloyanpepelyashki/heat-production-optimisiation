@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -178,7 +177,8 @@ public sealed partial class OptimizationViewModel : ViewModelBase
                 return;
             }
 
-            var response = await this.PostOptimizationAsync(request);
+            var response = await this.apiService.PostAsync<OptimizationRequestDto, ApiResponseModel<OptimisationRunDto>>(
+                BackendService.Rdm, "optimisation", request);
 
             if (response?.Data is null)
             {
@@ -198,10 +198,6 @@ public sealed partial class OptimizationViewModel : ViewModelBase
         {
             this.ErrorMessage = "Optimization failed. Please try again.";
         }
-        catch (TimeoutException)
-        {
-            this.ErrorMessage = "Optimization timed out. The service may still be starting up - please try again in a moment.";
-        }
         catch (Exception ex)
         {
             this.ErrorMessage = ex.Message;
@@ -211,31 +207,6 @@ public sealed partial class OptimizationViewModel : ViewModelBase
             this.IsLoading = false;
         }
     }
-    // Polls until RDM (and its internal OPT dependency) are fully ready.
-    // A single retry after 5s isn't enough - Render cold starts take 30-60s.
-    private async Task<ApiResponseModel<OptimisationRunDto>?> PostOptimizationAsync(OptimizationRequestDto request)
-    {
-        var deadline = DateTime.UtcNow.AddSeconds(150);
-
-        while (DateTime.UtcNow < deadline)
-        {
-            try
-            {
-                return await this.apiService.PostAsync<OptimizationRequestDto, ApiResponseModel<OptimisationRunDto>>(
-                    BackendService.Rdm, "optimisation", request);
-            }
-            catch (HttpRequestException ex) when (
-                ex.StatusCode == HttpStatusCode.ServiceUnavailable ||
-                ex.StatusCode == HttpStatusCode.BadGateway)
-            {
-                this.ErrorMessage = "Service is warming up, retrying…";
-                await Task.Delay(5000);
-            }
-        }
-
-        throw new TimeoutException("Optimization service did not become available. Please try again in a moment.");
-    }
-
     private bool CanRunOptimization()
     {
         var periodId = this.CurrentContext.PeriodId.ToString();

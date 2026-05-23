@@ -30,35 +30,23 @@ public class OptimiserService : IOptimiserService
 
             var json = JsonSerializer.Serialize(optimisationRequestDto);
             var url = $"{OptimiserUrl}/api/OptimizationResults/optimize";
-            var deadline = DateTime.UtcNow.AddSeconds(60);
 
             using var client = new HttpClient();
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var response = await client.PostAsync(url, content);
 
-            while (true)
+            if ((int)response.StatusCode == 422)
             {
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-                var response = await client.PostAsync(url, content);
-
-                if ((int)response.StatusCode >= 500 && DateTime.UtcNow < deadline)
-                {
-                    _logger.LogWarning("Optimiser returned {StatusCode}, retrying…", response.StatusCode);
-                    await Task.Delay(5000);
-                    continue;
-                }
-
-                if ((int)response.StatusCode == 422)
-                {
-                    var body = await response.Content.ReadAsStringAsync();
-                    throw new InvalidOperationException(body);
-                }
-
-                if (!response.IsSuccessStatusCode)
-                    _logger.LogError("Optimiser responded with status code: {StatusCode}, {ReasonPhrase}", response.StatusCode, response.ReasonPhrase);
-
-                response.EnsureSuccessStatusCode();
-                var responseBody = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<OptimisationWrapperDto>(responseBody);
+                var body = await response.Content.ReadAsStringAsync();
+                throw new InvalidOperationException(body);
             }
+
+            if (!response.IsSuccessStatusCode)
+                _logger.LogError("Optimiser responded with status code: {StatusCode}, {ReasonPhrase}", response.StatusCode, response.ReasonPhrase);
+
+            response.EnsureSuccessStatusCode();
+            var responseBody = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<OptimisationWrapperDto>(responseBody);
             
         }
         catch (HttpRequestException e)
@@ -84,38 +72,19 @@ public class OptimiserService : IOptimiserService
         }
     }
 
-    // Polls until the optimiser is ready - Render cold starts return 503 for up to 85 seconds.
     public async Task<bool> WakeUpService()
     {
         using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(10) };
         var endpoint = $"{OptimiserUrl}/api/Health/wakeup";
-        var deadline = DateTime.UtcNow.AddSeconds(85);
-
-        while (DateTime.UtcNow < deadline)
+        try
         {
-            try
-            {
-                var response = await client.GetAsync(endpoint);
-
-                if ((int)response.StatusCode < 500)
-                    return true;
-
-                _logger.LogInformation("WakeUp: Optimiser returned {StatusCode}, retrying…", response.StatusCode);
-                await Task.Delay(5000);
-            }
-            catch (TaskCanceledException)
-            {
-                _logger.LogWarning("WakeUp: Optimiser request timed out, retrying…");
-                await Task.Delay(5000);
-            }
-            catch (Exception e)
-            {
-                _logger.LogWarning("WakeUp: Optimiser error: {Message}, retrying…", e.Message);
-                await Task.Delay(5000);
-            }
+            var response = await client.GetAsync(endpoint);
+            return response.IsSuccessStatusCode;
         }
-
-        _logger.LogError("WakeUp: Optimiser timed out after 85s.");
-        return false;
+        catch (Exception e)
+        {
+            _logger.LogError("WakeUp: {Message}", e.Message);
+            return false;
+        }
     }
 }
