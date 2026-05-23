@@ -4,6 +4,7 @@
 **/bin/
 **/obj/
 *.user
+**/build_output.txt
 .vscode/
 
 # Keep the base config file
