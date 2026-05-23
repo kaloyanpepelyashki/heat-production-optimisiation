@@ -54,6 +54,11 @@ public class CreateController : Controller
             }
             
         }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogWarning(ex, "Insufficient boiler capacity");
+            return UnprocessableEntity(new ApiResponseModel<OptimisationRun>(ex.Message, null, 0, ex.Message));
+        }
         catch (HttpRequestException ex)
         {
             _logger.LogError(ex, "Connectivity error reaching the optimiser service");

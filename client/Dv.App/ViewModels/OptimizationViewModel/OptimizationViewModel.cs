@@ -190,9 +190,9 @@ public sealed partial class OptimizationViewModel : ViewModelBase
             this.ChartsVM.LoadOptimizationResult(response.Data, this.CurrentContext);
             this.HasOptimizationResults = true;
         }
-        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)
+        catch (HttpRequestException ex) when ((int?)ex.StatusCode == 422)
         {
-            this.ErrorMessage = "The optimization service is unavailable. Please try again.";
+            this.ErrorMessage = "Boiler capacity is insufficient to cover heat demand for the selected maintenance period.";
         }
         catch (HttpRequestException)
         {
