@@ -205,11 +205,11 @@ public class Optimizer
             {
                 UnitType = boiler.UnitType,
                 UnitId = boiler.UnitId,
-                HeatProductionPerUnit = Math.Round(dispatchedHeat, 2),
-                ElectricityConsumptionPerUnit = Math.Round(
+                HeatProduction = Math.Round(dispatchedHeat, 2),
+                ElectricityConsumption = Math.Round(
                     (boiler.UnitType == "EB" || boiler.UnitType == "GM") ? boiler.MaxElectricity * loadRatio * -1 : 0d, 2),
-                ExpensesPerUnit = Math.Round(boiler.GetExpensesAtFull(point.ElectricityPrice) * loadRatio, 2),
-                Co2EmissionsPerUnit = Math.Round(boiler.Co2PerMWh * dispatchedHeat, 2),
+                Expenses = Math.Round(boiler.GetExpensesAtFull(point.ElectricityPrice) * loadRatio, 2),
+                Co2Emissions = Math.Round(boiler.Co2PerMWh * dispatchedHeat, 2),
                 CapacityOutput = Math.Round(loadRatio * 100d, 2),
             });
 

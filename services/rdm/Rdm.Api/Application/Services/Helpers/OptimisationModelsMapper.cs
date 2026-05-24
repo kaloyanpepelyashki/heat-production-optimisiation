@@ -57,6 +57,10 @@ public class OptimisationModelsMapper
                 Id = dto.Id ?? 0,
                 ProductionUnitId = dto.ProductionUnitId,
                 ProductionUnitType = dto.ProductionUnitType,
+                HeatProduction = dto.HeatProduction,
+                ElectricityConsumption = dto.ElectricityConsumption,
+                Co2Emissions = dto.Co2Emissions,
+                Expenses = dto.Expenses,
                 Capacity = dto.Capacity
             };
         }
@@ -125,6 +129,10 @@ public class OptimisationModelsMapper
             OptimisationRunHourlyId = 0,
             ProductionUnitId = domain.ProductionUnitId,
             ProductionUnitType = domain.ProductionUnitType,
+            HeatProduction = domain.HeatProduction,
+            ElectricityConsumption = domain.ElectricityConsumption,
+            Co2Emissions = domain.Co2Emissions,
+            Expenses = domain.Expenses,
             Capacity = domain.Capacity
         };
     }

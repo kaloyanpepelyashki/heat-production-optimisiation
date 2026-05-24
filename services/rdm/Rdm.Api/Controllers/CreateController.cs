@@ -1,6 +1,7 @@
 ﻿using System.Net.Http;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
+using Rdm.Api.Application.Exceptions;
 using Rdm.Api.Application.Interfaces;
 using Rdm.Api.Application.Model;
 using Rdm.Api.Application.Services.Helpers;

@@ -16,7 +16,7 @@ public class OptimisationProductionUnitPersistence: BaseModel
     public string ProductionUnitType { get; set; }
     [Column("capacity")]
     public double Capacity { get; set; }
-
+    
     [Column("expenses")]
     public double Expenses { get; set; }
     [Column("co2Emissions")]
