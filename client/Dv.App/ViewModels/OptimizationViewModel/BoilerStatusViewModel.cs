@@ -5,7 +5,7 @@ using Avalonia.Media;
 public sealed class BoilerStatusViewModel : ViewModelBase
 {
     private static readonly SolidColorBrush AvailableBrush = new(Color.Parse("#10B981"));
-    private static readonly SolidColorBrush UnavailableBrush = new(Color.Parse("#EF4444"));
+    private static readonly SolidColorBrush UnavailableBrush = new(Color.Parse("#F97316"));
     private bool isUnavailable;
 
     public BoilerStatusViewModel(string boilerId, string fuelType, string period)
