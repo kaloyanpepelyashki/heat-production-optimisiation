@@ -34,7 +34,7 @@ public sealed class BoilerStatusViewModel : ViewModelBase
         }
     }
 
-    public string StatusText => this.IsUnavailable ? "Unavailable" : "Active";
+    public string StatusText => this.IsUnavailable ? "In Maintenance" : "Active";
 
     public IBrush StatusBrush => this.IsUnavailable ? UnavailableBrush : AvailableBrush;
 
