@@ -3,12 +3,6 @@ using Supabase.Postgrest.Models;
 
 namespace Rdm.Api.Inrastructure.Persistence.PersistenceModels;
 
-
-/// <summary>
-/// Stores information about the hourly optimisation of each optimisation run.
-/// Has information about the heat production, electricity consumption, co2 emissions produced by the units during the optimisation run, expenses and the time frame of the schedule (hour from and to).
-/// Also stores information about the production units used during the hour. 
-/// </summary>
 [Table("optimisation_results_hourly")]
 public class OptimisationResultsHourlyPersistence: BaseModel
 {

@@ -8,9 +8,6 @@ using Rdm.Api.Inrastructure.DTOs;
 
 namespace Rdm.Api.Application.Services;
 
-/// <summary>
-/// The serivce is responsible for handling all interactions with the Optimiser module.
-/// </summary>
 public class OptimiserService : IOptimiserService
 {
     private ILogger<OptimiserService> _logger;
@@ -23,12 +20,6 @@ public class OptimiserService : IOptimiserService
         _logger = logger;
     }
     
-    /// <summary>
-    /// Sends an optimisation request to the optimiser module via a HTTP client and returns the optimisation result.
-    /// Handles request serialization, HTTP communication, response deserialization, and logs any request or JSON errors.
-    /// </summary>
-    /// <param name="optimisationRequestDto">The optimisation input data used by the Optimiser.</param>
-    /// <returns>The optimisation result returned from the Optimiser service.</returns>
     public async Task<OptimisationWrapperDto> RequestOptimisation(OptimisationRequestDto optimisationRequestDto)
     {
         try
@@ -46,6 +37,12 @@ public class OptimiserService : IOptimiserService
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             var response = await client.PostAsync($"{OptimiserUrl}/api/OptimizationResults/optimize", content);
+
+            if ((int)response.StatusCode == 422)
+            {
+                var body = await response.Content.ReadAsStringAsync();
+                throw new InvalidOperationException(body);
+            }
 
             if (!response.IsSuccessStatusCode)
             {
@@ -82,11 +79,6 @@ public class OptimiserService : IOptimiserService
         }
     }
 
-    /// <summary>
-    /// Send a GET request to the optimiser service, to wake it up. 
-    /// </summary>
-    /// <returns></returns>
-    /// <exception cref="Exception"></exception>
     public async Task<bool> WakeUpService()
     {
         try

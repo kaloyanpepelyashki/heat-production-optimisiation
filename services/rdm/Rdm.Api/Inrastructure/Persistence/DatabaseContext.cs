@@ -5,10 +5,7 @@ using Supabase;
 
 namespace Rdm.Api.Inrastructure.Persistence;
 
-/// <summary>
-/// This class is soley responsible for exposing the database client (supabase client), to services that need it.
-/// The class is closed for any modification.
-/// </summary>
+
 public class DatabaseContext : IDatabaseContext<Client>
 {
     private readonly Client _client;
@@ -38,12 +35,6 @@ public class DatabaseContext : IDatabaseContext<Client>
         _client = new Client(configuration.Url, configuration.ApiKey, supabaseOptions);
     }
 
-    /// <summary>
-    /// Used to get the database client. Returns an instance of the database client used for quering (or other operations) the database
-    /// </summary>
-    /// <returns>
-    /// Client - supabase client instance
-    /// </returns>
     public Client GetClient()
     {
         return _client;

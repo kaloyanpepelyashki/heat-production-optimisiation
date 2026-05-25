@@ -2,9 +2,6 @@
 
 namespace Am.Api.Model.DTOs;
 
-/// <summary>
-/// Represents the Gas Boiler Entity 
-/// </summary>
 [Table("gas_boilers")]
 public class GasBoilerPersistence: ProductionUnitGeneralPersistence
 {

@@ -1,38 +1,52 @@
 namespace Dv.App.Services;
 
 using System;
-using System.Diagnostics;
 using System.Text.RegularExpressions;
-using Avalonia.Threading;
+using System.Threading.Tasks;
+using Dv.App.Interfaces;
 using Dv.App.Models;
-using Dv.App.Services;
 
 public sealed class MaintenanceService
 {
-    private readonly IApiService apiService =  new ApiService();
-    public async void SaveMaintenance(string boilerId, DateTime startDateTime, DateTime endDateTime, string period, string scenario)
+    private readonly IApiService apiService;
+
+    public MaintenanceService(IApiService apiService)
+    {
+        this.apiService = apiService;
+    }
+
+    public async Task SaveMaintenanceAsync(
+        string boilerId,
+        DateTime startDateTime,
+        DateTime endDateTime,
+        string period,
+        string scenario)
     {
         var boilerMetadata = ParseBoilerMetadata(boilerId);
         var periodId = this.GetPeriodId(period);
         var scenarioId = GetScenarioId(scenario);
 
-        // Print all selected maintenance input in one log line.
-        ProductionUnitMaintenanceDTO productionUnitMaintenanceDTO = new ProductionUnitMaintenanceDTO
+        var productionUnitMaintenanceDTO = new ProductionUnitMaintenanceDTO
         {
             UnitId = boilerMetadata.BoilerId,
-            UnitType = boilerId.Substring(0,2),
+            UnitType = boilerId.Substring(0, 2),
             CreatedAt = DateTime.UtcNow,
             FromDate = startDateTime,
             ToDate = endDateTime,
             PeriodId = int.Parse(periodId),
             ScenarioId = int.Parse(scenarioId),
         };
-        int maintenanceId = await this.apiService.PostAsync<ProductionUnitMaintenanceDTO, int>(BackendService.Am, "api/GetProductionUnits/productionUnitMaintenance", productionUnitMaintenanceDTO);
+
+        var newId = await this.apiService.PostAsync<ProductionUnitMaintenanceDTO, int>(
+            BackendService.Am,
+            "api/GetProductionUnits/productionUnitMaintenance",
+            productionUnitMaintenanceDTO);
 
         MaintenanceStore.MaintenanceSchedules.Add(new MaintenanceEvent
         {
             AssetName = boilerId,
             BoilerId = boilerMetadata.BoilerId,
+            MaintenanceId = newId,
             BoilerType = boilerMetadata.BoilerType,
             StartDate = startDateTime,
             EndDate = endDateTime,
@@ -59,15 +73,17 @@ public sealed class MaintenanceService
                 : scenario;
     }
 
-    // Gets maintenance boiler information from selected boiler input
     private static (int BoilerId, string BoilerType) ParseBoilerMetadata(string boilerName)
     {
         var trimmedName = boilerName.Trim();
         var boilerType = trimmedName.StartsWith("GB", StringComparison.OrdinalIgnoreCase)
-            ? "Gas"
-            : trimmedName.StartsWith("OB", StringComparison.OrdinalIgnoreCase)
-                ? "Oil"
-                : string.Empty;
+            || trimmedName.StartsWith("GM", StringComparison.OrdinalIgnoreCase)
+                ? "Gas"
+                : trimmedName.StartsWith("OB", StringComparison.OrdinalIgnoreCase)
+                    ? "Oil"
+                    : trimmedName.StartsWith("EB", StringComparison.OrdinalIgnoreCase)
+                        ? "Electric"
+                        : string.Empty;
 
         var boilerIdText = Regex.Match(trimmedName, @"\d+").Value;
         _ = int.TryParse(boilerIdText, out var boilerId);

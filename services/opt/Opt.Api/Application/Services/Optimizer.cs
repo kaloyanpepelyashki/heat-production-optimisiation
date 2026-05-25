@@ -65,7 +65,7 @@ public class Optimizer
             OptResultsHourly = hourlyResults,
         };
         } 
-        catch (Exception ex) when (ex is not OperationCanceledException)
+        catch (Exception ex) when (ex is not OperationCanceledException and not InvalidOperationException)
         {
             throw new ExternalDataFetchException("Optimization failed.", ex);
         }

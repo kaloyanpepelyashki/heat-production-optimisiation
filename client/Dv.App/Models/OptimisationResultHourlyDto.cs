@@ -1,13 +1,15 @@
 ﻿using System.Text.Json.Serialization;
-using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 
-namespace Rdm.Api.Inrastructure.DTOs;
+namespace Dv.App.Models;
 
-
-public class OptimisationResultHourlyDto
+public class OptimisationResultsHourlyDto
 {
     [JsonPropertyName("id")]
     public int? Id { get; set; }
+    [JsonPropertyName("optimisation_run_id")]
+    public int? OptimizationRunId { get; set; }
     [JsonPropertyName("heatProduction")]
     public double HeatProduction { get; set; }
     [JsonPropertyName("electricityConsumption")]
@@ -21,6 +23,6 @@ public class OptimisationResultHourlyDto
     [JsonPropertyName("timeTo")]
     public DateTime TimeTo { get; set; }
 
-    [JsonPropertyName("units")]
+    [JsonPropertyName("productionUnits")]
     public List<ProductionUnitDto> ProductionUnits { get; set; }
 }
