@@ -164,23 +164,11 @@ public class Optimizer
         var co2 = 0d;
         var netElectricity = 0d;
 
-        var isEbDispatched = false;
-        var isGmDispatched = false;
-
         foreach (var boiler in availableBoilers)
         {
             if (remainingHeatDemand <= 0d)
             {
                 break;
-            }
-
-            if (boiler.UnitType == "EB" && isGmDispatched)
-            {
-                continue;
-            }
-            if (boiler.UnitType == "GM" && isEbDispatched)
-            {
-                continue;
             }
 
             var dispatchedHeat = Math.Min(boiler.MaxHeat, remainingHeatDemand);
@@ -190,16 +178,7 @@ public class Optimizer
             netCost += boiler.GetExpensesAtFull(point.ElectricityPrice) * loadRatio;
             co2 += boiler.Co2PerMWh * dispatchedHeat;
             
-            if (boiler.UnitType == "EB")
-            {
-                netElectricity -= boiler.MaxElectricity * loadRatio;
-                isEbDispatched = true;
-            }
-            else if (boiler.UnitType == "GM")
-            {
-                netElectricity -= boiler.MaxElectricity * loadRatio;
-                isGmDispatched = true;
-            }
+            netElectricity -= boiler.MaxElectricity * loadRatio;
 
             unitRows.Add(new PUnitDto
             {
@@ -246,10 +225,10 @@ public class Optimizer
         public double GetExpensesAtFull(double electricityPrice)
         {
             double baseCost = ProductionCost * MaxHeat;
-            if (UnitType == "EB")
+            if (UnitType == "EB" || UnitType == "GM")
+            {
                 return baseCost - (MaxElectricity * electricityPrice);
-            if (UnitType == "GM")
-                return baseCost - (MaxElectricity * electricityPrice);
+            }
             return baseCost;
         }
 
