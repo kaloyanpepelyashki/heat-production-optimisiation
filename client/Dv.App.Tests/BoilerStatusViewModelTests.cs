@@ -1,45 +1,38 @@
-﻿using Xunit;
 using Dv.App.ViewModels;
-using Assert = Xunit.Assert;
+using NUnit.Framework;
 
 namespace Dv.App.Tests.ViewModels;
 
+[TestFixture]
 public class BoilerStatusViewModelTests
 {
-    [Fact]
+    [Test]
     public void Constructor_InitializesProperties()
     {
-        // Act
         var boiler = new BoilerStatusViewModel("GB1", "Gas", "Summer");
 
-        // Assert
-        Assert.Equal("GB1", boiler.BoilerId);
-        Assert.Equal("Gas", boiler.FuelType);
+        Assert.That(boiler.BoilerId, Is.EqualTo("GB1"));
+        Assert.That(boiler.FuelType, Is.EqualTo("Gas"));
     }
 
-    [Xunit.Theory]
-    [InlineData("GB1", "Gas")]
-    [InlineData("OB1", "Oil")]
-    [InlineData("GM1", "Gas")]
-    [InlineData("EB1", "Electric")]
+    [TestCase("GB1", "Gas")]
+    [TestCase("OB1", "Oil")]
+    [TestCase("GM1", "Gas")]
+    [TestCase("EB1", "Electric")]
     public void Constructor_AcceptsVariousBoilerTypes(string id, string fuelType)
     {
-        // Act
         var boiler = new BoilerStatusViewModel(id, fuelType, "Winter");
 
-        // Assert
-        Assert.Equal(id, boiler.BoilerId);
-        Assert.Equal(fuelType, boiler.FuelType);
+        Assert.That(boiler.BoilerId, Is.EqualTo(id));
+        Assert.That(boiler.FuelType, Is.EqualTo(fuelType));
     }
 
-    [Fact]
+    [Test]
     public void StatusText_ReturnsCorrectString()
     {
-        // Arrange
         var boiler = new BoilerStatusViewModel("GB1", "Gas", "Summer");
 
-        // Assert
-        Assert.NotNull(boiler.StatusText);
-        Assert.NotEmpty(boiler.StatusText);
+        Assert.That(boiler.StatusText, Is.Not.Null);
+        Assert.That(boiler.StatusText, Is.Not.Empty);
     }
 }
