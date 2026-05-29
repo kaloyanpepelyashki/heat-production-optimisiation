@@ -3,7 +3,7 @@
 using Supabase.Postgrest.Attributes;
 
 [Table("gas_boilers")]
-public class GasBoilerPersistence: ProductionUnitGeneralPersistence
+public class GasBoilerPersistence : ProductionUnitGeneralPersistence
 {
     [Column("co2_emissions")]
     public int Co2Emissions { get; set; }

@@ -1,7 +1,7 @@
+namespace Dv.App.Models;
+
 using System;
 using System.Collections.Generic;
-
-namespace Dv.App.Models;
 
 public sealed record OptimizationContext(
     string Period,
@@ -10,9 +10,9 @@ public sealed record OptimizationContext(
     DateTime EndDate,
     IReadOnlyList<OptimizationBoilerDefinition> Boilers)
 {
-    public int PeriodId => string.Equals(Period, "Summer", StringComparison.OrdinalIgnoreCase) ? 1 : 2;
+    public int PeriodId => string.Equals(this.Period, "Summer", StringComparison.OrdinalIgnoreCase) ? 1 : 2;
 
-    public int ScenarioId => string.Equals(Scenario, "Scenario 1", StringComparison.OrdinalIgnoreCase) ? 1 : 2;
+    public int ScenarioId => string.Equals(this.Scenario, "Scenario 1", StringComparison.OrdinalIgnoreCase) ? 1 : 2;
 }
 
 public sealed record OptimizationBoilerDefinition(string BoilerId, string FuelType);

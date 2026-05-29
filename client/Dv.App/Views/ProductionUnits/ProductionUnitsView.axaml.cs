@@ -1,6 +1,6 @@
-using Avalonia.Controls;
-
 namespace Dv.App.Views;
+
+using Avalonia.Controls;
 
 public partial class ProductionUnitsView : UserControl
 {
@@ -8,4 +8,4 @@ public partial class ProductionUnitsView : UserControl
     {
         this.InitializeComponent();
     }
-} 
+}

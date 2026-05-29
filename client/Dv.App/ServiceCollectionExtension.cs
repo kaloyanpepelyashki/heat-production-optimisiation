@@ -1,10 +1,10 @@
-﻿using Dv.App.Services;
+﻿namespace Dv.App;
+
+using Dv.App.Interfaces;
+using Dv.App.Services;
 using Dv.App.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Dv.App.Interfaces;
-
-namespace Dv.App;
 
 public static class ServiceCollectionExtension
 {
@@ -18,7 +18,7 @@ public static class ServiceCollectionExtension
             builder.AddConsole();
             builder.SetMinimumLevel(LogLevel.Debug);
         });
-        
+
         services.AddTransient<IDialogService, DialogService>();
 
         services.AddSingleton<MainWindowViewModel>();
@@ -26,8 +26,7 @@ public static class ServiceCollectionExtension
         services.AddSingleton<DashboardViewModel>();
         services.AddSingleton<OptimizationViewModel>();
         services.AddSingleton<SettingsViewModel>();
-        
+
         services.AddSingleton<MainWindow>();
-        
     }
 }

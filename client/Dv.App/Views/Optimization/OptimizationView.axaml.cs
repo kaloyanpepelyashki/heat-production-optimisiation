@@ -1,14 +1,14 @@
+namespace Dv.App.Views;
+
 using Avalonia.Controls;
 using Avalonia.VisualTree;
 using Dv.App.ViewModels;
-
-namespace Dv.App.Views;
 
 public partial class OptimizationView : UserControl
 {
     public OptimizationView()
     {
-        InitializeComponent();
+        this.InitializeComponent();
 
         this.AttachedToVisualTree += (_, _) =>
         {
@@ -21,5 +21,4 @@ public partial class OptimizationView : UserControl
             }
         };
     }
-    
 }

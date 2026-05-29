@@ -1,3 +1,5 @@
+namespace Opt.Api.Infrastructure.Clients;
+
 using System.Net;
 using System.Net.Http.Json;
 using Microsoft.Extensions.Caching.Memory;
@@ -6,8 +8,6 @@ using Opt.Api.Application.Interfaces;
 using Opt.Api.Domain.Models;
 using Opt.Api.DTOs;
 using Opt.Api.Infrastructure.Options;
-
-namespace Opt.Api.Infrastructure.Clients;
 
 public sealed class AmDataProvider : IAssetDataProvider
 {

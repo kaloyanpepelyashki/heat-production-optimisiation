@@ -1,3 +1,5 @@
+namespace Dv.App;
+
 using System;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -8,8 +10,6 @@ using Dv.App.Services;
 using Dv.App.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Dv.App;
-
 public partial class App : Application
 {
     /// <inheritdoc/>
@@ -19,8 +19,8 @@ public partial class App : Application
     }
 
     /// <inheritdoc/>
-    
     public static IServiceProvider Services { get; private set; } = null!;
+
     public override void OnFrameworkInitializationCompleted()
     {
         var settings = SettingsService.Load();
@@ -30,7 +30,7 @@ public partial class App : Application
             "Dark" => ThemeVariant.Dark,
             _ => ThemeVariant.Default,
         };
-        
+
         BindingPlugins.DataValidators.RemoveAt(0);
 
         // Register all the services needed for the application to run
@@ -42,11 +42,9 @@ public partial class App : Application
 
         var vm = services.GetRequiredService<MainWindowViewModel>();
 
-
-        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        if (this.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             desktop.MainWindow = services.GetRequiredService<MainWindow>();
-         
         }
 
         base.OnFrameworkInitializationCompleted();

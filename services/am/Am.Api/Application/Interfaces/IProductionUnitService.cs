@@ -7,7 +7,7 @@ public interface IProductionUnitService
 {
    Task<List<GasBoiler>> GetAllGasBoilersAsync();
 
-   Task <List<OilBoiler>> GetAllOilBoilersAsync();
+   Task<List<OilBoiler>> GetAllOilBoilersAsync();
 
    Task<List<ElectricBoiler>> GetAllElectricBoilersAsync();
 

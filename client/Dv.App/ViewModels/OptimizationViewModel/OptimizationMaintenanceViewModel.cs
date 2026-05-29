@@ -1,3 +1,5 @@
+namespace Dv.App.ViewModels;
+
 using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -8,8 +10,6 @@ using CommunityToolkit.Mvvm.Input;
 using Dv.App.Interfaces;
 using Dv.App.Models;
 using Dv.App.Services;
-    
-namespace Dv.App.ViewModels;
 
 public sealed partial class OptimizationMaintenanceViewModel : ObservableObject
 {

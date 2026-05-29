@@ -6,7 +6,7 @@ public class OilBoilerDTO
 
     public string Name { get; set; } = string.Empty;
 
-    public float  MaxHeat { get; set; }
+    public float MaxHeat { get; set; }
 
     public float ProductionCost { get; set; }
 

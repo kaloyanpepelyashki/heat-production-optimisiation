@@ -59,21 +59,31 @@ public sealed class OptimizationChartsViewModel : ViewModelBase
                 .Select(x => new DateTimePoint(x.TimeFrom, (double)x.ElectricityPrice))
                 .ToArray();
 
-        ConfigureSingleChart(this.heatDemandChart, "Heat Demand", "#F59E0B", "MWh", heatDemand);
-        ConfigureDualAxisChart(this.electricityPriceChart, this.cachedElectricityPrices, null);
+        this.ConfigureSingleChart(this.heatDemandChart, "Heat Demand", "#F59E0B", "MWh", heatDemand);
+        this.ConfigureDualAxisChart(this.electricityPriceChart, this.cachedElectricityPrices, null);
     }
 
     public void ClearOptimizationCharts()
     {
         if (this.optimizationResultsChart is not null)
+        {
             this.optimizationResultsChart.Series = Array.Empty<ISeries>();
+        }
+
         if (this.expensesChart is not null)
+        {
             this.expensesChart.Series = Array.Empty<ISeries>();
+        }
+
         if (this.co2EmissionsChart is not null)
+        {
             this.co2EmissionsChart.Series = Array.Empty<ISeries>();
+        }
 
         if (this.cachedElectricityPrices.Length > 0)
-            ConfigureDualAxisChart(this.electricityPriceChart, this.cachedElectricityPrices, null);
+        {
+            this.ConfigureDualAxisChart(this.electricityPriceChart, this.cachedElectricityPrices, null);
+        }
     }
 
     public void LoadOptimizationResult(OptimisationRunDto optimizationResult, OptimizationContext context)
@@ -81,11 +91,20 @@ public sealed class OptimizationChartsViewModel : ViewModelBase
         if (optimizationResult.optimisationResultsHourly is null || optimizationResult.optimisationResultsHourly.Count == 0)
         {
             if (this.optimizationResultsChart is not null)
+            {
                 this.optimizationResultsChart.Series = new List<ISeries>();
+            }
+
             if (this.expensesChart is not null)
+            {
                 this.expensesChart.Series = new List<ISeries>();
+            }
+
             if (this.co2EmissionsChart is not null)
+            {
                 this.co2EmissionsChart.Series = new List<ISeries>();
+            }
+
             return;
         }
 
@@ -105,11 +124,11 @@ public sealed class OptimizationChartsViewModel : ViewModelBase
             .Select(x => new DateTimePoint(x.TimeFrom, x.Co2Emissions))
             .ToArray();
 
-        ConfigureDualAxisChart(this.electricityPriceChart, this.cachedElectricityPrices, electricityConsumption);
-        ConfigureSingleChart(this.expensesChart, "Expenses", "#ea8080", "DKK", expenses);
-        ConfigureSingleChart(this.co2EmissionsChart, "CO2 Emissions", "#DC2626", "kg / MWh", co2Emissions);
+        this.ConfigureDualAxisChart(this.electricityPriceChart, this.cachedElectricityPrices, electricityConsumption);
+        this.ConfigureSingleChart(this.expensesChart, "Expenses", "#ea8080", "DKK", expenses);
+        this.ConfigureSingleChart(this.co2EmissionsChart, "CO2 Emissions", "#DC2626", "kg / MWh", co2Emissions);
 
-        BuildOptimizationStackedChart(orderedResults);
+        this.BuildOptimizationStackedChart(orderedResults);
     }
 
     private void BuildOptimizationStackedChart(List<OptimisationResultsHourlyDto> orderedResults)
@@ -153,7 +172,9 @@ public sealed class OptimizationChartsViewModel : ViewModelBase
                         u.ProductionUnitType == unit.ProductionUnitType);
 
                 if (currentUnit == null || currentUnit.HeatProduction <= 0 || h.HeatProduction <= 0)
+                {
                     return new DateTimePoint(h.TimeFrom, 0);
+                }
 
                 return new DateTimePoint(h.TimeFrom, currentUnit.HeatProduction);
             }).ToList();
@@ -203,7 +224,10 @@ public sealed class OptimizationChartsViewModel : ViewModelBase
         DateTimePoint[] prices,
         DateTimePoint[]? consumption)
     {
-        if (chart is null) return;
+        if (chart is null)
+        {
+            return;
+        }
 
         var priceColor = SKColor.Parse("#3B82F6");
         var consumptionColor = SKColor.Parse("#10B981");
@@ -298,7 +322,10 @@ public sealed class OptimizationChartsViewModel : ViewModelBase
         string axisName,
         DateTimePoint[] data)
     {
-        if (chart is null) return;
+        if (chart is null)
+        {
+            return;
+        }
 
         var color = SKColor.Parse(colorHex);
 
@@ -346,7 +373,6 @@ public sealed class OptimizationChartsViewModel : ViewModelBase
     }
 
     // ── Maximize overlay ──────────────────────────────────────────────────────
-
     private IEnumerable<ISeries>? maximizedSeries;
     private IEnumerable<ICartesianAxis>? maximizedXAxes;
     private IEnumerable<ICartesianAxis>? maximizedYAxes;
@@ -393,7 +419,10 @@ public sealed class OptimizationChartsViewModel : ViewModelBase
 
     public void Maximize(CartesianChart? chart, string title)
     {
-        if (chart is null) return;
+        if (chart is null)
+        {
+            return;
+        }
 
         this.MaximizedSeries = chart.Series;
         this.MaximizedXAxes = chart.XAxes;
@@ -403,7 +432,6 @@ public sealed class OptimizationChartsViewModel : ViewModelBase
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-
     private static SolidColorPaint GetAxisNamePaint()
     {
         var isDarkMode = Avalonia.Application.Current?.ActualThemeVariant == Avalonia.Styling.ThemeVariant.Dark;

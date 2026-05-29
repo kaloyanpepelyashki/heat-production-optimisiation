@@ -44,7 +44,7 @@ public class ElectricBoilerRepository : IProductionUnitRepository<ElectricBoiler
         catch (Exception e)
         {
             Console.WriteLine($"Error fetching all in ElectricBoilerRepository: {e.GetType()} {e.Message}");
-            _logger.LogError($"Error fetching all in ElectricBoilerRepository: {e.GetType()} {e.Message}");
+            this._logger.LogError($"Error fetching all in ElectricBoilerRepository: {e.GetType()} {e.Message}");
             throw;
         }
     }

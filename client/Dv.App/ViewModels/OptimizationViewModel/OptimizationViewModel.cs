@@ -1,3 +1,5 @@
+namespace Dv.App.ViewModels;
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -10,8 +12,6 @@ using CommunityToolkit.Mvvm.Input;
 using Dv.App.Interfaces;
 using Dv.App.Models;
 using Dv.App.Services;
-
-namespace Dv.App.ViewModels;
 
 public sealed partial class OptimizationViewModel : ViewModelBase
 {
@@ -48,9 +48,11 @@ public sealed partial class OptimizationViewModel : ViewModelBase
     }
 
     public OptimizationChartsViewModel ChartsVM { get; } = new();
+
     public OptimizationMaintenanceViewModel Maintenance { get; }
 
     public ObservableCollection<string> Periods { get; } = ["Summer", "Winter"];
+
     public ObservableCollection<string> Scenarios { get; } = ["Scenario 1", "Scenario 2"];
 
     public OptimizationContext CurrentContext
@@ -207,6 +209,7 @@ public sealed partial class OptimizationViewModel : ViewModelBase
             this.IsLoading = false;
         }
     }
+
     private bool CanRunOptimization()
     {
         var periodId = this.CurrentContext.PeriodId.ToString();
@@ -237,7 +240,9 @@ public sealed partial class OptimizationViewModel : ViewModelBase
     private void RefreshSourceCharts()
     {
         if (this.cachedSourceData.Count == 0)
+        {
             return;
+        }
 
         this.ChartsVM.LoadSourceData(this.cachedSourceData, this.CurrentContext);
     }

@@ -2,7 +2,6 @@ namespace Am.Api.Domain.Models;
 
 using System.Drawing;
 
-
 public class HeatingGrid
 {
     public string Architecture;

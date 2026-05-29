@@ -90,7 +90,7 @@ public class ProductionUnitService_Test
             },
         });
 
-        var service = new ProductionUnitService(this.repoGasBoiler.Object, this.repoOilBoiler.Object, this.repoElectricBoiler.Object, this.repoGasMotor.Object, this.repoMaintenance.Object );
+        var service = new ProductionUnitService(this.repoGasBoiler.Object, this.repoOilBoiler.Object, this.repoElectricBoiler.Object, this.repoGasMotor.Object, this.repoMaintenance.Object);
 
         var result = await service.GetAllElectricBoilersAsync();
 
