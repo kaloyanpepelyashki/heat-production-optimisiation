@@ -1,3 +1,5 @@
+namespace Am.Api.Tests;
+
 using Am.Api.Application.Exceptions;
 using Am.Api.Application.Interfaces;
 using Am.Api.Controllers;
@@ -7,8 +9,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 
-namespace Am.Api.Tests;
-
 public class GetProductionUnitsController_Test
 {
     private readonly Mock<IProductionUnitService> _mockService;
@@ -16,8 +16,8 @@ public class GetProductionUnitsController_Test
 
     public GetProductionUnitsController_Test()
     {
-        _mockService = new Mock<IProductionUnitService>();
-        _controller = new GetProductionUnits(_mockService.Object, NullLogger<GetProductionUnits>.Instance);
+        this._mockService = new Mock<IProductionUnitService>();
+        this._controller = new GetProductionUnits(this._mockService.Object, NullLogger<GetProductionUnits>.Instance);
     }
 
     [Fact]
@@ -25,11 +25,11 @@ public class GetProductionUnitsController_Test
     {
         var mockData = new List<GasBoiler>
         {
-            new GasBoiler { Id = 1, Name = "GB1", MaxHeat = 5.0f }
+            new GasBoiler { Id = 1, Name = "GB1", MaxHeat = 5.0f },
         };
-        _mockService.Setup(s => s.GetAllGasBoilersAsync()).ReturnsAsync(mockData);
+        this._mockService.Setup(s => s.GetAllGasBoilersAsync()).ReturnsAsync(mockData);
 
-        var result = await _controller.GetAllGasBoilers();
+        var result = await this._controller.GetAllGasBoilers();
 
         var okResult = Assert.IsType<OkObjectResult>(result);
         var returnedData = Assert.IsAssignableFrom<IEnumerable<GasBoilerDTO>>(okResult.Value);
@@ -39,9 +39,9 @@ public class GetProductionUnitsController_Test
     [Fact]
     public async Task GetGasBoilers_ReturnsInternalServerError_OnException()
     {
-        _mockService.Setup(s => s.GetAllGasBoilersAsync()).ThrowsAsync(new Exception("Database failed"));
+        this._mockService.Setup(s => s.GetAllGasBoilersAsync()).ThrowsAsync(new Exception("Database failed"));
 
-        var result = await _controller.GetAllGasBoilers();
+        var result = await this._controller.GetAllGasBoilers();
 
         var statusResult = Assert.IsType<ObjectResult>(result);
         Assert.Equal(500, statusResult.StatusCode);
@@ -50,10 +50,10 @@ public class GetProductionUnitsController_Test
     [Fact]
     public async Task GetProductionUnitMaintenanceById_ReturnsNotFound_WhenNotFound()
     {
-        _mockService.Setup(s => s.GetProductionUnitMaintenanceByIdAsync(It.IsAny<int>()))
+        this._mockService.Setup(s => s.GetProductionUnitMaintenanceByIdAsync(It.IsAny<int>()))
                     .ThrowsAsync(new KeyNotFoundException("Not found"));
 
-        var result = await _controller.GetProductionUnitMaintenanceById(99);
+        var result = await this._controller.GetProductionUnitMaintenanceById(99);
 
         Assert.IsType<NotFoundObjectResult>(result);
     }
@@ -61,10 +61,10 @@ public class GetProductionUnitsController_Test
     [Fact]
     public async Task GetGasBoilers_ReturnsNotFound_WhenNoAssetsFound()
     {
-        _mockService.Setup(s => s.GetAllGasBoilersAsync())
+        this._mockService.Setup(s => s.GetAllGasBoilersAsync())
                     .ThrowsAsync(new NoAssetsFoundException("No gas boilers found"));
 
-        var result = await _controller.GetAllGasBoilers();
+        var result = await this._controller.GetAllGasBoilers();
 
         Assert.IsType<NotFoundObjectResult>(result);
     }
@@ -72,10 +72,10 @@ public class GetProductionUnitsController_Test
     [Fact]
     public async Task PostProductionUnitMaintenance_ReturnsBadRequest_WhenArgumentNullException()
     {
-        _mockService.Setup(s => s.PostProductionUnitMaintenanceAsync(It.IsAny<ProductionUnitMaintenance>()))
+        this._mockService.Setup(s => s.PostProductionUnitMaintenanceAsync(It.IsAny<ProductionUnitMaintenance>()))
                     .ThrowsAsync(new ArgumentNullException("maintenance"));
 
-        var result = await _controller.PostProductionUnitMaintenance(new ProductionUnitMaintenanceDTO());
+        var result = await this._controller.PostProductionUnitMaintenance(new ProductionUnitMaintenanceDTO());
 
         Assert.IsType<BadRequestObjectResult>(result);
     }

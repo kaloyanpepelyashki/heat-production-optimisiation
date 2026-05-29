@@ -1,3 +1,5 @@
+namespace Opt.Api.Infrastructure.Clients;
+
 using System.Net;
 using System.Net.Http.Json;
 using Microsoft.Extensions.Caching.Memory;
@@ -6,8 +8,6 @@ using Opt.Api.Application.Interfaces;
 using Opt.Api.Domain.Models;
 using Opt.Api.DTOs;
 using Opt.Api.Infrastructure.Options;
-
-namespace Opt.Api.Infrastructure.Clients;
 
 public sealed class AmDataProvider : IAssetDataProvider
 {
@@ -23,16 +23,16 @@ public sealed class AmDataProvider : IAssetDataProvider
         Microsoft.Extensions.Options.IOptions<ExternalApiOptions> options,
         IMemoryCache cache)
     {
-        _httpClient = httpClient;
-        _options = options.Value;
-        _cache = cache;
+        this._httpClient = httpClient;
+        this._options = options.Value;
+        this._cache = cache;
     }
 
     public async Task<AssetDataBundle> GetAssetDataAsync(int maintenanceId, CancellationToken cancellationToken)
     {
         var cacheKey = $"am-assets-{maintenanceId}";
 
-        if (_cache.TryGetValue(cacheKey, out AssetDataBundle? cached))
+        if (this._cache.TryGetValue(cacheKey, out AssetDataBundle? cached))
         {
             return cached!;
         }
@@ -40,13 +40,13 @@ public sealed class AmDataProvider : IAssetDataProvider
         await FetchLock.WaitAsync(cancellationToken);
         try
         {
-            if (_cache.TryGetValue(cacheKey, out cached))
+            if (this._cache.TryGetValue(cacheKey, out cached))
             {
                 return cached!;
             }
 
-            var result = await FetchAllAsync(maintenanceId, cancellationToken);
-            _cache.Set(cacheKey, result, CacheTtl);
+            var result = await this.FetchAllAsync(maintenanceId, cancellationToken);
+            this._cache.Set(cacheKey, result, CacheTtl);
             return result;
         }
         finally
@@ -60,23 +60,23 @@ public sealed class AmDataProvider : IAssetDataProvider
         try
         {
             var gasBoilers = await this.GetWithRetryAsync<List<AmGasBoilerResponseDto>>(
-                _options.Am.GasBoilersEndpoint,
+                this._options.Am.GasBoilersEndpoint,
                 cancellationToken);
 
             var oilBoilers = await this.GetWithRetryAsync<List<AmOilBoilerResponseDto>>(
-                _options.Am.OilBoilersEndpoint,
+                this._options.Am.OilBoilersEndpoint,
                 cancellationToken);
 
             var electricBoilers = await this.GetWithRetryAsync<List<AmElectricBoilerResponseDto>>(
-                _options.Am.ElectricBoilersEndpoint,
+                this._options.Am.ElectricBoilersEndpoint,
                 cancellationToken);
 
             var gasMotors = await this.GetWithRetryAsync<List<AmGasMotorResponseDto>>(
-                _options.Am.GasMotorsEndpoint,
+                this._options.Am.GasMotorsEndpoint,
                 cancellationToken);
 
             var schedule = await this.GetWithRetryAsync<AmMaintenanceScheduleResponseDto>(
-                _options.Am.ResolveMaintenanceSchedulesEndpoint(maintenanceId),
+                this._options.Am.ResolveMaintenanceSchedulesEndpoint(maintenanceId),
                 cancellationToken);
 
             var gasBoilersMapped = (gasBoilers ?? []).Select(x => new GasBoiler
@@ -149,5 +149,5 @@ public sealed class AmDataProvider : IAssetDataProvider
     }
 
     private Task<T?> GetWithRetryAsync<T>(string url, CancellationToken cancellationToken) =>
-        HttpRetryHelper.GetWithRetryAsync<T>(_httpClient, url, cancellationToken);
+        HttpRetryHelper.GetWithRetryAsync<T>(this._httpClient, url, cancellationToken);
 }

@@ -1,3 +1,5 @@
+namespace Dv.App.ViewModels;
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -5,132 +7,128 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Dv.App.Interfaces;
 using Dv.App.Models;
 using Dv.App.Services;
 using Microsoft.Extensions.Logging;
 
-namespace Dv.App.ViewModels;
-
 public sealed partial class MainWindowViewModel : ViewModelBase
 {
-	private readonly ILogger<MainWindowViewModel> _logger;
-	
-	private readonly IApiService _apiService; 
-	
-	private readonly Dictionary<string, ViewModelBase> viewMap;
-	private ViewModelBase currentViewModel;
-	private NavigationItem? selectedNavigationItem;
-	
-	private readonly CancellationTokenSource _startupCts = new CancellationTokenSource();
-	private readonly Task _wakeUpServicesTask;
+    private readonly ILogger<MainWindowViewModel> _logger;
 
+    private readonly IApiService _apiService;
+    private readonly SettingsViewModel _settingsViewModel;
 
-	[ObservableProperty] 
-	private bool _isWakingUp;
-	[ObservableProperty]
-	private bool _allServicesWokeUp;
+    private readonly Dictionary<string, ViewModelBase> viewMap;
+    private ViewModelBase currentViewModel;
+    private NavigationItem? selectedNavigationItem;
 
-	[ObservableProperty] 
-	private string _startUpError;
+    private readonly CancellationTokenSource _startupCts = new CancellationTokenSource();
+    private readonly Task _wakeUpServicesTask;
 
-	public MainWindowViewModel(IApiService apiService, ILogger<MainWindowViewModel> logger, 
-		DashboardViewModel dashboardViewModel,
-		ProductionUnitsViewModel productionUnitsViewModel,
-		SourceDataViewModel sourceDataViewModel,
-		OptimizationViewModel optimizationViewModel,
-		SettingsViewModel settingsViewModel)
-	{
-		_logger = logger;
-		
-		_apiService = apiService;
-		_wakeUpServicesTask = WakeUpServices(_startupCts.Token);
-		 
-		this.NavigationItems = new ObservableCollection<NavigationItem>
-		{
-			new NavigationItem { Title = "Dashboard", ViewKey = "dashboard" },
-			new NavigationItem { Title = "Production Units", ViewKey = "production-units" },
-			new NavigationItem { Title = "Source Data", ViewKey = "source-data" },
-			new NavigationItem { Title = "Optimization", ViewKey = "optimization" },
-			new NavigationItem { Title = "Settings", ViewKey = "settings" },
-		};
+    [ObservableProperty]
+    private bool _isWakingUp;
+    [ObservableProperty]
+    private bool _allServicesWokeUp;
 
-		this.viewMap = new Dictionary<string, ViewModelBase>
-		{
-			["dashboard"] = dashboardViewModel,
-			["production-units"] = productionUnitsViewModel,
-			["source-data"] = sourceDataViewModel,
-			["optimization"] = optimizationViewModel,
-			["settings"] = settingsViewModel,
-		};
+    [ObservableProperty]
+    private string _startUpError;
 
-		this.currentViewModel = this.viewMap["dashboard"];
-		this.selectedNavigationItem = this.NavigationItems[0];
-	}
-	
-	
-	//Calls the WakeUpAllServices from the ApiClient, to send a health check to all the services and wake them up
-	private async Task WakeUpServices(CancellationToken ct)
-	{
-		_isWakingUp = true;
-		try
-		{
-			var response = await _apiService.WakeUpAllServices(ct);
+    public MainWindowViewModel(IApiService apiService, ILogger<MainWindowViewModel> logger,
+        DashboardViewModel dashboardViewModel,
+        ProductionUnitsViewModel productionUnitsViewModel,
+        OptimizationViewModel optimizationViewModel,
+        SettingsViewModel settingsViewModel)
+    {
+        this._logger = logger;
+        this._apiService = apiService;
+        this._settingsViewModel = settingsViewModel;
+        this._wakeUpServicesTask = this.WakeUpServices(this._startupCts.Token);
 
-			if (!response)
-			{
-				_allServicesWokeUp = false;
-				_isWakingUp = false;
-			}
-		}
-		catch (OperationCanceledException)
-		{
-			_allServicesWokeUp = false;
-			_startUpError = "Waking up services process cancelled";
-			_logger.LogError("Failed to wake up all services in MainWindowViewModel. Waking up services process cancelled");
-		}
-		catch (Exception e)
-		{
-			_isWakingUp = false;
-			_startUpError = e.Message;
-			Debug.WriteLine($"Error waking up all services {e.Message}, {e.GetType()}: {e.StackTrace}");
-			_logger.LogError($"Error waking up all services {e.Message}, {e.GetType()}: {e.StackTrace}");
-		}
-		finally
-		{
-			_isWakingUp = false;
-			_allServicesWokeUp = true;
-			Debug.WriteLine("All services woke up successfully in MainWindowViewModel");
-			_logger.LogInformation("All services woke up successfully in MainWindowViewModel");
-		}
-	}
+        this.NavigationItems = new ObservableCollection<NavigationItem>
+        {
+            new NavigationItem { Title = "Dashboard", ViewKey = "dashboard" },
+            new NavigationItem { Title = "Production Units", ViewKey = "production-units" },
+            new NavigationItem { Title = "Optimization", ViewKey = "optimization" },
+            new NavigationItem { Title = "Settings", ViewKey = "settings" },
+        };
 
-	public ObservableCollection<NavigationItem> NavigationItems { get; }
+        this.viewMap = new Dictionary<string, ViewModelBase>
+        {
+            ["dashboard"] = dashboardViewModel,
+            ["production-units"] = productionUnitsViewModel,
+            ["optimization"] = optimizationViewModel,
+            ["settings"] = settingsViewModel,
+        };
 
-	public NavigationItem? SelectedNavigationItem
-	{
-		get => this.selectedNavigationItem;
-		set
-		{
-			if (!this.SetProperty(ref this.selectedNavigationItem, value) || value is null)
-			{
-				return;
-			}
+        this.currentViewModel = this.viewMap["dashboard"];
+        this.selectedNavigationItem = this.NavigationItems[0];
+    }
 
-			this.NavigateTo(value.ViewKey);
-		}
-	}
+    private async Task WakeUpServices(CancellationToken ct)
+    {
+        this.IsWakingUp = true;
+        this.StartUpError = string.Empty;
+        try
+        {
+            var response = await this._apiService.WakeUpAllServices(ct);
 
-	public ViewModelBase CurrentViewModel
-	{
-		get => this.currentViewModel;
-		private set => this.SetProperty(ref this.currentViewModel, value);
-	}
+            if (!response)
+            {
+                this.AllServicesWokeUp = false;
+                this.StartUpError = "One or more services failed to wake up.";
+            }
+            else
+            {
+                this.AllServicesWokeUp = true;
+            }
+        }
+        catch (OperationCanceledException) when (ct.IsCancellationRequested)
+        {
+            this.AllServicesWokeUp = false;
+            this.StartUpError = "Service wakeup was cancelled.";
+            this._logger.LogError("Failed to wake up all services in MainWindowViewModel. Waking up services process cancelled");
+        }
+        catch (Exception e)
+        {
+            this.AllServicesWokeUp = false;
+            this.StartUpError = e.Message;
+            this._logger.LogError($"Error waking up all services {e.Message}, {e.GetType()}: {e.StackTrace}");
+        }
+        finally
+        {
+            this.IsWakingUp = false;
+            this._settingsViewModel.RefreshServices();
+        }
+    }
 
-	private void NavigateTo(string viewKey)
-	{
-		if (this.viewMap.TryGetValue(viewKey, out var targetViewModel))
-		{
-			this.CurrentViewModel = targetViewModel;
-		}
-	}
+    public ObservableCollection<NavigationItem> NavigationItems { get; }
+
+    public NavigationItem? SelectedNavigationItem
+    {
+        get => this.selectedNavigationItem;
+        set
+        {
+            if (!this.SetProperty(ref this.selectedNavigationItem, value) || value is null)
+            {
+                return;
+            }
+
+            this.NavigateTo(value.ViewKey);
+        }
+    }
+
+    public ViewModelBase CurrentViewModel
+    {
+        get => this.currentViewModel;
+        private set => this.SetProperty(ref this.currentViewModel, value);
+    }
+
+    private void NavigateTo(string viewKey)
+    {
+        if (this.viewMap.TryGetValue(viewKey, out var targetViewModel))
+        {
+            this.CurrentViewModel = targetViewModel;
+        }
+    }
 }

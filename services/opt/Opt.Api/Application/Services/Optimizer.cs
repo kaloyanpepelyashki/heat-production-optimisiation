@@ -1,10 +1,10 @@
-
-using Opt.Api.Application.Interfaces;
-using Opt.Api.DTOs;
-using Opt.Api.Domain.Models;
-using Opt.Api.Application.Exceptions;
-using Microsoft.Extensions.Logging;
 namespace Opt.Api.Application.Services;
+
+using Microsoft.Extensions.Logging;
+using Opt.Api.Application.Exceptions;
+using Opt.Api.Application.Interfaces;
+using Opt.Api.Domain.Models;
+using Opt.Api.DTOs;
 
 public class Optimizer
 {
@@ -15,57 +15,56 @@ public class Optimizer
 
     public Optimizer(IAssetDataProvider assetDataProvider, ISourceDataProvider sourceDataProvider, ILogger<Optimizer> logger)
     {
-        _assetDataProvider = assetDataProvider;
-        _sourceDataProvider = sourceDataProvider;
-        _logger = logger;
+        this._assetDataProvider = assetDataProvider;
+        this._sourceDataProvider = sourceDataProvider;
+        this._logger = logger;
     }
 
     public async Task<OptimizationResponseDto> OptimizeAsync(
         OptimizationRequestDto request,
         CancellationToken cancellationToken)
     {
-
-        try {
-            
-        var assets = await _assetDataProvider.GetAssetDataAsync(request.MaintenanceId, cancellationToken);
-        var sourceDataResponse = await _sourceDataProvider.GetSourceDataAsync(cancellationToken);
-
-        var sourceData = sourceDataResponse
-            .Where(x => x.PeriodId == request.PeriodId)
-            .Where(x => x.TimeFrom >= request.TimeFrom && x.TimeTo <= request.TimeTo)
-            .OrderBy(x => x.TimeFrom)
-            .ToList();
-
-        var boilers = request.ScenarioId == 2 
-            ? BuildScenario2Boilers(assets)
-            : BuildScenario1Boilers(assets);
-        
-        var createdAt = DateTime.UtcNow;
-        var hourlyResults = sourceData
-            .Select(point => BuildHourlyResult(point, assets, boilers, createdAt))
-            .ToList(); 
-
-        var runFrom = sourceData.Count == 0 ? createdAt : sourceData.Min(x => x.TimeFrom);
-        var runTo = sourceData.Count == 0 ? createdAt : sourceData.Max(x => x.TimeTo);
-
-        return new OptimizationResponseDto
+        try
         {
-            OptRun = new OptRunDto
+            var assets = await this._assetDataProvider.GetAssetDataAsync(request.MaintenanceId, cancellationToken);
+            var sourceDataResponse = await this._sourceDataProvider.GetSourceDataAsync(cancellationToken);
+
+            var sourceData = sourceDataResponse
+                .Where(x => x.PeriodId == request.PeriodId)
+                .Where(x => x.TimeFrom >= request.TimeFrom && x.TimeTo <= request.TimeTo)
+                .OrderBy(x => x.TimeFrom)
+                .ToList();
+
+            var boilers = request.ScenarioId == 2
+                ? BuildScenario2Boilers(assets)
+                : BuildScenario1Boilers(assets);
+
+            var createdAt = DateTime.UtcNow;
+            var hourlyResults = sourceData
+                .Select(point => BuildHourlyResult(point, assets, boilers))
+                .ToList();
+
+            var runFrom = sourceData.Count == 0 ? createdAt : sourceData.Min(x => x.TimeFrom);
+            var runTo = sourceData.Count == 0 ? createdAt : sourceData.Max(x => x.TimeTo);
+
+            return new OptimizationResponseDto
             {
-                TimeFrom = runFrom,
-                TimeTo = runTo,
-                Scenario = request.ScenarioId.ToString(),
-                PeriodType = request.PeriodId switch
+                OptRun = new OptRunDto
                 {
-                    1 => "summer",
-                    2 => "winter",
-                    _ => request.PeriodId.ToString()
+                    TimeFrom = runFrom,
+                    TimeTo = runTo,
+                    Scenario = request.ScenarioId.ToString(),
+                    PeriodType = request.PeriodId switch
+                    {
+                        1 => "summer",
+                        2 => "winter",
+                        _ => request.PeriodId.ToString(),
+                    },
                 },
-            },
-            OptResultsHourly = hourlyResults,
-        };
-        } 
-        catch (Exception ex) when (ex is not OperationCanceledException)
+                OptResultsHourly = hourlyResults,
+            };
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException and not InvalidOperationException)
         {
             throw new ExternalDataFetchException("Optimization failed.", ex);
         }
@@ -144,11 +143,10 @@ public class Optimizer
     private static OptResultsHourlyDto BuildHourlyResult(
         SourceDataPoint point,
         AssetDataBundle assets,
-        IReadOnlyList<DispatchUnit> boilers,
-        DateTime createdAt)
+        IReadOnlyList<DispatchUnit> boilers)
     {
         var maintenance = assets.MaintenanceSchedule;
-        
+
         var availableBoilers = boilers
             .Where(
             b => maintenance is null ||
@@ -165,9 +163,6 @@ public class Optimizer
         var co2 = 0d;
         var netElectricity = 0d;
 
-        var isEbDispatched = false;
-        var isGmDispatched = false;
-
         foreach (var boiler in availableBoilers)
         {
             if (remainingHeatDemand <= 0d)
@@ -175,32 +170,14 @@ public class Optimizer
                 break;
             }
 
-            if (boiler.UnitType == "EB" && isGmDispatched)
-            {
-                continue;
-            }
-            if (boiler.UnitType == "GM" && isEbDispatched)
-            {
-                continue;
-            }
-
             var dispatchedHeat = Math.Min(boiler.MaxHeat, remainingHeatDemand);
 
             var loadRatio = dispatchedHeat / boiler.MaxHeat;
-            
+
             netCost += boiler.GetExpensesAtFull(point.ElectricityPrice) * loadRatio;
             co2 += boiler.Co2PerMWh * dispatchedHeat;
-            
-            if (boiler.UnitType == "EB")
-            {
-                netElectricity -= boiler.MaxElectricity * loadRatio;
-                isEbDispatched = true;
-            }
-            else if (boiler.UnitType == "GM")
-            {
-                netElectricity -= boiler.MaxElectricity * loadRatio;
-                isGmDispatched = true;
-            }
+
+            netElectricity -= boiler.MaxElectricity * loadRatio;
 
             unitRows.Add(new PUnitDto
             {
@@ -246,14 +223,15 @@ public class Optimizer
     {
         public double GetExpensesAtFull(double electricityPrice)
         {
-            double baseCost = ProductionCost * MaxHeat;
-            if (UnitType == "EB")
-                return baseCost - (MaxElectricity * electricityPrice);
-            if (UnitType == "GM")
-                return baseCost - (MaxElectricity * electricityPrice);
+            double baseCost = this.ProductionCost * this.MaxHeat;
+            if (this.UnitType == "EB" || this.UnitType == "GM")
+            {
+                return baseCost - (this.MaxElectricity * electricityPrice);
+            }
+
             return baseCost;
         }
 
-        public double GetCostPerHeat(double electricityPrice) => GetExpensesAtFull(electricityPrice) / MaxHeat;
+        public double GetCostPerHeat(double electricityPrice) => this.GetExpensesAtFull(electricityPrice) / this.MaxHeat;
     }
 }

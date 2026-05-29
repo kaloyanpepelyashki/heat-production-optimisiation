@@ -6,8 +6,8 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Layout;
 using Avalonia.Media;
+using Dv.App.Interfaces;
 
-// Dialogs for Optimizationview - maintenance selection - error handling
 public class DialogService : IDialogService
 {
     public async Task ShowValidationDialogAsync(string message)
@@ -72,13 +72,13 @@ public class DialogService : IDialogService
             Text = "Review selected maintenance",
             FontSize = 18,
             FontWeight = FontWeight.SemiBold,
-            Margin = new Avalonia.Thickness(0, 0, 0, 12)
+            Margin = new Avalonia.Thickness(0, 0, 0, 12),
         };
 
         var details = new StackPanel
         {
             Spacing = 8,
-            Margin = new Avalonia.Thickness(0, 0, 0, 16)
+            Margin = new Avalonia.Thickness(0, 0, 0, 16),
         };
 
         details.Children.Add(this.CreateDetailRow("Boiler", boilerId));
@@ -154,20 +154,20 @@ public class DialogService : IDialogService
         var row = new StackPanel
         {
             Orientation = Orientation.Horizontal,
-            Spacing = 8
+            Spacing = 8,
         };
 
         row.Children.Add(new TextBlock
         {
             Text = $"{label}:",
             FontWeight = FontWeight.SemiBold,
-            Width = 80
+            Width = 80,
         });
 
         row.Children.Add(new TextBlock
         {
             Text = value,
-            TextWrapping = TextWrapping.Wrap
+            TextWrapping = TextWrapping.Wrap,
         });
 
         return row;

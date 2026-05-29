@@ -1,11 +1,11 @@
+namespace Sdm.Api.Tests;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Sdm.Api.Application.Interfaces;
 using Sdm.Api.Controllers;
 using Sdm.Api.Infrastructure.Persistence.PersistenceModels;
-
-namespace Sdm.Api.Tests;
 
 public class SourceDataController_Test
 {
@@ -14,8 +14,8 @@ public class SourceDataController_Test
 
     public SourceDataController_Test()
     {
-        _mockService = new Mock<ISourceDataService>();
-        _controller = new GetAllSourceDataController(_mockService.Object);
+        this._mockService = new Mock<ISourceDataService>();
+        this._controller = new GetAllSourceDataController(this._mockService.Object);
     }
 
     [Fact]
@@ -23,11 +23,11 @@ public class SourceDataController_Test
     {
         var mockData = new List<SourceDataPersistence>
         {
-            new SourceDataPersistence { Id = 1, PeriodId = 1, HeatDemand = 10, ElectricityPrice = 100 }
+            new SourceDataPersistence { Id = 1, PeriodId = 1, HeatDemand = 10, ElectricityPrice = 100 },
         };
-        _mockService.Setup(s => s.GetAllSourceData()).ReturnsAsync(mockData);
+        this._mockService.Setup(s => s.GetAllSourceData()).ReturnsAsync(mockData);
 
-        var result = await _controller.GetAll();
+        var result = await this._controller.GetAll();
 
         var okResult = Assert.IsType<OkObjectResult>(result);
         Assert.NotNull(okResult.Value);
@@ -36,10 +36,10 @@ public class SourceDataController_Test
     [Fact]
     public async Task GetAllSourceData_ReturnsNotFound_WhenNoDataAndExceptionThrown()
     {
-        _mockService.Setup(s => s.GetAllSourceData())
+        this._mockService.Setup(s => s.GetAllSourceData())
                     .ThrowsAsync(new Sdm.Api.Application.Exceptions.NoDataFoundException("No data"));
 
-        var result = await _controller.GetAll();
+        var result = await this._controller.GetAll();
 
         Assert.IsType<NotFoundObjectResult>(result);
     }

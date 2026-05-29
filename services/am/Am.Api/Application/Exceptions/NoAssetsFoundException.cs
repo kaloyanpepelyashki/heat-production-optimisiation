@@ -1,6 +1,9 @@
 ﻿namespace Am.Api.Application.Exceptions;
 
-public class NoAssetsFoundException: Exception
+public class NoAssetsFoundException : Exception
 {
-    public NoAssetsFoundException(string message) : base(message) {}
+    public NoAssetsFoundException(string message)
+        : base(message)
+    {
+    }
 }

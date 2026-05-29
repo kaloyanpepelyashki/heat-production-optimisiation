@@ -1,17 +1,17 @@
+namespace Rdm.Api.Tests;
+
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using Xunit;
 using Rdm.Api.Application.Exceptions;
-using Rdm.Api.Controllers;
 using Rdm.Api.Application.Interfaces;
 using Rdm.Api.Application.Model;
+using Rdm.Api.Controllers;
 using Rdm.Api.Inrastructure.API;
-
-namespace Rdm.Api.Tests;
+using Xunit;
 
 public class GetResultControllerTests
 {
@@ -20,8 +20,8 @@ public class GetResultControllerTests
 
     public GetResultControllerTests()
     {
-        _mockService = new Mock<IOptimisationResultService>();
-        _controller = new GetResult(_mockService.Object, NullLogger<GetResult>.Instance);
+        this._mockService = new Mock<IOptimisationResultService>();
+        this._controller = new GetResult(this._mockService.Object, NullLogger<GetResult>.Instance);
     }
 
     [Fact]
@@ -29,11 +29,11 @@ public class GetResultControllerTests
     {
         var runs = new List<OptimisationRun>
         {
-            new OptimisationRun { Id = 1 }
+            new OptimisationRun { Id = 1 },
         };
-        _mockService.Setup(s => s.GetAllOptimisationResults()).ReturnsAsync(runs);
+        this._mockService.Setup(s => s.GetAllOptimisationResults()).ReturnsAsync(runs);
 
-        var result = await _controller.GetAllOptimisationRuns();
+        var result = await this._controller.GetAllOptimisationRuns();
 
         var okResult = Assert.IsType<OkObjectResult>(result);
         var apiResponse = Assert.IsType<ApiResponseModel<List<OptimisationRun>>>(okResult.Value);
@@ -44,9 +44,9 @@ public class GetResultControllerTests
     [Fact]
     public async Task GetAllOptimisationRuns_ReturnsOk_WithNoData_Edge()
     {
-        _mockService.Setup(s => s.GetAllOptimisationResults()).ReturnsAsync(new List<OptimisationRun>());
+        this._mockService.Setup(s => s.GetAllOptimisationResults()).ReturnsAsync(new List<OptimisationRun>());
 
-        var result = await _controller.GetAllOptimisationRuns();
+        var result = await this._controller.GetAllOptimisationRuns();
 
         var okResult = Assert.IsType<OkObjectResult>(result);
         var apiResponse = Assert.IsType<ApiResponseModel<List<OptimisationRun>>>(okResult.Value);
@@ -57,9 +57,9 @@ public class GetResultControllerTests
     [Fact]
     public async Task GetAllOptimisationRuns_Returns500_OnException_Negative()
     {
-        _mockService.Setup(s => s.GetAllOptimisationResults()).ThrowsAsync(new Exception("DB Failure"));
+        this._mockService.Setup(s => s.GetAllOptimisationResults()).ThrowsAsync(new Exception("DB Failure"));
 
-        var result = await _controller.GetAllOptimisationRuns();
+        var result = await this._controller.GetAllOptimisationRuns();
 
         var statusCodeResult = Assert.IsType<ObjectResult>(result);
         Assert.Equal(500, statusCodeResult.StatusCode);
@@ -70,9 +70,9 @@ public class GetResultControllerTests
     [Fact]
     public async Task GetAllOptimisationRuns_Returns500_OnDatabaseOperationException_Negative()
     {
-        _mockService.Setup(s => s.GetAllOptimisationResults()).ThrowsAsync(new DatabaseOperationException("DB operation failed"));
+        this._mockService.Setup(s => s.GetAllOptimisationResults()).ThrowsAsync(new DatabaseOperationException("DB operation failed"));
 
-        var result = await _controller.GetAllOptimisationRuns();
+        var result = await this._controller.GetAllOptimisationRuns();
 
         var statusCodeResult = Assert.IsType<ObjectResult>(result);
         Assert.Equal(500, statusCodeResult.StatusCode);

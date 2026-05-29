@@ -1,10 +1,10 @@
-﻿using Sdm.Api.Application.Exceptions;
+﻿namespace Sdm.Api.Infrastructure.Persistence;
+
+using Sdm.Api.Application.Exceptions;
 using Sdm.Api.Application.Interfaces;
 using Sdm.Api.Infrastructure.Persistence.PersistenceModels;
 using Supabase;
 using Supabase.Postgrest.Responses;
-
-namespace Sdm.Api.Infrastructure.Persistence;
 
 public class SourceDataRepository : ISourceDataRepository
 {
@@ -16,21 +16,19 @@ public class SourceDataRepository : ISourceDataRepository
     {
         try
         {
-            _context = context;
-            _client = context.GetClient();
-            _logger = logger;
+            this._context = context;
+            this._client = context.GetClient();
+            this._logger = logger;
         }
         catch (DatabaseContextException e)
         {
             Console.WriteLine($"Error with SourceDataRepository. DatabaseContext issue {e.Message}, {e.StackTrace}");
-            _logger.LogError($"Error with SourceDataRepository. DatabaseContext issue {e.Message}, {e.StackTrace}");
-            
+            this._logger!.LogError($"Error with SourceDataRepository. DatabaseContext issue {e.Message}, {e.StackTrace}");
         }
         catch (Exception e)
         {
             Console.WriteLine($"Error initialising SourceDataRepository: {e.Message}");
-            _logger.LogError($"Error initialising SourceDataRepository: {e.Message}");
-            
+            this._logger!.LogError($"Error initialising SourceDataRepository: {e.Message}");
         }
     }
 
@@ -38,20 +36,20 @@ public class SourceDataRepository : ISourceDataRepository
     {
         try
         {
-            ModeledResponse<SourceDataPersistence> result = await _client.From<SourceDataPersistence>().Get();
+            ModeledResponse<SourceDataPersistence> result = await this._client.From<SourceDataPersistence>().Get();
             List<SourceDataPersistence> sourceData = result.Models;
-            _logger.LogInformation($"Request GetAllSourceData. Returned {sourceData}");
+            this._logger.LogInformation($"Request GetAllSourceData. Returned {sourceData}");
             if (sourceData == null || sourceData.Count == 0)
             {
                 throw new NoDataFoundException("No data found when Getting all source data");
             }
-            
+
             return sourceData;
         }
         catch (Exception e)
         {
             Console.WriteLine($"Error fetching all SourceDataPersistence: {e.GetType()} {e.Message}");
-            _logger.LogError($"Error fetching all SourceDataPersistence: {e.GetType()} {e.Message}");
+            this._logger.LogError($"Error fetching all SourceDataPersistence: {e.GetType()} {e.Message}");
             throw;
         }
     }

@@ -1,23 +1,16 @@
-﻿using Am.Api.Application.Interfaces;
-using Am.Api.Infrastructure.Presistence;
-using Am.Api.Model.DTOs;
-using Am.Api.Infrastructure.DTOs;
+﻿namespace Am.Api.Application.Services;
+
+using Am.Api.Application.Interfaces;
 using Am.Api.Domain.Models;
 
-namespace Am.Api.Application.Services;
-
-/// <summary>
-/// In charge of handling all operations in relation to a production unit. Maps the functionality to specific use cases.
-/// The class stores methods about retrieval of different production units.
-/// </summary>
-public class ProductionUnitService: IProductionUnitService
-{   
+public class ProductionUnitService : IProductionUnitService
+{
     private IProductionUnitRepository<GasBoiler> _gasBoilerRepository;
     private IProductionUnitRepository<OilBoiler> _oilBoilerRepository;
     private IProductionUnitRepository<ElectricBoiler> _electricBoilerRepository;
-    private IProductionUnitRepository<GasMotor> _gasMotorRepository; 
+    private IProductionUnitRepository<GasMotor> _gasMotorRepository;
     private IMaintenanceRepository _maintenanceRepository;
-    
+
     public ProductionUnitService(
         IProductionUnitRepository<GasBoiler> gasBoilerRepository,
         IProductionUnitRepository<OilBoiler> oilBoilerRepository,
@@ -25,18 +18,18 @@ public class ProductionUnitService: IProductionUnitService
         IProductionUnitRepository<GasMotor> gasMotorRepository,
         IMaintenanceRepository maintenanceRepository)
     {
-        _gasBoilerRepository = gasBoilerRepository;
-        _oilBoilerRepository = oilBoilerRepository;
-        _electricBoilerRepository = electricBoilerRepository;
-        _gasMotorRepository = gasMotorRepository;
-        _maintenanceRepository = maintenanceRepository;
+        this._gasBoilerRepository = gasBoilerRepository;
+        this._oilBoilerRepository = oilBoilerRepository;
+        this._electricBoilerRepository = electricBoilerRepository;
+        this._gasMotorRepository = gasMotorRepository;
+        this._maintenanceRepository = maintenanceRepository;
     }
 
     public async Task<List<GasBoiler>> GetAllGasBoilersAsync()
     {
         try
         {
-            return await _gasBoilerRepository.GetAllAsync();
+            return await this._gasBoilerRepository.GetAllAsync();
         }
         catch (Exception e)
         {
@@ -49,7 +42,7 @@ public class ProductionUnitService: IProductionUnitService
     {
         try
         {
-            return await _oilBoilerRepository.GetAllAsync();
+            return await this._oilBoilerRepository.GetAllAsync();
         }
         catch (Exception e)
         {
@@ -60,24 +53,24 @@ public class ProductionUnitService: IProductionUnitService
 
     public async Task<List<ElectricBoiler>> GetAllElectricBoilersAsync()
     {
-        return await  _electricBoilerRepository.GetAllAsync();
+        return await this._electricBoilerRepository.GetAllAsync();
     }
 
     public async Task<List<GasMotor>> GetAllGasMotorsAsync()
     {
-        return await  _gasMotorRepository.GetAllAsync();
+        return await this._gasMotorRepository.GetAllAsync();
     }
 
-    public async Task<ProductionUnitMaintenance> GetProductionUnitMaintenanceByIdAsync(int Id)
+    public async Task<ProductionUnitMaintenance> GetProductionUnitMaintenanceByIdAsync(int id)
     {
         try
         {
-            ProductionUnitMaintenance? maintenance = (await _maintenanceRepository.GetAllProductionUnitMaintenanceAsync())
-                .FirstOrDefault(p => p.Id == Id);
+            ProductionUnitMaintenance? maintenance = (await this._maintenanceRepository.GetAllProductionUnitMaintenanceAsync())
+                .FirstOrDefault(p => p.Id == id);
 
             if (maintenance is null)
             {
-                throw new KeyNotFoundException($"No ProductionUnitMaintenance found with Id {Id}.");
+                throw new KeyNotFoundException($"No ProductionUnitMaintenance found with Id {id}.");
             }
 
             return maintenance;
@@ -93,9 +86,9 @@ public class ProductionUnitService: IProductionUnitService
     {
         try
         {
-            int Id = await _maintenanceRepository.PostProductionUnitMaintenanceAsync(productionUnitMaintenance);
+            int id = await this._maintenanceRepository.PostProductionUnitMaintenanceAsync(productionUnitMaintenance);
 
-            return Id;
+            return id;
         }
         catch (Exception e)
         {

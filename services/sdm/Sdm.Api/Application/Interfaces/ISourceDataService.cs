@@ -1,6 +1,6 @@
-﻿using Sdm.Api.Infrastructure.Persistence.PersistenceModels;
+﻿namespace Sdm.Api.Application.Interfaces;
 
-namespace Sdm.Api.Application.Interfaces;
+using Sdm.Api.Infrastructure.Persistence.PersistenceModels;
 
 public interface ISourceDataService
 {

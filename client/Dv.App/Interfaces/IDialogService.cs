@@ -1,4 +1,4 @@
-namespace Dv.App.Services;
+namespace Dv.App.Interfaces;
 
 using System;
 using System.Threading.Tasks;
@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 public interface IDialogService
 {
     Task ShowValidationDialogAsync(string message);
-    
+
     Task<bool> ShowConfirmationDialogAsync(
         string period,
         string boilerId,

@@ -1,12 +1,9 @@
+namespace Am.Api.Model.DTOs;
+
 using System;
 using Supabase.Postgrest.Attributes;
 using Supabase.Postgrest.Models;
 
-namespace Am.Api.Model.DTOs;
-
-/// <summary>
-/// Represents the Maintenance Period entity.
-/// </summary>
 [Table("production_unit_maintenance")]
 public class ProductionUnitMaintenancePersistence : BaseModel
 {

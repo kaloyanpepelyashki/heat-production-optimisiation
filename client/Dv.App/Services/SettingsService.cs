@@ -22,7 +22,10 @@ public static class SettingsService
                 return JsonSerializer.Deserialize<AppSettings>(json) ?? new AppSettings();
             }
         }
-        catch { }
+        catch
+        {
+        }
+
         return new AppSettings();
     }
 
@@ -31,8 +34,12 @@ public static class SettingsService
         try
         {
             Directory.CreateDirectory(Path.GetDirectoryName(SettingsFilePath)!);
-            File.WriteAllText(SettingsFilePath, JsonSerializer.Serialize(settings, new JsonSerializerOptions { WriteIndented = true }));
+            File.WriteAllText(
+                SettingsFilePath,
+                JsonSerializer.Serialize(settings, new JsonSerializerOptions { WriteIndented = true }));
         }
-        catch { }
+        catch
+        {
+        }
     }
 }

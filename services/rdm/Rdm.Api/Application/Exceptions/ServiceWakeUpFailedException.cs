@@ -1,6 +1,5 @@
 ﻿namespace Rdm.Api.Application.Exceptions;
 
-public class ServiceWakeUpFailedException: Exception
+public class ServiceWakeUpFailedException : Exception
 {
-    
 }
