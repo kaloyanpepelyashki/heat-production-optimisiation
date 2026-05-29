@@ -75,9 +75,6 @@
         <DataTemplate DataType="viewModels:ProductionUnitsViewModel">
             <views:ProductionUnitsView />
         </DataTemplate>
-        <DataTemplate DataType="viewModels:SourceDataViewModel">
-            <views:SourceDataView />
-        </DataTemplate>
         <DataTemplate DataType="viewModels:OptimizationViewModel">
             <views:OptimizationView />
         </DataTemplate>

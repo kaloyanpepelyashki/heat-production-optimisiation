@@ -2,6 +2,7 @@
 using Dv.App.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Dv.App.Interfaces;
 
 namespace Dv.App;
 
@@ -10,6 +11,7 @@ public static class ServiceCollectionExtension
     public static void AddCommonServices(this IServiceCollection services)
     {
         services.AddSingleton<IApiService, ApiService>();
+        services.AddSingleton<MaintenanceService>();
         services.AddLogging(builder =>
         {
             builder.AddDebug();
@@ -23,7 +25,6 @@ public static class ServiceCollectionExtension
         services.AddSingleton<ProductionUnitsViewModel>();
         services.AddSingleton<DashboardViewModel>();
         services.AddSingleton<OptimizationViewModel>();
-        services.AddSingleton<SourceDataViewModel>();
         services.AddSingleton<SettingsViewModel>();
         
         services.AddSingleton<MainWindow>();

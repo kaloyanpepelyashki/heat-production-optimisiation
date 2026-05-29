@@ -1,23 +1,20 @@
-﻿namespace Am.Api.Application.Services;
-
-using Am.Api.Application.Interfaces;
-using Am.Api.Domain.Models;
-using Am.Api.Infrastructure.DTOs;
+﻿using Am.Api.Application.Interfaces;
 using Am.Api.Infrastructure.Presistence;
 using Am.Api.Model.DTOs;
+using Am.Api.Infrastructure.DTOs;
+using Am.Api.Domain.Models;
 
-/// <summary>
-/// In charge of handling all operations in relation to a production unit. Maps the functionality to specific use cases.
-/// The class stores methods about retrieval of different production units.
-/// </summary>
-public class ProductionUnitService : IProductionUnitService
-{
+namespace Am.Api.Application.Services;
+
+
+public class ProductionUnitService: IProductionUnitService
+{   
     private IProductionUnitRepository<GasBoiler> _gasBoilerRepository;
     private IProductionUnitRepository<OilBoiler> _oilBoilerRepository;
     private IProductionUnitRepository<ElectricBoiler> _electricBoilerRepository;
-    private IProductionUnitRepository<GasMotor> _gasMotorRepository;
+    private IProductionUnitRepository<GasMotor> _gasMotorRepository; 
     private IMaintenanceRepository _maintenanceRepository;
-
+    
     public ProductionUnitService(
         IProductionUnitRepository<GasBoiler> gasBoilerRepository,
         IProductionUnitRepository<OilBoiler> oilBoilerRepository,
@@ -25,18 +22,18 @@ public class ProductionUnitService : IProductionUnitService
         IProductionUnitRepository<GasMotor> gasMotorRepository,
         IMaintenanceRepository maintenanceRepository)
     {
-        this._gasBoilerRepository = gasBoilerRepository;
-        this._oilBoilerRepository = oilBoilerRepository;
-        this._electricBoilerRepository = electricBoilerRepository;
-        this._gasMotorRepository = gasMotorRepository;
-        this._maintenanceRepository = maintenanceRepository;
+        _gasBoilerRepository = gasBoilerRepository;
+        _oilBoilerRepository = oilBoilerRepository;
+        _electricBoilerRepository = electricBoilerRepository;
+        _gasMotorRepository = gasMotorRepository;
+        _maintenanceRepository = maintenanceRepository;
     }
 
     public async Task<List<GasBoiler>> GetAllGasBoilersAsync()
     {
         try
         {
-            return await this._gasBoilerRepository.GetAllAsync();
+            return await _gasBoilerRepository.GetAllAsync();
         }
         catch (Exception e)
         {
@@ -49,7 +46,7 @@ public class ProductionUnitService : IProductionUnitService
     {
         try
         {
-            return await this._oilBoilerRepository.GetAllAsync();
+            return await _oilBoilerRepository.GetAllAsync();
         }
         catch (Exception e)
         {
@@ -60,19 +57,19 @@ public class ProductionUnitService : IProductionUnitService
 
     public async Task<List<ElectricBoiler>> GetAllElectricBoilersAsync()
     {
-        return await this._electricBoilerRepository.GetAllAsync();
+        return await  _electricBoilerRepository.GetAllAsync();
     }
 
     public async Task<List<GasMotor>> GetAllGasMotorsAsync()
     {
-        return await this._gasMotorRepository.GetAllAsync();
+        return await  _gasMotorRepository.GetAllAsync();
     }
 
     public async Task<ProductionUnitMaintenance> GetProductionUnitMaintenanceByIdAsync(int Id)
     {
         try
         {
-            ProductionUnitMaintenance? maintenance = (await this._maintenanceRepository.GetAllProductionUnitMaintenanceAsync())
+            ProductionUnitMaintenance? maintenance = (await _maintenanceRepository.GetAllProductionUnitMaintenanceAsync())
                 .FirstOrDefault(p => p.Id == Id);
 
             if (maintenance is null)
@@ -93,7 +90,7 @@ public class ProductionUnitService : IProductionUnitService
     {
         try
         {
-            int Id = await this._maintenanceRepository.PostProductionUnitMaintenanceAsync(productionUnitMaintenance);
+            int Id = await _maintenanceRepository.PostProductionUnitMaintenanceAsync(productionUnitMaintenance);
 
             return Id;
         }

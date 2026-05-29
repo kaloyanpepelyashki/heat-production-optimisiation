@@ -1,6 +1,8 @@
-﻿using System.Text.Json.Serialization;
+﻿using System;
+using System.Text.Json.Serialization;
+using System.Collections.Generic;
 
-namespace Rdm.Api.Inrastructure.DTOs;
+namespace Dv.App.Models;
 
 public class OptimisationRunDto
 {
@@ -15,5 +17,7 @@ public class OptimisationRunDto
     public string Scenario { get; set; }
     [JsonPropertyName("periodType")]
     public string PeriodType { get; set; }
+    [JsonPropertyName("optimisationResultsHourly")]
+    public List<OptimisationResultsHourlyDto> optimisationResultsHourly{get; set;}
     
 }

@@ -2,11 +2,10 @@ namespace Dv.App.ViewModels;
 
 using Avalonia.Media;
 
-// sealed to not extend this class, it is done as it is
 public sealed class BoilerStatusViewModel : ViewModelBase
 {
     private static readonly SolidColorBrush AvailableBrush = new(Color.Parse("#10B981"));
-    private static readonly SolidColorBrush UnavailableBrush = new(Color.Parse("#EF4444"));
+    private static readonly SolidColorBrush UnavailableBrush = new(Color.Parse("#F97316"));
     private bool isUnavailable;
 
     public BoilerStatusViewModel(string boilerId, string fuelType, string period)
@@ -22,7 +21,6 @@ public sealed class BoilerStatusViewModel : ViewModelBase
 
     public string Period { get; }
 
-    // Active or Unavailable, changes with colour here
     public bool IsUnavailable
     {
         get => this.isUnavailable;
@@ -36,7 +34,7 @@ public sealed class BoilerStatusViewModel : ViewModelBase
         }
     }
 
-    public string StatusText => this.IsUnavailable ? "Unavailable" : "Active";
+    public string StatusText => this.IsUnavailable ? "In Maintenance" : "Active";
 
     public IBrush StatusBrush => this.IsUnavailable ? UnavailableBrush : AvailableBrush;
 

@@ -8,6 +8,7 @@ public class MaintenanceEvent
 {
     public string AssetName { get; set; } = string.Empty;
     public int BoilerId { get; set; }
+    public int MaintenanceId { get; set; }
     public string BoilerType { get; set; } = string.Empty;
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }

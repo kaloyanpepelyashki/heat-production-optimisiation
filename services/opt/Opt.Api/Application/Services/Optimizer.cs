@@ -1,10 +1,10 @@
-namespace Opt.Api.Application.Services;
 
-using Microsoft.Extensions.Logging;
-using Opt.Api.Application.Exceptions;
 using Opt.Api.Application.Interfaces;
-using Opt.Api.Domain.Models;
 using Opt.Api.DTOs;
+using Opt.Api.Domain.Models;
+using Opt.Api.Application.Exceptions;
+using Microsoft.Extensions.Logging;
+namespace Opt.Api.Application.Services;
 
 public class Optimizer
 {
@@ -15,55 +15,56 @@ public class Optimizer
 
     public Optimizer(IAssetDataProvider assetDataProvider, ISourceDataProvider sourceDataProvider, ILogger<Optimizer> logger)
     {
-        this._assetDataProvider = assetDataProvider;
-        this._sourceDataProvider = sourceDataProvider;
-        this._logger = logger;
+        _assetDataProvider = assetDataProvider;
+        _sourceDataProvider = sourceDataProvider;
+        _logger = logger;
     }
 
     public async Task<OptimizationResponseDto> OptimizeAsync(
         OptimizationRequestDto request,
         CancellationToken cancellationToken)
     {
-        try
+
+        try {
+            
+        var assets = await _assetDataProvider.GetAssetDataAsync(request.MaintenanceId, cancellationToken);
+        var sourceDataResponse = await _sourceDataProvider.GetSourceDataAsync(cancellationToken);
+
+        var sourceData = sourceDataResponse
+            .Where(x => x.PeriodId == request.PeriodId)
+            .Where(x => x.TimeFrom >= request.TimeFrom && x.TimeTo <= request.TimeTo)
+            .OrderBy(x => x.TimeFrom)
+            .ToList();
+
+        var boilers = request.ScenarioId == 2 
+            ? BuildScenario2Boilers(assets)
+            : BuildScenario1Boilers(assets);
+        
+        var createdAt = DateTime.UtcNow;
+        var hourlyResults = sourceData
+            .Select(point => BuildHourlyResult(point, assets, boilers))
+            .ToList(); 
+
+        var runFrom = sourceData.Count == 0 ? createdAt : sourceData.Min(x => x.TimeFrom);
+        var runTo = sourceData.Count == 0 ? createdAt : sourceData.Max(x => x.TimeTo);
+
+        return new OptimizationResponseDto
         {
-            var assets = await this._assetDataProvider.GetAssetDataAsync(request.MaintenanceId, cancellationToken);
-            var sourceDataResponse = await this._sourceDataProvider.GetSourceDataAsync(cancellationToken);
-
-            var sourceData = sourceDataResponse
-                .Where(x => x.PeriodId == request.PeriodId)
-                .Where(x => x.TimeFrom >= request.TimeFrom && x.TimeTo <= request.TimeTo)
-                .OrderBy(x => x.TimeFrom)
-                .ToList();
-
-            var boilers = request.ScenarioId == 2
-                ? BuildScenario2Boilers(assets)
-                : BuildScenario1Boilers(assets);
-
-            var createdAt = DateTime.UtcNow;
-            var hourlyResults = sourceData
-                .Select(point => BuildHourlyResult(point, assets, boilers))
-                .ToList();
-
-            var runFrom = sourceData.Count == 0 ? createdAt : sourceData.Min(x => x.TimeFrom);
-            var runTo = sourceData.Count == 0 ? createdAt : sourceData.Max(x => x.TimeTo);
-
-            return new OptimizationResponseDto
+            OptRun = new OptRunDto
             {
-                OptRun = new OptRunDto
+                TimeFrom = runFrom,
+                TimeTo = runTo,
+                Scenario = request.ScenarioId.ToString(),
+                PeriodType = request.PeriodId switch
                 {
-                    TimeFrom = runFrom,
-                    TimeTo = runTo,
-                    Scenario = request.ScenarioId.ToString(),
-                    PeriodType = request.PeriodId switch
-                    {
-                        1 => "summer",
-                        2 => "winter",
-                        _ => request.PeriodId.ToString(),
-                    },
+                    1 => "summer",
+                    2 => "winter",
+                    _ => request.PeriodId.ToString()
                 },
-                OptResultsHourly = hourlyResults,
-            };
-        }
+            },
+            OptResultsHourly = hourlyResults,
+        };
+        } 
         catch (Exception ex) when (ex is not OperationCanceledException and not InvalidOperationException)
         {
             throw new ExternalDataFetchException("Optimization failed.", ex);
@@ -146,7 +147,7 @@ public class Optimizer
         IReadOnlyList<DispatchUnit> boilers)
     {
         var maintenance = assets.MaintenanceSchedule;
-
+        
         var availableBoilers = boilers
             .Where(
             b => maintenance is null ||
@@ -163,9 +164,6 @@ public class Optimizer
         var co2 = 0d;
         var netElectricity = 0d;
 
-        var isEbDispatched = false;
-        var isGmDispatched = false;
-
         foreach (var boiler in availableBoilers)
         {
             if (remainingHeatDemand <= 0d)
@@ -173,53 +171,33 @@ public class Optimizer
                 break;
             }
 
-            if (boiler.UnitType == "EB" && isGmDispatched)
-            {
-                continue;
-            }
-
-            if (boiler.UnitType == "GM" && isEbDispatched)
-            {
-                continue;
-            }
-
             var dispatchedHeat = Math.Min(boiler.MaxHeat, remainingHeatDemand);
 
             var loadRatio = dispatchedHeat / boiler.MaxHeat;
-
+            
             netCost += boiler.GetExpensesAtFull(point.ElectricityPrice) * loadRatio;
             co2 += boiler.Co2PerMWh * dispatchedHeat;
-
-            if (boiler.UnitType == "EB")
-            {
-                netElectricity -= boiler.MaxElectricity * loadRatio;
-                isEbDispatched = true;
-            }
-            else if (boiler.UnitType == "GM")
-            {
-                netElectricity -= boiler.MaxElectricity * loadRatio;
-                isGmDispatched = true;
-            }
+            
+            netElectricity -= boiler.MaxElectricity * loadRatio;
 
             unitRows.Add(new PUnitDto
             {
                 UnitType = boiler.UnitType,
                 UnitId = boiler.UnitId,
-                HeatProductionPerUnit = Math.Round(dispatchedHeat, 2),
-                ElectricityConsumptionPerUnit = Math.Round(
+                HeatProduction = Math.Round(dispatchedHeat, 2),
+                ElectricityConsumption = Math.Round(
                     (boiler.UnitType == "EB" || boiler.UnitType == "GM") ? boiler.MaxElectricity * loadRatio * -1 : 0d, 2),
-                ExpensesPerUnit = Math.Round(boiler.GetExpensesAtFull(point.ElectricityPrice) * loadRatio, 2),
-                Co2EmissionsPerUnit = Math.Round(boiler.Co2PerMWh * dispatchedHeat, 2),
+                Expenses = Math.Round(boiler.GetExpensesAtFull(point.ElectricityPrice) * loadRatio, 2),
+                Co2Emissions = Math.Round(boiler.Co2PerMWh * dispatchedHeat, 2),
                 CapacityOutput = Math.Round(loadRatio * 100d, 2),
             });
 
             remainingHeatDemand -= dispatchedHeat;
         }
 
-        if (remainingHeatDemand > 0.001)
+        if (remainingHeatDemand > 0d)
         {
-            throw new InvalidOperationException(
-                "Heat demand cannot be fully covered by the available production units.");
+            throw new InvalidOperationException("Heat demand could not be fully covered with available boilers.");
         }
 
         return new OptResultsHourlyDto
@@ -246,20 +224,14 @@ public class Optimizer
     {
         public double GetExpensesAtFull(double electricityPrice)
         {
-            double baseCost = this.ProductionCost * this.MaxHeat;
-            if (this.UnitType == "EB")
+            double baseCost = ProductionCost * MaxHeat;
+            if (UnitType == "EB" || UnitType == "GM")
             {
-                return baseCost - (this.MaxElectricity * electricityPrice);
+                return baseCost - (MaxElectricity * electricityPrice);
             }
-
-            if (this.UnitType == "GM")
-            {
-                return baseCost - (this.MaxElectricity * electricityPrice);
-            }
-
             return baseCost;
         }
 
-        public double GetCostPerHeat(double electricityPrice) => this.GetExpensesAtFull(electricityPrice) / this.MaxHeat;
+        public double GetCostPerHeat(double electricityPrice) => GetExpensesAtFull(electricityPrice) / MaxHeat;
     }
 }

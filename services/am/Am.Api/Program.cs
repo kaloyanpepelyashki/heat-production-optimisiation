@@ -1,16 +1,13 @@
 using Am.Api.Application.Interfaces;
 using Am.Api.Application.Services;
-using Am.Api.Domain.Models;
 using Am.Api.Infrastructure.Configuration;
 using Am.Api.Infrastructure.Presistence;
+using Am.Api.Domain.Models;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddControllers();
-
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.Configure<SupabaseSettings>(builder.Configuration.GetSection("SupabaseSettings"));
@@ -22,13 +19,10 @@ builder.Services.AddScoped<IProductionUnitRepository<OilBoiler>, OilBoilerReposi
 builder.Services.AddScoped<IProductionUnitRepository<ElectricBoiler>, ElectricBoilerRepository>();
 builder.Services.AddScoped<IProductionUnitRepository<GasMotor>, GasMotorRepository>();
 builder.Services.AddScoped<IMaintenanceRepository, MaintenanceRepository>();
-
-// Registers the ProductionUnitService as a scope service (important for the dependency injection container.
 builder.Services.AddScoped<IProductionUnitService, ProductionUnitService>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
 {
     app.MapOpenApi();

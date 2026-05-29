@@ -7,37 +7,29 @@ using Supabase.Postgrest.Responses;
 
 namespace Am.Api.Infrastructure.Presistence;
 
-/// <summary>
-/// Repository responsible for retrieving GasBoilerPersistence data from the database
-/// using the configured database client.
-/// </summary>
 public class GasBoilerRepository: IProductionUnitRepository<GasBoiler>
 {
     private readonly DatabaseContext _context;
     private readonly Client _client;
     private readonly ILogger<GasBoilerRepository> _logger;
+    
 
     public GasBoilerRepository(DatabaseContext context, ILogger<GasBoilerRepository> logger)
     {
-        this._context = context;
-        this._client = this._context.GetClient();
-        this._logger = logger;
+        _context = context;
+        _client = _context.GetClient();
+        _logger = logger;
     }
-
-    /// <summary>
-    /// Retrieves all gas boiler records from the database.
-    /// Throws an exception if no data is returned.
-    /// </summary>
-    /// <returns>A list of GasBoilerPersistence entities.</returns>
+    
     public async Task<List<GasBoiler>> GetAllAsync()
     {
         try
         {
-            ModeledResponse<GasBoilerPersistence> result = await this._client.From<GasBoilerPersistence>().Get();
+            ModeledResponse<GasBoilerPersistence> result = await _client.From<GasBoilerPersistence>().Get();
             List<GasBoilerPersistence> gasBoilersPersistence = result.Models;
-            this._logger.LogInformation($"Request GetAllAsync for GasBoilers. Returned:  {gasBoilersPersistence}");
+            _logger.LogInformation($"Request GetAllAsync for GasBoilers. Returned:  {gasBoilersPersistence}");
 
-            if (gasBoilersPersistence == null || gasBoilersPersistence.Count == 0)
+            if ( gasBoilersPersistence == null || gasBoilersPersistence.Count == 0 )
             {
                 throw new NoAssetsFoundException("No asset data received. Gas Boiler set empty");
             }
@@ -54,41 +46,30 @@ public class GasBoilerRepository: IProductionUnitRepository<GasBoiler>
         catch (Exception e)
         {
             Console.WriteLine($"Error fetching all in GasBoilerRepository: {e.GetType()} {e.Message}");
-            this._logger.LogError($"Error fetching all in GasBoilerRepository: {e.GetType()} {e.Message}");
+            _logger.LogError($"Error fetching all in GasBoilerRepository: {e.GetType()} {e.Message}");
             throw;
         }
     }
-
-    /// <summary>
-    /// Retrieves a gas boiler record by its identifier.
-    /// </summary>
-    /// <param name="id">The identifier of the gas boiler.</param>
-    /// <returns>A GasBoilerPersistence entity matching the given id.</returns>
-    public async Task<GasBoiler> GetByIdAsync(int id)
+    public async  Task<GasBoiler> GetByIdAsync(int id)
     {
         try
         {
-            ModeledResponse<GasBoilerPersistence> result = await this._client.From<GasBoilerPersistence>().Select(obj => new object[] { obj.Id }).Get();
+            ModeledResponse<GasBoilerPersistence> result = await _client.From<GasBoilerPersistence>().Select(obj => new object[] { obj.Id }).Get();
 
             GasBoilerPersistence gasBoiler = result.Model;
-            this._logger.LogInformation($"Request GetByIdAsync for GasBoilers. Returned:  {gasBoiler}");
-
-            // TODO - To be finished. Validation check is to be done here
+            _logger.LogInformation($"Request GetByIdAsync for GasBoilers. Returned:  {gasBoiler}");
+            //TODO - To be finished. Validation check is to be done here
+            
             return ToDomain(gasBoiler);
         }
         catch (Exception e)
         {
             Console.WriteLine($"Error fetching GasBoilerRepository: {e.GetType()} {e.Message}");
-            this._logger.LogError($"Error fetching GasBoilerRepository: {e.GetType()} {e.Message}");
+            _logger.LogError($"Error fetching GasBoilerRepository: {e.GetType()} {e.Message}");
             throw;
         }
     }
 
-    /// <summary>
-    /// Turns Persistance Model into a Domain model.
-    /// </summary>
-    /// <param name="p">The Persistance model.</param>
-    /// <returns>A domain model.</returns>
     public static GasBoiler ToDomain(GasBoilerPersistence p)
     {
         return new GasBoiler
