@@ -1,9 +1,9 @@
 using Avalonia.Controls;
 using Avalonia.Headless.NUnit;
+using Dv.App.Interfaces;
 using Dv.App.Services;
 using Dv.App.ViewModels;
 using Dv.App.Views;
-using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 
@@ -13,12 +13,18 @@ namespace Dv.App.Tests;
 public class OptimizationViewTests
 {
     private Mock<IApiService> CreateMockApiService() => new();
-    private Mock<ILogger<OptimizationViewModel>> CreateMockLogger() => new();
+    private Mock<IDialogService> CreateMockDialogService() => new();
 
     private (Window, OptimizationView, OptimizationViewModel) CreateTestWindow()
     {
         var window = new Window { Width = 1200, Height = 800 };
-        var viewModel = new OptimizationViewModel(CreateMockApiService().Object, CreateMockLogger().Object);
+        var mockApiService = CreateMockApiService();
+        var mockDialogService = CreateMockDialogService();
+        var maintenanceService = new MaintenanceService(mockApiService.Object);
+        var viewModel = new OptimizationViewModel(
+            mockApiService.Object,
+            maintenanceService,
+            mockDialogService.Object);
         var view = new OptimizationView { DataContext = viewModel };
         window.Content = view;
         return (window, view, viewModel);
@@ -50,294 +56,277 @@ public class OptimizationViewTests
     }
 
     [AvaloniaTest]
-    public void ViewModel_InitializesAllFourPeriodViewModels()
+    public void ViewModel_Initializes_WithCorrectComponents()
     {
         var (window, _, viewModel) = CreateTestWindow();
         window.Show();
 
-        Assert.That(viewModel.SummerScenario1, Is.Not.Null);
-        Assert.That(viewModel.WinterScenario1, Is.Not.Null);
-        Assert.That(viewModel.SummerScenario2, Is.Not.Null);
-        Assert.That(viewModel.WinterScenario2, Is.Not.Null);
+        Assert.That(viewModel.Periods, Is.Not.Null);
+        Assert.That(viewModel.Scenarios, Is.Not.Null);
+        Assert.That(viewModel.CurrentContext, Is.Not.Null);
+        Assert.That(viewModel.Maintenance, Is.Not.Null);
+        Assert.That(viewModel.ChartsVM, Is.Not.Null);
 
         window.Close();
     }
 
     [AvaloniaTest]
-    public void ViewModel_AssignsCorrectScenarioNumbersToPeriodsFromField()
+    public void ViewModel_Periods_ContainsExpectedValues()
     {
         var (window, _, viewModel) = CreateTestWindow();
         window.Show();
 
-        Assert.That(viewModel.SummerScenario1.Scenario, Is.EqualTo("1"));
-        Assert.That(viewModel.WinterScenario1.Scenario, Is.EqualTo("1"));
-        Assert.That(viewModel.SummerScenario2.Scenario, Is.EqualTo("2"));
-        Assert.That(viewModel.WinterScenario2.Scenario, Is.EqualTo("2"));
+        Assert.That(viewModel.Periods.Count, Is.EqualTo(2));
+        Assert.That(viewModel.Periods, Does.Contain("Summer"));
+        Assert.That(viewModel.Periods, Does.Contain("Winter"));
 
         window.Close();
     }
 
-    // Boiler Configuration - Scenario 1
     [AvaloniaTest]
-    public void Scenario1Summer_PopulatesWithFourBoilers()
+    public void ViewModel_Scenarios_ContainsExpectedValues()
     {
         var (window, _, viewModel) = CreateTestWindow();
         window.Show();
 
-        var boilers = viewModel.SummerScenario1.Boilers;
-        Assert.That(boilers, Is.Not.Null);
+        Assert.That(viewModel.Scenarios.Count, Is.EqualTo(2));
+        Assert.That(viewModel.Scenarios, Does.Contain("Scenario 1"));
+        Assert.That(viewModel.Scenarios, Does.Contain("Scenario 2"));
+
+        window.Close();
+    }
+
+    [AvaloniaTest]
+    public void CurrentContext_Scenario1_HasFourBoilers()
+    {
+        var (window, _, viewModel) = CreateTestWindow();
+        window.Show();
+
+        viewModel.SelectedScenario = "Scenario 1";
+
+        var boilers = viewModel.CurrentContext.Boilers;
         Assert.That(boilers.Count, Is.EqualTo(4));
-
-        Assert.That(boilers.Count(b => b.BoilerId == "GB1"), Is.EqualTo(1));
-        Assert.That(boilers.Count(b => b.BoilerId == "GB2"), Is.EqualTo(1));
-        Assert.That(boilers.Count(b => b.BoilerId == "GB3"), Is.EqualTo(1));
-        Assert.That(boilers.Count(b => b.BoilerId == "OB1"), Is.EqualTo(1));
+        Assert.That(boilers[0].BoilerId, Is.EqualTo("GB1"));
+        Assert.That(boilers[1].BoilerId, Is.EqualTo("GB2"));
+        Assert.That(boilers[2].BoilerId, Is.EqualTo("GB3"));
+        Assert.That(boilers[3].BoilerId, Is.EqualTo("OB1"));
 
         window.Close();
     }
 
     [AvaloniaTest]
-    public void Scenario1Winter_PopulatesWithFourBoilers()
+    public void CurrentContext_Scenario1_BoilersHaveCorrectFuelTypes()
     {
         var (window, _, viewModel) = CreateTestWindow();
         window.Show();
 
-        var boilers = viewModel.WinterScenario1.Boilers;
-        Assert.That(boilers, Is.Not.Null);
+        viewModel.SelectedScenario = "Scenario 1";
+
+        var boilers = viewModel.CurrentContext.Boilers;
+        Assert.That(boilers[0].FuelType, Is.EqualTo("Gas"));
+        Assert.That(boilers[1].FuelType, Is.EqualTo("Gas"));
+        Assert.That(boilers[2].FuelType, Is.EqualTo("Gas"));
+        Assert.That(boilers[3].FuelType, Is.EqualTo("Oil"));
+
+        window.Close();
+    }
+
+    [AvaloniaTest]
+    public void CurrentContext_Scenario2_HasFourBoilersWithDifferentMix()
+    {
+        var (window, _, viewModel) = CreateTestWindow();
+        window.Show();
+
+        viewModel.SelectedScenario = "Scenario 2";
+
+        var boilers = viewModel.CurrentContext.Boilers;
         Assert.That(boilers.Count, Is.EqualTo(4));
-
-        Assert.That(boilers.Count(b => b.BoilerId == "GB1"), Is.EqualTo(1));
-        Assert.That(boilers.Count(b => b.BoilerId == "GB2"), Is.EqualTo(1));
-        Assert.That(boilers.Count(b => b.BoilerId == "GB3"), Is.EqualTo(1));
-        Assert.That(boilers.Count(b => b.BoilerId == "OB1"), Is.EqualTo(1));
-
-        window.Close();
-    }
-
-    // Boiler Configuration - Scenario 2
-    [AvaloniaTest]
-    public void Scenario2Summer_PopulatesWithDifferentBoilerMix()
-    {
-        var (window, _, viewModel) = CreateTestWindow();
-        window.Show();
-
-        var boilers = viewModel.SummerScenario2.Boilers;
-        Assert.That(boilers, Is.Not.Null);
-        Assert.That(boilers.Count, Is.EqualTo(4));
-
-        Assert.That(boilers.Count(b => b.BoilerId == "GB1"), Is.EqualTo(1));
-        Assert.That(boilers.Count(b => b.BoilerId == "GB2"), Is.EqualTo(1));
-        Assert.That(boilers.Count(b => b.BoilerId == "GM1"), Is.EqualTo(1));
-        Assert.That(boilers.Count(b => b.BoilerId == "EB1"), Is.EqualTo(1));
+        Assert.That(boilers[0].BoilerId, Is.EqualTo("GB1"));
+        Assert.That(boilers[1].BoilerId, Is.EqualTo("GB3"));
+        Assert.That(boilers[2].BoilerId, Is.EqualTo("GM1"));
+        Assert.That(boilers[3].BoilerId, Is.EqualTo("EB1"));
 
         window.Close();
     }
 
     [AvaloniaTest]
-    public void Scenario2Winter_PopulatesWithDifferentBoilerMix()
+    public void CurrentContext_Scenario2_BoilersHaveCorrectFuelTypes()
     {
         var (window, _, viewModel) = CreateTestWindow();
         window.Show();
 
-        var boilers = viewModel.WinterScenario2.Boilers;
-        Assert.That(boilers, Is.Not.Null);
-        Assert.That(boilers.Count, Is.EqualTo(4));
+        viewModel.SelectedScenario = "Scenario 2";
 
-        Assert.That(boilers.Count(b => b.BoilerId == "GB1"), Is.EqualTo(1));
-        Assert.That(boilers.Count(b => b.BoilerId == "GB2"), Is.EqualTo(1));
-        Assert.That(boilers.Count(b => b.BoilerId == "GM1"), Is.EqualTo(1));
-        Assert.That(boilers.Count(b => b.BoilerId == "EB1"), Is.EqualTo(1));
+        var boilers = viewModel.CurrentContext.Boilers;
+        Assert.That(boilers[0].FuelType, Is.EqualTo("Gas"));
+        Assert.That(boilers[1].FuelType, Is.EqualTo("Gas"));
+        Assert.That(boilers[2].FuelType, Is.EqualTo("Gas"));
+        Assert.That(boilers[3].FuelType, Is.EqualTo("Electric"));
 
         window.Close();
     }
 
     [AvaloniaTest]
-    public void BoilerSelection_StartsAsNull()
+    public void SelectedPeriod_DefaultsToWinter()
     {
         var (window, _, viewModel) = CreateTestWindow();
         window.Show();
 
-        Assert.That(viewModel.SummerScenario1.SelectedBoiler, Is.Null);
-        Assert.That(viewModel.SummerScenario2.SelectedBoiler, Is.Null);
-        Assert.That(viewModel.WinterScenario1.SelectedBoiler, Is.Null);
-        Assert.That(viewModel.WinterScenario2.SelectedBoiler, Is.Null);
+        Assert.That(viewModel.SelectedPeriod, Is.EqualTo("Winter"));
 
         window.Close();
     }
 
     [AvaloniaTest]
-    public void BoilerSelection_CanSelectBoiler()
+    public void SelectedScenario_DefaultsToScenario2()
     {
         var (window, _, viewModel) = CreateTestWindow();
         window.Show();
 
-        var scenario = viewModel.SummerScenario1;
-        var targetBoiler = scenario.Boilers[0];
-
-        scenario.SelectedBoiler = targetBoiler;
-
-        Assert.That(scenario.SelectedBoiler, Is.Not.Null);
-        Assert.That(scenario.SelectedBoiler.BoilerId, Is.EqualTo("GB1"));
-        Assert.That(scenario.SelectedBoiler, Is.SameAs(targetBoiler));
+        Assert.That(viewModel.SelectedScenario, Is.EqualTo("Scenario 2"));
 
         window.Close();
     }
 
     [AvaloniaTest]
-    public void BoilerSelection_CanChangeSelection()
+    public void WinterPeriod_HasCorrectDateRange()
     {
         var (window, _, viewModel) = CreateTestWindow();
         window.Show();
 
-        var scenario = viewModel.SummerScenario1;
-        scenario.SelectedBoiler = scenario.Boilers[0];
-        Assert.That(scenario.SelectedBoiler.BoilerId, Is.EqualTo("GB1"));
+        viewModel.SelectedPeriod = "Winter";
 
-        scenario.SelectedBoiler = scenario.Boilers[2];
-        Assert.That(scenario.SelectedBoiler.BoilerId, Is.EqualTo("GB3"));
+        Assert.That(viewModel.CurrentContext.StartDate, Is.EqualTo(new DateTime(2026, 1, 5, 0, 0, 0)));
+        Assert.That(viewModel.CurrentContext.EndDate, Is.EqualTo(new DateTime(2026, 1, 19, 0, 0, 0)));
 
         window.Close();
     }
 
     [AvaloniaTest]
-    public void BoilerSelection_CanClearSelection()
+    public void SummerPeriod_HasCorrectDateRange()
     {
         var (window, _, viewModel) = CreateTestWindow();
         window.Show();
 
-        var scenario = viewModel.SummerScenario1;
-        scenario.SelectedBoiler = scenario.Boilers[0];
-        Assert.That(scenario.SelectedBoiler, Is.Not.Null);
+        viewModel.SelectedPeriod = "Summer";
 
-        scenario.SelectedBoiler = null;
-        Assert.That(scenario.SelectedBoiler, Is.Null);
+        Assert.That(viewModel.CurrentContext.StartDate, Is.EqualTo(new DateTime(2025, 9, 8, 0, 0, 0)));
+        Assert.That(viewModel.CurrentContext.EndDate, Is.EqualTo(new DateTime(2025, 9, 21, 23, 59, 59)));
 
         window.Close();
     }
 
     [AvaloniaTest]
-    public void MaintenanceStartHour_DefaultsTo12()
+    public void PeriodChange_UpdatesCurrentContext()
     {
         var (window, _, viewModel) = CreateTestWindow();
         window.Show();
 
-        Assert.That(viewModel.SummerScenario1.MaintenanceStartHour, Is.EqualTo(12));
-        Assert.That(viewModel.SummerScenario2.MaintenanceStartHour, Is.EqualTo(12));
-        Assert.That(viewModel.WinterScenario1.MaintenanceStartHour, Is.EqualTo(12));
-        Assert.That(viewModel.WinterScenario2.MaintenanceStartHour, Is.EqualTo(12));
+        var initialPeriod = viewModel.CurrentContext.Period;
+        viewModel.SelectedPeriod = "Summer";
+
+        Assert.That(viewModel.CurrentContext.Period, Is.EqualTo("Summer"));
+        Assert.That(viewModel.CurrentContext.Period, Is.Not.EqualTo(initialPeriod));
 
         window.Close();
     }
 
     [AvaloniaTest]
-    public void MaintenanceStartHour_CanBeModified()
+    public void ScenarioChange_UpdatesCurrentContext()
     {
         var (window, _, viewModel) = CreateTestWindow();
         window.Show();
 
-        var scenario = viewModel.SummerScenario1;
-        scenario.MaintenanceStartHour = 15;
+        var initialScenario = viewModel.CurrentContext.Scenario;
+        viewModel.SelectedScenario = "Scenario 1";
 
-        Assert.That(scenario.MaintenanceStartHour, Is.EqualTo(15));
+        Assert.That(viewModel.CurrentContext.Scenario, Is.EqualTo("Scenario 1"));
+        Assert.That(viewModel.CurrentContext.Scenario, Is.Not.EqualTo(initialScenario));
 
         window.Close();
     }
 
     [AvaloniaTest]
-    public void MaintenanceDuration_DefaultsTo30Minutes()
+    public void CurrentContextPeriodId_ReturnsCorrectIdForWinter()
     {
         var (window, _, viewModel) = CreateTestWindow();
         window.Show();
 
-        Assert.That(viewModel.SummerScenario1.MaintenanceDuration, Is.EqualTo(30));
-        Assert.That(viewModel.SummerScenario2.MaintenanceDuration, Is.EqualTo(30));
-        Assert.That(viewModel.WinterScenario1.MaintenanceDuration, Is.EqualTo(30));
-        Assert.That(viewModel.WinterScenario2.MaintenanceDuration, Is.EqualTo(30));
+        viewModel.SelectedPeriod = "Winter";
+
+        Assert.That(viewModel.CurrentContext.PeriodId, Is.EqualTo(2));
 
         window.Close();
     }
 
     [AvaloniaTest]
-    public void MaintenanceDuration_CanBeModified()
+    public void CurrentContextPeriodId_ReturnsCorrectIdForSummer()
     {
         var (window, _, viewModel) = CreateTestWindow();
         window.Show();
 
-        var scenario = viewModel.SummerScenario1;
-        scenario.MaintenanceDuration = 45;
+        viewModel.SelectedPeriod = "Summer";
 
-        Assert.That(scenario.MaintenanceDuration, Is.EqualTo(45));
+        Assert.That(viewModel.CurrentContext.PeriodId, Is.EqualTo(1));
 
         window.Close();
     }
 
     [AvaloniaTest]
-    public void SummerPeriods_HaveCorrectDateRange()
+    public void CurrentContextScenarioId_ReturnsCorrectIdForScenario1()
     {
         var (window, _, viewModel) = CreateTestWindow();
         window.Show();
 
-        var summerStart = new DateTime(2025, 9, 8, 0, 0, 0);
-        var summerEnd = new DateTime(2025, 9, 21, 23, 59, 59);
+        viewModel.SelectedScenario = "Scenario 1";
 
-        Assert.That(viewModel.SummerScenario1.PeriodStart, Is.EqualTo(summerStart));
-        Assert.That(viewModel.SummerScenario1.PeriodEnd, Is.EqualTo(summerEnd));
-        Assert.That(viewModel.SummerScenario2.PeriodStart, Is.EqualTo(summerStart));
-        Assert.That(viewModel.SummerScenario2.PeriodEnd, Is.EqualTo(summerEnd));
+        Assert.That(viewModel.CurrentContext.ScenarioId, Is.EqualTo(1));
 
         window.Close();
     }
 
     [AvaloniaTest]
-    public void WinterPeriods_HaveCorrectDateRange()
+    public void CurrentContextScenarioId_ReturnsCorrectIdForScenario2()
     {
         var (window, _, viewModel) = CreateTestWindow();
         window.Show();
 
-        var winterStart = new DateTime(2026, 1, 5, 0, 0, 0);
-        var winterEnd = new DateTime(2026, 1, 18, 23, 59, 59);
+        viewModel.SelectedScenario = "Scenario 2";
 
-        Assert.That(viewModel.WinterScenario1.PeriodStart, Is.EqualTo(winterStart));
-        Assert.That(viewModel.WinterScenario1.PeriodEnd, Is.EqualTo(winterEnd));
-        Assert.That(viewModel.WinterScenario2.PeriodStart, Is.EqualTo(winterStart));
-        Assert.That(viewModel.WinterScenario2.PeriodEnd, Is.EqualTo(winterEnd));
+        Assert.That(viewModel.CurrentContext.ScenarioId, Is.EqualTo(2));
 
         window.Close();
     }
 
     [AvaloniaTest]
-    public void Periods_HaveCorrectSeasonNames()
+    public void IsLoading_DefaultsToFalse()
     {
         var (window, _, viewModel) = CreateTestWindow();
         window.Show();
 
-        Assert.That(viewModel.SummerScenario1.PeriodName, Is.EqualTo("Summer"));
-        Assert.That(viewModel.WinterScenario1.PeriodName, Is.EqualTo("Winter"));
-        Assert.That(viewModel.SummerScenario2.PeriodName, Is.EqualTo("Summer"));
-        Assert.That(viewModel.WinterScenario2.PeriodName, Is.EqualTo("Winter"));
+        Assert.That(viewModel.IsLoading, Is.False);
 
         window.Close();
     }
 
     [AvaloniaTest]
-    public void ScenarioStates_RemainIndependent()
+    public void HasOptimizationResults_DefaultsToFalse()
     {
         var (window, _, viewModel) = CreateTestWindow();
         window.Show();
 
-        // Modify Scenario 1 Summer
-        viewModel.SummerScenario1.MaintenanceStartHour = 14;
-        viewModel.SummerScenario1.MaintenanceDuration = 60;
-        viewModel.SummerScenario1.SelectedBoiler = viewModel.SummerScenario1.Boilers[0];
+        Assert.That(viewModel.HasOptimizationResults, Is.False);
 
-        // Verify Scenario 2 Summer is isolated
-        Assert.That(viewModel.SummerScenario2.MaintenanceStartHour, Is.EqualTo(12));
-        Assert.That(viewModel.SummerScenario2.MaintenanceDuration, Is.EqualTo(30));
-        Assert.That(viewModel.SummerScenario2.SelectedBoiler, Is.Null);
+        window.Close();
+    }
 
-        // Verify Winter scenarios are isolated
-        Assert.That(viewModel.WinterScenario1.MaintenanceStartHour, Is.EqualTo(12));
-        Assert.That(viewModel.WinterScenario2.MaintenanceStartHour, Is.EqualTo(12));
+    [AvaloniaTest]
+    public void ErrorMessage_DefaultsToNull()
+    {
+        var (window, _, viewModel) = CreateTestWindow();
+        window.Show();
+
+        Assert.That(viewModel.ErrorMessage, Is.Null);
 
         window.Close();
     }
@@ -354,7 +343,7 @@ public class OptimizationViewTests
 
         Assert.That(window.IsVisible, Is.False);
     }
-    
+
     [AvaloniaTest]
     public void MultipleViewInstances_DoNotShareState()
     {
@@ -364,11 +353,11 @@ public class OptimizationViewTests
         window1.Show();
         window2.Show();
 
-        viewModel1.SummerScenario1.MaintenanceStartHour = 15;
-        viewModel1.SummerScenario1.MaintenanceDuration = 50;
+        viewModel1.SelectedPeriod = "Summer";
+        viewModel1.SelectedScenario = "Scenario 1";
 
-        Assert.That(viewModel2.SummerScenario1.MaintenanceStartHour, Is.EqualTo(12));
-        Assert.That(viewModel2.SummerScenario1.MaintenanceDuration, Is.EqualTo(30));
+        Assert.That(viewModel2.SelectedPeriod, Is.EqualTo("Winter"));
+        Assert.That(viewModel2.SelectedScenario, Is.EqualTo("Scenario 2"));
 
         window1.Close();
         window2.Close();

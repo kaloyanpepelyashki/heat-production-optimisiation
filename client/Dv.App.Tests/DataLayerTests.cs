@@ -1,7 +1,6 @@
-using Dv.App.Models;
+using Dv.App.Interfaces;
 using Dv.App.Services;
 using Dv.App.ViewModels;
-using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 
@@ -11,72 +10,11 @@ namespace Dv.App.Tests;
 public class DataLayerTests
 {
     [Test]
-    public async Task DashboardViewModel_LoadsData_ShouldSetDashboardDataOnSuccess()
+    public void DashboardViewModel_Initializes_Successfully()
     {
-        var mockApiService = new Mock<IApiService>();
-        var mockLogger = new Mock<ILogger<DashboardViewModel>>();
-        var sampleData = new List<SourceDataDto>
-        {
-            new SourceDataDto { HeatDemand = 42, ElectricityPrice = 101, TimeFrom = new DateTime(2026, 4, 4) }
-        };
+        var viewModel = new DashboardViewModel();
 
-        mockApiService
-            .Setup(x => x.GetAsync<List<SourceDataDto>>(BackendService.Sdm, "getAll"))
-            .ReturnsAsync(sampleData);
-
-        var viewModel = new DashboardViewModel(mockApiService.Object, mockLogger.Object);
-        await viewModel.InitializationTask;
-
-        Assert.That(viewModel.DashboardData, Does.Contain("Success! SDM API responded."));
-        Assert.That(viewModel.DashboardData, Does.Contain("Heat Demand 42"));
-    }
-
-    [Test]
-    public async Task DashboardViewModel_LoadsData_ShouldHandleEmptyData()
-    {
-        var mockApiService = new Mock<IApiService>();
-        var mockLogger = new Mock<ILogger<DashboardViewModel>>();
-        var emptyData = new List<SourceDataDto>();
-
-        mockApiService
-            .Setup(x => x.GetAsync<List<SourceDataDto>>(BackendService.Sdm, "getAll"))
-            .ReturnsAsync(emptyData);
-
-        var viewModel = new DashboardViewModel(mockApiService.Object, mockLogger.Object);
-        await viewModel.InitializationTask;
-
-        Assert.That(viewModel.DashboardData, Does.Contain("SDM API returned an empty array"));
-    }
-
-    [Test]
-    public async Task DashboardViewModel_LoadsData_ShouldHandleException()
-    {
-        var mockApiService = new Mock<IApiService>();
-        var mockLogger = new Mock<ILogger<DashboardViewModel>>();
-
-        mockApiService
-            .Setup(x => x.GetAsync<List<SourceDataDto>>(BackendService.Sdm, "getAll"))
-            .ThrowsAsync(new Exception("Network blip"));
-
-        var viewModel = new DashboardViewModel(mockApiService.Object, mockLogger.Object);
-        await viewModel.InitializationTask;
-
-        Assert.That(viewModel.DashboardData, Does.Contain("Test Failed: Network blip"));
-    }
-
-    [Test]
-    public async Task ProductionUnitsViewModel_LoadsData_ShouldSetProductionDataOnSuccess()
-    {
-        var mockApiService = new Mock<IApiService>();
-        var mockLogger = new Mock<ILogger<ProductionUnitsViewModel>>();
-        mockApiService
-            .Setup(x => x.GetAsync<object>(BackendService.Am, "api/GetProductionUnits/allGasBoilers"))
-            .ReturnsAsync(new { status = "ok" });
-
-        var viewModel = new ProductionUnitsViewModel(mockApiService.Object, mockLogger.Object);
-        await viewModel.InitializationTask;
-
-        Assert.That(viewModel.ProductionData, Does.Contain("AM API responded. Data parsed: True"));
+        Assert.That(viewModel, Is.Not.Null);
     }
 
     [Test]
@@ -85,33 +23,132 @@ public class DataLayerTests
         var viewModel = new SettingsViewModel();
 
         Assert.That(viewModel, Is.Not.Null);
+        Assert.That(viewModel.IsSystemTheme, Is.True);
     }
 
     [Test]
-    public void OptimizationViewModel_Initialization_SetsScenarios_Positive()
+    public void ProductionUnitsViewModel_Initialization_SetsDefaultValues()
     {
-        var mockApiService = new Mock<IApiService>();
-        var mockLogger = new Mock<ILogger<OptimizationViewModel>>();
+        var viewModel = new ProductionUnitsViewModel();
 
-        var viewModel = new OptimizationViewModel(mockApiService.Object, mockLogger.Object);
-
-        Assert.That(viewModel.SummerScenario1, Is.Not.Null);
-        Assert.That(viewModel.WinterScenario1, Is.Not.Null);
-        Assert.That(viewModel.SummerScenario2, Is.Not.Null);
-        Assert.That(viewModel.WinterScenario2, Is.Not.Null);
-        Assert.That(viewModel.SummerScenario1.PeriodName, Is.EqualTo("Summer"));
-        Assert.That(viewModel.WinterScenario1.PeriodName, Is.EqualTo("Winter"));
+        Assert.That(viewModel, Is.Not.Null);
+        Assert.That(viewModel.MaintenanceSchedules, Is.Not.Null);
     }
 
     [Test]
-    public void OptimizationViewModel_Scenario_Instantiates_Boilers_Edge()
+    public void OptimizationViewModel_Initialization_WithValidDependencies()
     {
         var mockApiService = new Mock<IApiService>();
-        var mockLogger = new Mock<ILogger<OptimizationViewModel>>();
+        var mockDialogService = new Mock<IDialogService>();
+        var maintenanceService = new MaintenanceService(mockApiService.Object);
 
-        var viewModel = new OptimizationViewModel(mockApiService.Object, mockLogger.Object);
+        var viewModel = new OptimizationViewModel(
+            mockApiService.Object,
+            maintenanceService,
+            mockDialogService.Object);
 
-        Assert.That(viewModel.SummerScenario1?.Boilers.Count ?? 0, Is.EqualTo(4));
-        Assert.That(viewModel.SummerScenario2?.Boilers.Count ?? 0, Is.EqualTo(4));
+        Assert.That(viewModel, Is.Not.Null);
+        Assert.That(viewModel.Periods, Is.Not.Null);
+        Assert.That(viewModel.Scenarios, Is.Not.Null);
+    }
+
+    [Test]
+    public void OptimizationViewModel_Initialization_SetsDefaultSelectedPeriod()
+    {
+        var mockApiService = new Mock<IApiService>();
+        var mockDialogService = new Mock<IDialogService>();
+        var maintenanceService = new MaintenanceService(mockApiService.Object);
+
+        var viewModel = new OptimizationViewModel(
+            mockApiService.Object,
+            maintenanceService,
+            mockDialogService.Object);
+
+        Assert.That(viewModel.SelectedPeriod, Is.EqualTo("Winter"));
+    }
+
+    [Test]
+    public void OptimizationViewModel_Initialization_SetsDefaultSelectedScenario()
+    {
+        var mockApiService = new Mock<IApiService>();
+        var mockDialogService = new Mock<IDialogService>();
+        var maintenanceService = new MaintenanceService(mockApiService.Object);
+
+        var viewModel = new OptimizationViewModel(
+            mockApiService.Object,
+            maintenanceService,
+            mockDialogService.Object);
+
+        Assert.That(viewModel.SelectedScenario, Is.EqualTo("Scenario 2"));
+    }
+
+    [Test]
+    public void OptimizationViewModel_Initialization_CreatesFourBoilersForScenario1()
+    {
+        var mockApiService = new Mock<IApiService>();
+        var mockDialogService = new Mock<IDialogService>();
+        var maintenanceService = new MaintenanceService(mockApiService.Object);
+
+        var viewModel = new OptimizationViewModel(
+            mockApiService.Object,
+            maintenanceService,
+            mockDialogService.Object);
+
+        viewModel.SelectedScenario = "Scenario 1";
+
+        Assert.That(viewModel.CurrentContext.Boilers.Count, Is.EqualTo(4));
+    }
+
+    [Test]
+    public void OptimizationViewModel_Initialization_CreatesFourBoilersForScenario2()
+    {
+        var mockApiService = new Mock<IApiService>();
+        var mockDialogService = new Mock<IDialogService>();
+        var maintenanceService = new MaintenanceService(mockApiService.Object);
+
+        var viewModel = new OptimizationViewModel(
+            mockApiService.Object,
+            maintenanceService,
+            mockDialogService.Object);
+
+        viewModel.SelectedScenario = "Scenario 2";
+
+        Assert.That(viewModel.CurrentContext.Boilers.Count, Is.EqualTo(4));
+    }
+
+    [Test]
+    public void OptimizationViewModel_WinterPeriodDates_AreCorrect()
+    {
+        var mockApiService = new Mock<IApiService>();
+        var mockDialogService = new Mock<IDialogService>();
+        var maintenanceService = new MaintenanceService(mockApiService.Object);
+
+        var viewModel = new OptimizationViewModel(
+            mockApiService.Object,
+            maintenanceService,
+            mockDialogService.Object);
+
+        viewModel.SelectedPeriod = "Winter";
+
+        Assert.That(viewModel.CurrentContext.StartDate, Is.EqualTo(new DateTime(2026, 1, 5, 0, 0, 0)));
+        Assert.That(viewModel.CurrentContext.EndDate, Is.EqualTo(new DateTime(2026, 1, 19, 0, 0, 0)));
+    }
+
+    [Test]
+    public void OptimizationViewModel_SummerPeriodDates_AreCorrect()
+    {
+        var mockApiService = new Mock<IApiService>();
+        var mockDialogService = new Mock<IDialogService>();
+        var maintenanceService = new MaintenanceService(mockApiService.Object);
+
+        var viewModel = new OptimizationViewModel(
+            mockApiService.Object,
+            maintenanceService,
+            mockDialogService.Object);
+
+        viewModel.SelectedPeriod = "Summer";
+
+        Assert.That(viewModel.CurrentContext.StartDate, Is.EqualTo(new DateTime(2025, 9, 8, 0, 0, 0)));
+        Assert.That(viewModel.CurrentContext.EndDate, Is.EqualTo(new DateTime(2025, 9, 21, 23, 59, 59)));
     }
 }
