@@ -1,99 +1,99 @@
-﻿using Rdm.Api.Application.Model;
+﻿namespace Rdm.Api.Application.Services.Helpers;
+
+using Rdm.Api.Application.Model;
 using Rdm.Api.Inrastructure.DTOs;
 using Rdm.Api.Inrastructure.Persistence.PersistenceModels;
 
-namespace Rdm.Api.Application.Services.Helpers;
-
 public class OptimisationModelsMapper
 {
-        public static OptimisationRun ToDomain(OptimisationWrapperDto dto)
+    public static OptimisationRun ToDomain(OptimisationWrapperDto dto)
+    {
+        if (dto == null)
         {
-            if (dto == null)
-            {
-                throw new ArgumentNullException(nameof(dto));
-            }
-
-            if (dto.OptimisationRun == null)
-            {
-                throw new ArgumentException("Optimisation run data is missing.", nameof(dto));
-            }
-
-            return new OptimisationRun
-            {
-                Id = dto.OptimisationRun.Id ?? 0,
-                TimeFrom = dto.OptimisationRun.TimeFrom,
-                TimeTo = dto.OptimisationRun.TimeTo,
-                Scenario = dto.OptimisationRun.Scenario,
-                PeriodType = dto.OptimisationRun.PeriodType,
-
-                OptimisationResultsHourly = dto.OptimisationResultsHourly?
-                    .Select(OptimisationResultHourlyToDomain)
-                    .ToList() ?? new List<OptimisationResultsHourly>()
-            };
+            throw new ArgumentNullException(nameof(dto));
         }
 
-        private static OptimisationResultsHourly OptimisationResultHourlyToDomain(OptimisationResultHourlyDto dto)
+        if (dto.OptimisationRun == null)
         {
-            return new OptimisationResultsHourly
-            {
-                Id = dto.Id ?? 0,
-                HeatProduction = dto.HeatProduction,
-                ElectricityConsumption = dto.ElectricityConsumption,
-                Co2Emissions = dto.Co2Emissions,
-                Expenses = dto.Expenses,
-                TimeFrom = dto.TimeFrom,
-                TimeTo = dto.TimeTo,
-
-                ProductionUnits = dto.ProductionUnits?
-                    .Select(ProductionUnitsToDomain)
-                    .ToList() ?? new List<ProductionUnit>()
-            };
+            throw new ArgumentException("Optimisation run data is missing.", nameof(dto));
         }
 
-        private static ProductionUnit ProductionUnitsToDomain(ProductionUnitDto dto)
+        return new OptimisationRun
         {
-            return new ProductionUnit
-            {
-                Id = dto.Id ?? 0,
-                ProductionUnitId = dto.ProductionUnitId,
-                ProductionUnitType = dto.ProductionUnitType,
-                HeatProduction = dto.HeatProduction,
-                ElectricityConsumption = dto.ElectricityConsumption,
-                Co2Emissions = dto.Co2Emissions,
-                Expenses = dto.Expenses,
-                Capacity = dto.Capacity
-            };
-        }
-        
-        public static OptimisationRunPersistenceWrapper ToPersistenceWrapper(OptimisationRun domain)
-        {
-            if (domain == null)
-            {
-                throw new ArgumentNullException(nameof(domain));
-            }
+            Id = dto.OptimisationRun.Id ?? 0,
+            TimeFrom = dto.OptimisationRun.TimeFrom,
+            TimeTo = dto.OptimisationRun.TimeTo,
+            Scenario = dto.OptimisationRun.Scenario,
+            PeriodType = dto.OptimisationRun.PeriodType,
 
-            return new OptimisationRunPersistenceWrapper
+            OptimisationResultsHourly = dto.OptimisationResultsHourly?
+                .Select(OptimisationResultHourlyToDomain)
+                .ToList() ?? new List<OptimisationResultsHourly>(),
+        };
+    }
+
+    private static OptimisationResultsHourly OptimisationResultHourlyToDomain(OptimisationResultHourlyDto dto)
+    {
+        return new OptimisationResultsHourly
+        {
+            Id = dto.Id ?? 0,
+            HeatProduction = dto.HeatProduction,
+            ElectricityConsumption = dto.ElectricityConsumption,
+            Co2Emissions = dto.Co2Emissions,
+            Expenses = dto.Expenses,
+            TimeFrom = dto.TimeFrom,
+            TimeTo = dto.TimeTo,
+
+            ProductionUnits = dto.ProductionUnits?
+                .Select(ProductionUnitsToDomain)
+                .ToList() ?? new List<ProductionUnit>(),
+        };
+    }
+
+    private static ProductionUnit ProductionUnitsToDomain(ProductionUnitDto dto)
+    {
+        return new ProductionUnit
+        {
+            Id = dto.Id ?? 0,
+            ProductionUnitId = dto.ProductionUnitId,
+            ProductionUnitType = dto.ProductionUnitType,
+            HeatProduction = dto.HeatProduction,
+            ElectricityConsumption = dto.ElectricityConsumption,
+            Co2Emissions = dto.Co2Emissions,
+            Expenses = dto.Expenses,
+            Capacity = dto.Capacity,
+        };
+    }
+
+    public static OptimisationRunPersistenceWrapper ToPersistenceWrapper(OptimisationRun domain)
+    {
+        if (domain == null)
+        {
+            throw new ArgumentNullException(nameof(domain));
+        }
+
+        return new OptimisationRunPersistenceWrapper
+        {
+            OptimisationRunPersistence = new OptimisationRunPersistence
             {
-                OptimisationRunPersistence = new OptimisationRunPersistence
+                Id = domain.Id,
+                TimeFrom = domain.TimeFrom,
+                TimeTo = domain.TimeTo,
+                Scenario = domain.Scenario,
+                Type = domain.PeriodType,
+            },
+
+            OptimisationResultsHourlyPersistence = domain.OptimisationResultsHourly?
+                .Select(hourly => new OptimisationResultsHourlyPersistenceWrapper
                 {
-                    Id = domain.Id,
-                    TimeFrom = domain.TimeFrom,
-                    TimeTo = domain.TimeTo,
-                    Scenario = domain.Scenario,
-                    Type = domain.PeriodType
-                },
+                    HourlyResult = ToPersistence(hourly),
 
-                OptimisationResultsHourlyPersistence = domain.OptimisationResultsHourly?
-                    .Select(hourly => new OptimisationResultsHourlyPersistenceWrapper
-                    {
-                        HourlyResult = ToPersistence(hourly),
-
-                        ProductionUnitsPersistence = hourly.ProductionUnits?
-                            .Select(ToPersistence)
-                            .ToList() ?? new List<OptimisationProductionUnitPersistence>()
-                    })
-                    .ToList() ?? new List<OptimisationResultsHourlyPersistenceWrapper>()
-            };
+                    ProductionUnitsPersistence = hourly.ProductionUnits?
+                        .Select(ToPersistence)
+                        .ToList() ?? new List<OptimisationProductionUnitPersistence>(),
+                })
+                .ToList() ?? new List<OptimisationResultsHourlyPersistenceWrapper>(),
+        };
     }
 
     private static OptimisationResultsHourlyPersistence ToPersistence(OptimisationResultsHourly domain)
@@ -112,7 +112,7 @@ public class OptimisationModelsMapper
             Co2Emissions = domain.Co2Emissions,
             Expenses = domain.Expenses,
             TimeFrom = domain.TimeFrom,
-            TimeTo = domain.TimeTo
+            TimeTo = domain.TimeTo,
         };
     }
 
@@ -133,7 +133,7 @@ public class OptimisationModelsMapper
             ElectricityConsumption = domain.ElectricityConsumption,
             Co2Emissions = domain.Co2Emissions,
             Expenses = domain.Expenses,
-            Capacity = domain.Capacity
+            Capacity = domain.Capacity,
         };
     }
 }

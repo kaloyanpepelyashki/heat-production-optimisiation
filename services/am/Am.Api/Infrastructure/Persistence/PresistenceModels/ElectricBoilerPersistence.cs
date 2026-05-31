@@ -1,11 +1,10 @@
-﻿using Supabase.Postgrest.Attributes;
+﻿namespace Am.Api.Model.DTOs;
 
-namespace Am.Api.Model.DTOs;
+using Supabase.Postgrest.Attributes;
 
 [Table("electric_boilers")]
-public class ElectricBoilerPersistence:   ProductionUnitGeneralPersistence
+public class ElectricBoilerPersistence : ProductionUnitGeneralPersistence
 {
     [Column("max_electricity")]
     public float MaxElectricity { get; set; }
-    
 }

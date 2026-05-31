@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿namespace Am.Api.Controllers;
 
-namespace Am.Api.Controllers;
+using Microsoft.AspNetCore.Mvc;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -9,6 +9,6 @@ public class Health : Controller
     [HttpGet("wakeup")]
     public IActionResult WakeUp()
     {
-        return Ok();
+        return this.Ok();
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 public interface IDialogService
 {
     Task ShowValidationDialogAsync(string message);
-    
+
     Task<bool> ShowConfirmationDialogAsync(
         string period,
         string boilerId,

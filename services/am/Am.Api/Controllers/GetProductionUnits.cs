@@ -1,11 +1,11 @@
+namespace Am.Api.Controllers;
+
 using Am.Api.Application.Exceptions;
 using Am.Api.Application.Interfaces;
+using Am.Api.Domain.Models;
 using Am.Api.Infrastructure.DTOs;
 using Am.Api.Model.DTOs;
 using Microsoft.AspNetCore.Mvc;
-using Am.Api.Domain.Models;
-
-namespace Am.Api.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -16,8 +16,8 @@ public class GetProductionUnits : Controller
 
     public GetProductionUnits(IProductionUnitService productionUnitService, ILogger<GetProductionUnits> logger)
     {
-        _productionUnitService = productionUnitService;
-        _logger = logger;
+        this._productionUnitService = productionUnitService;
+        this._logger = logger;
     }
 
     [HttpGet("allGasBoilers")]
@@ -25,7 +25,7 @@ public class GetProductionUnits : Controller
     {
         try
         {
-            List<GasBoiler> gasBoilersResult = await _productionUnitService.GetAllGasBoilersAsync();
+            List<GasBoiler> gasBoilersResult = await this._productionUnitService.GetAllGasBoilersAsync();
 
             List<GasBoilerDTO> gasBoilersDTOs = gasBoilersResult.Select(x => new GasBoilerDTO
             {
@@ -37,17 +37,17 @@ public class GetProductionUnits : Controller
                 GasConsumption = x.GasConsumption,
             }).ToList();
 
-            return Ok(gasBoilersDTOs);
+            return this.Ok(gasBoilersDTOs);
         }
         catch (NoAssetsFoundException e)
         {
-            _logger.LogWarning(e, "No gas boilers found");
-            return NotFound(e.Message);
+            this._logger.LogWarning(e, "No gas boilers found");
+            return this.NotFound(e.Message);
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Exception in Controller/allGasBoilers");
-            return StatusCode(500, "Internal Server Error");
+            this._logger.LogError(e, "Exception in Controller/allGasBoilers");
+            return this.StatusCode(500, "Internal Server Error");
         }
     }
 
@@ -56,7 +56,7 @@ public class GetProductionUnits : Controller
     {
         try
         {
-            List<OilBoiler> oilBoilerResult = await _productionUnitService.GetAllOilBoilersAsync();
+            List<OilBoiler> oilBoilerResult = await this._productionUnitService.GetAllOilBoilersAsync();
 
             List<OilBoilerDTO> oilBoilerDtos = oilBoilerResult.Select(obj => new OilBoilerDTO
             {
@@ -65,20 +65,20 @@ public class GetProductionUnits : Controller
                 MaxHeat = obj.MaxHeat,
                 ProductionCost = obj.ProductionCost,
                 Co2Emissions = obj.Co2Emissions,
-                OilConsumption = obj.OilConsumption
+                OilConsumption = obj.OilConsumption,
             }).ToList();
 
-            return Ok(oilBoilerDtos);
+            return this.Ok(oilBoilerDtos);
         }
         catch (NoAssetsFoundException e)
         {
-            _logger.LogWarning(e, "No oil boilers found");
-            return NotFound(e.Message);
+            this._logger.LogWarning(e, "No oil boilers found");
+            return this.NotFound(e.Message);
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Exception in Controller/allOilBoilers");
-            return StatusCode(500, "Internal Server Error");
+            this._logger.LogError(e, "Exception in Controller/allOilBoilers");
+            return this.StatusCode(500, "Internal Server Error");
         }
     }
 
@@ -88,7 +88,7 @@ public class GetProductionUnits : Controller
         try
         {
             List<ElectricBoiler> electricBoilersResult =
-                await _productionUnitService.GetAllElectricBoilersAsync();
+                await this._productionUnitService.GetAllElectricBoilersAsync();
 
             List<ElectricBoilerDTO> electricBoilerDtos = electricBoilersResult.Select(elBoiler =>
                 new ElectricBoilerDTO
@@ -100,17 +100,17 @@ public class GetProductionUnits : Controller
                     MaxElectricity = elBoiler.MaxElectricity,
                 }).ToList();
 
-            return Ok(electricBoilerDtos);
+            return this.Ok(electricBoilerDtos);
         }
         catch (NoAssetsFoundException e)
         {
-            _logger.LogWarning(e, "No electric boilers found");
-            return NotFound(e.Message);
+            this._logger.LogWarning(e, "No electric boilers found");
+            return this.NotFound(e.Message);
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Exception in Controller/allElectricBoilers");
-            return StatusCode(500, "Internal Server Error");
+            this._logger.LogError(e, "Exception in Controller/allElectricBoilers");
+            return this.StatusCode(500, "Internal Server Error");
         }
     }
 
@@ -119,7 +119,7 @@ public class GetProductionUnits : Controller
     {
         try
         {
-            List<GasMotor> gasMotorResult = await _productionUnitService.GetAllGasMotorsAsync();
+            List<GasMotor> gasMotorResult = await this._productionUnitService.GetAllGasMotorsAsync();
 
             List<GasMotorDTO> gasMotorDtos = gasMotorResult.Select(gasMotor => new GasMotorDTO
             {
@@ -129,20 +129,20 @@ public class GetProductionUnits : Controller
                 ProductionCost = gasMotor.ProductionCost,
                 MaxElectricity = gasMotor.MaxElectricity,
                 Co2Emissions = gasMotor.Co2Emissions,
-                GasConsumption = gasMotor.GasConsumption
+                GasConsumption = gasMotor.GasConsumption,
             }).ToList();
 
-            return Ok(gasMotorDtos);
+            return this.Ok(gasMotorDtos);
         }
         catch (NoAssetsFoundException e)
         {
-            _logger.LogWarning(e, "No gas motors found");
-            return NotFound(e.Message);
+            this._logger.LogWarning(e, "No gas motors found");
+            return this.NotFound(e.Message);
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Exception in Controller/allGasMotors");
-            return StatusCode(500, "Internal Server Error");
+            this._logger.LogError(e, "Exception in Controller/allGasMotors");
+            return this.StatusCode(500, "Internal Server Error");
         }
     }
 
@@ -152,7 +152,7 @@ public class GetProductionUnits : Controller
         try
         {
             ProductionUnitMaintenance result =
-                await _productionUnitService.GetProductionUnitMaintenanceByIdAsync(id);
+                await this._productionUnitService.GetProductionUnitMaintenanceByIdAsync(id);
 
             ProductionUnitMaintenanceDTO productionUnitMaintenanceDto = new ProductionUnitMaintenanceDTO
             {
@@ -166,17 +166,17 @@ public class GetProductionUnits : Controller
                 ScenarioId = result.ScenarioId,
             };
 
-            return Ok(productionUnitMaintenanceDto);
+            return this.Ok(productionUnitMaintenanceDto);
         }
         catch (KeyNotFoundException e)
         {
-            _logger.LogWarning(e, "Production unit maintenance not found for id {Id}", id);
-            return NotFound(e.Message);
+            this._logger.LogWarning(e, "Production unit maintenance not found for id {Id}", id);
+            return this.NotFound(e.Message);
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Exception in Controller/productionUnitMaintenancesById");
-            return StatusCode(500, "Internal Server Error");
+            this._logger.LogError(e, "Exception in Controller/productionUnitMaintenancesById");
+            return this.StatusCode(500, "Internal Server Error");
         }
     }
 
@@ -198,19 +198,19 @@ public class GetProductionUnits : Controller
             };
 
             int result =
-                await _productionUnitService.PostProductionUnitMaintenanceAsync(maintenance);
+                await this._productionUnitService.PostProductionUnitMaintenanceAsync(maintenance);
 
-            return Ok(result);
+            return this.Ok(result);
         }
         catch (ArgumentNullException e)
         {
-            _logger.LogWarning(e, "Null argument in Controller/productionUnitMaintenance");
-            return BadRequest(e.Message);
+            this._logger.LogWarning(e, "Null argument in Controller/productionUnitMaintenance");
+            return this.BadRequest(e.Message);
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Exception in Controller/productionUnitMaintenance");
-            return StatusCode(500, "Internal Server Error");
+            this._logger.LogError(e, "Exception in Controller/productionUnitMaintenance");
+            return this.StatusCode(500, "Internal Server Error");
         }
     }
 }

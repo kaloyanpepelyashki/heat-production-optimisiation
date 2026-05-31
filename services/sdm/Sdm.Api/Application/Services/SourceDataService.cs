@@ -1,23 +1,23 @@
-﻿using Sdm.Api.Application.Interfaces;
+﻿namespace Sdm.Api.Application.Services;
+
+using Sdm.Api.Application.Interfaces;
 using Sdm.Api.Infrastructure.Persistence.PersistenceModels;
 
-namespace Sdm.Api.Application.Services;
-
-public class SourceDataService: ISourceDataService
+public class SourceDataService : ISourceDataService
 {
     private readonly ISourceDataRepository _sourceDataRepository;
 
     public SourceDataService(ISourceDataRepository sourceDataRepository)
     {
-        _sourceDataRepository = sourceDataRepository;
+        this._sourceDataRepository = sourceDataRepository;
     }
 
     public async Task<List<SourceDataPersistence>> GetAllSourceData()
     {
         try
         {
-            var sourceData = await _sourceDataRepository.GetAllSourceData();
-            
+            var sourceData = await this._sourceDataRepository.GetAllSourceData();
+
             return sourceData;
         }
         catch (Exception e)

@@ -1,7 +1,7 @@
-﻿using Rdm.Api.Application.Model;
-using Rdm.Api.Inrastructure.DTOs;
+﻿namespace Rdm.Api.Application.Interfaces;
 
-namespace Rdm.Api.Application.Interfaces;
+using Rdm.Api.Application.Model;
+using Rdm.Api.Inrastructure.DTOs;
 
 public interface IOptimiserService
 {

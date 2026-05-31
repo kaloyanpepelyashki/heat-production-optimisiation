@@ -1,8 +1,8 @@
-﻿using Supabase.Postgrest.Attributes;
+﻿namespace Rdm.Api.Inrastructure.Persistence.PersistenceModels;
 
-namespace Rdm.Api.Inrastructure.Persistence.PersistenceModels;
+using Supabase.Postgrest.Attributes;
 
-public class OptimisationResultHourlyWithProductionUnitPersistence: OptimisationResultsHourlyPersistence
+public class OptimisationResultHourlyWithProductionUnitPersistence : OptimisationResultsHourlyPersistence
 {
     [Reference(typeof(OptimisationProductionUnitPersistence))]
     [Column("ProductionUnits")]

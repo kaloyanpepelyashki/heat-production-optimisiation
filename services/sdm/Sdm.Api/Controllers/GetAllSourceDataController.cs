@@ -1,31 +1,30 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿namespace Sdm.Api.Controllers;
+
+using Microsoft.AspNetCore.Mvc;
 using Sdm.Api.Application.Exceptions;
 using Sdm.Api.Application.Interfaces;
 using Sdm.Api.Infrastructure.DTOs;
 using Sdm.Api.Infrastructure.Persistence.PersistenceModels;
-
-namespace Sdm.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
 public class GetAllSourceDataController : Controller
 {
     private ISourceDataService _sourceDataService;
-    
+
     public GetAllSourceDataController(ISourceDataService sourceDataService)
     {
-        _sourceDataService = sourceDataService;
+        this._sourceDataService = sourceDataService;
     }
-    
+
     [HttpGet("/getAll")]
     public async Task<IActionResult> GetAll()
     {
         try
         {
-            List<SourceDataPersistence> sourceDataResult = await _sourceDataService.GetAllSourceData(); 
-            
+            List<SourceDataPersistence> sourceDataResult = await this._sourceDataService.GetAllSourceData();
+
             List<SourceDataDTO> sourceDataDTOs = sourceDataResult.Select(res =>
-            
                 new SourceDataDTO
                 {
                     Id = res.Id,
@@ -35,16 +34,15 @@ public class GetAllSourceDataController : Controller
                     HeatDemand = res.HeatDemand,
                     ElectricityPrice = res.ElectricityPrice,
                 }).ToList();
-            
-            return Ok(sourceDataDTOs);
+            return this.Ok(sourceDataDTOs);
         }
         catch (NoDataFoundException e)
         {
-            return NotFound(e.Message);
+            return this.NotFound(e.Message);
         }
         catch (Exception)
         {
-            return StatusCode(500, "Error Getting All SourceData");
+            return this.StatusCode(500, "Error Getting All SourceData");
         }
     }
 }

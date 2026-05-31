@@ -1,7 +1,7 @@
+namespace Dv.App.Views.Optimization.Components;
+
 using Avalonia.Controls;
 using Dv.App.ViewModels;
-
-namespace Dv.App.Views.Optimization.Components;
 
 public partial class GraphsCard : UserControl
 {
@@ -9,7 +9,7 @@ public partial class GraphsCard : UserControl
 
     public GraphsCard()
     {
-        InitializeComponent();
+        this.InitializeComponent();
 
         this.DataContextChanged += (_, _) => this.TryAttachCharts();
         this.AttachedToVisualTree += (_, _) => this.TryAttachCharts();
@@ -18,7 +18,9 @@ public partial class GraphsCard : UserControl
     private void TryAttachCharts()
     {
         if (this.attached || this.DataContext is not OptimizationViewModel vm)
+        {
             return;
+        }
 
         this.attached = true;
 
@@ -43,7 +45,9 @@ public partial class GraphsCard : UserControl
         vm.PropertyChanged += (_, e) =>
         {
             if (e.PropertyName == nameof(OptimizationViewModel.HasOptimizationResults))
+            {
                 this.SetOptimizationSectionVisible(vm.HasOptimizationResults);
+            }
         };
 
         this.SetOptimizationSectionVisible(vm.HasOptimizationResults);

@@ -40,7 +40,7 @@ public sealed class SettingsViewModel : ViewModelBase
             }
         }
     }
-    
+
     public bool IsSystemTheme
     {
         get => this.selectedTheme == "Default";
@@ -90,7 +90,7 @@ public sealed class SettingsViewModel : ViewModelBase
         this.IsRdmChecking = true;
         this.IsRdmOnline = false;
         this.OnPropertyChanged(nameof(this.IsRdmOffline));
-        
+
         this.IsSdmChecking = true;
         this.IsSdmOnline = false;
         this.OnPropertyChanged(nameof(this.IsSdmOffline));

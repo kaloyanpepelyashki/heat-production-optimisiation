@@ -3,9 +3,14 @@
 public class ElectricBoilerDTO
 {
     public int Id { get; set; }
+
     public string Name { get; set; } = string.Empty;
-    public float  MaxHeat { get; set; }
+
+    public float MaxHeat { get; set; }
+
     public float ProductionCost { get; set; }
+
     public float MaxElectricity { get; set; }
+
     public bool Active { get; set; } = true;
 }

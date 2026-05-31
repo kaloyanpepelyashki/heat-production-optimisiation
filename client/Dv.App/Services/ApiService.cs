@@ -1,22 +1,23 @@
-using System.Diagnostics;
-using System.Linq;
-using System.Threading;
-
 namespace Dv.App.Services;
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Dv.App.Interfaces;
+
 public class ApiService : IApiService
 {
     private static readonly HttpClient SharedHttpClient = new HttpClient
     {
         Timeout = TimeSpan.FromMinutes(4),
     };
+
     private readonly JsonSerializerOptions jsonOptions;
 
     public static readonly IReadOnlyDictionary<BackendService, string> ServiceUrls = new Dictionary<BackendService, string>
@@ -72,8 +73,7 @@ public class ApiService : IApiService
 
         return $"{baseUrl.TrimEnd('/')}/{endpoint.TrimStart('/')}";
     }
-    
-    
+
     public async Task<bool> WakeUpService(BackendService service, CancellationToken token)
     {
         var endpoint = this.BuildUrl(service, "api/Health/wakeup");
@@ -95,7 +95,7 @@ public class ApiService : IApiService
 
     public async Task<bool> WakeUpAllServices(CancellationToken token = default)
     {
-        var tasks = ServiceUrls.Keys.Select(svc => WakeUpService(svc, token));
+        var tasks = ServiceUrls.Keys.Select(svc => this.WakeUpService(svc, token));
         var results = await Task.WhenAll(tasks);
         return results.All(r => r);
     }

@@ -1,7 +1,7 @@
+namespace Dv.App.Models;
+
 using System;
 using System.Collections.Generic;
-
-namespace Dv.App.Models;
 
 public static class OptimizationContextFactory
 {

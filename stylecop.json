@@ -11,7 +11,13 @@
       "systemUsingDirectivesFirst": true,
       "blankLinesBetweenUsingGroups": "oneOrMore"
     },
-    "namingRules": {},
+    "namingRules": {
+      "rules": {
+        "SA1309": {
+          "enabled": false
+        }
+      }
+    },
     "layoutRules": {}
   }
 }

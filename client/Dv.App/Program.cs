@@ -1,7 +1,7 @@
-﻿using Avalonia;
-using System;
+﻿namespace Dv.App;
 
-namespace Dv.App;
+using System;
+using Avalonia;
 
 class Program
 {

@@ -1,12 +1,11 @@
-﻿using Rdm.Api.Application.Exceptions;
+﻿namespace Rdm.Api.Application.Services;
+
+using Rdm.Api.Application.Exceptions;
 using Rdm.Api.Application.Interfaces;
 using Rdm.Api.Application.Model;
 using Rdm.Api.Application.Services.Helpers;
 using Rdm.Api.Inrastructure.Persistence;
 using Rdm.Api.Inrastructure.Persistence.PersistenceModels;
-
-namespace Rdm.Api.Application.Services;
-
 
 public class OptimisationResultService : IOptimisationResultService
 {
@@ -15,15 +14,15 @@ public class OptimisationResultService : IOptimisationResultService
 
     public OptimisationResultService(IResultRepository resultRepository, ILogger<OptimisationResultService> logger)
     {
-        _resultRepository = resultRepository;
-        _logger = logger;
+        this._resultRepository = resultRepository;
+        this._logger = logger;
     }
-    
+
     public async Task<List<OptimisationRun>> GetAllOptimisationResults()
     {
         try
         {
-            List<OptimisationRunWithHourlyResultsPersistence> persistenceModel = await _resultRepository.GetAllOptimisationResults();
+            List<OptimisationRunWithHourlyResultsPersistence> persistenceModel = await this._resultRepository.GetAllOptimisationResults();
             List<OptimisationRun> optimisationResultsModels = persistenceModel.Select(obj => new OptimisationRun
             {
                 Id = obj.Id,
@@ -51,27 +50,25 @@ public class OptimisationResultService : IOptimisationResultService
                         ElectricityConsumption = opu.ElectricityConsumption,
                         Co2Emissions = opu.Co2Emissions,
                         Expenses = opu.Expenses,
-                        Capacity = opu.Capacity
-                    }).ToList()
-                }).ToList()
+                        Capacity = opu.Capacity,
+                    }).ToList(),
+                }).ToList(),
             }).ToList();
 
             return optimisationResultsModels;
         }
         catch (DatabaseOperationException e)
         {
-            _logger.LogError(
+            this._logger.LogError(
                 $"Error in OptimisationResultService. Database operation error. Failed to get all optimisation results due to a database born error : {e.Message}, {e.GetType()}");
             throw;
         }
         catch (Exception e)
         {
-            _logger.LogError($"Error in OptimisationResultService. Failed to get all optimisations Error: {e.Message}, {e.GetType()}");
+            this._logger.LogError($"Error in OptimisationResultService. Failed to get all optimisations Error: {e.Message}, {e.GetType()}");
             throw;
         }
     }
-
-
 
     public async Task<bool> SaveOptimisationRun(OptimisationRun optimisationRun)
     {
@@ -79,24 +76,24 @@ public class OptimisationResultService : IOptimisationResultService
         {
             OptimisationRunPersistenceWrapper optimisationRunPersistence =
                 OptimisationModelsMapper.ToPersistenceWrapper(optimisationRun);
-            var creationResult = await _resultRepository.SaveOptimisationResult(optimisationRunPersistence);
+            var creationResult = await this._resultRepository.SaveOptimisationResult(optimisationRunPersistence);
 
             return creationResult;
         }
         catch (ArgumentException e)
         {
-            _logger.LogError($"Error translating domain to persistence model: {e.Message} ");
-            throw e;
+            this._logger.LogError($"Error translating domain to persistence model: {e.Message} ");
+            throw;
         }
         catch (DatabaseOperationException e)
         {
-            _logger.LogError($"Error in OptimisationResultService. Database operation error. Failed to create a new optimisation run due to a database born error: {e.Message}, {e.GetType()}");
+            this._logger.LogError($"Error in OptimisationResultService. Database operation error. Failed to create a new optimisation run due to a database born error: {e.Message}, {e.GetType()}");
             throw;
         }
         catch (Exception e)
         {
-            _logger.LogError($"Error in OptimisationResultService. Failed to get all optimisations Error: {e.Message}, {e.GetType()}");
+            this._logger.LogError($"Error in OptimisationResultService. Failed to get all optimisations Error: {e.Message}, {e.GetType()}");
             throw;
         }
     }
-} 
+}
