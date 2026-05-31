@@ -4,7 +4,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Opt.Api.Application.Exceptions;
 using Opt.Api.Application.Interfaces;
 using Opt.Api.Domain.Models;
-using Opt.Api.DTOs;
+using Opt.Api.Infrastructure.DTOs;
 using Opt.Api.Infrastructure.Options;
 
 public sealed class SdmDataProvider : ISourceDataProvider

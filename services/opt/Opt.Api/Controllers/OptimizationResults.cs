@@ -3,7 +3,7 @@ namespace Opt.Api.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Opt.Api.Application.Exceptions;
 using Opt.Api.Application.Services;
-using Opt.Api.DTOs;
+using Opt.Api.Infrastructure.DTOs;
 
 [Route("api/[controller]")]
 [ApiController]
