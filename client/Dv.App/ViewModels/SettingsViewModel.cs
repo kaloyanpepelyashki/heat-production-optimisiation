@@ -20,6 +20,8 @@ public sealed class SettingsViewModel : ViewModelBase
     private bool sdmOnline;
     private bool amChecking = true;
     private bool amOnline;
+    private bool optChecking = true;
+    private bool optOnline;
     private DateTime lastRefreshed = DateTime.Now;
 
     public SettingsViewModel()
@@ -83,6 +85,11 @@ public sealed class SettingsViewModel : ViewModelBase
 
     public bool IsAmOffline => !this.amChecking && !this.amOnline;
 
+    public bool IsOptChecking { get => this.optChecking; private set => this.SetProperty(ref this.optChecking, value); }
+
+    public bool IsOptOnline { get => this.optOnline; private set => this.SetProperty(ref this.optOnline, value); }
+
+    public bool IsOptOffline => !this.optChecking && !this.optOnline;
     public string LastRefreshedText => $"Last refresh: {this.lastRefreshed:HH:mm:ss}";
 
     public void RefreshServices()
@@ -98,6 +105,10 @@ public sealed class SettingsViewModel : ViewModelBase
         this.IsAmChecking = true;
         this.IsAmOnline = false;
         this.OnPropertyChanged(nameof(this.IsAmOffline));
+
+        this.IsOptChecking = true;
+        this.IsOptOnline = false;
+        this.OnPropertyChanged(nameof(this.IsOptOffline));
 
         _ = this.CheckServicesAsync();
     }
@@ -149,6 +160,14 @@ public sealed class SettingsViewModel : ViewModelBase
                     this.IsAmChecking = false;
                     this.IsAmOnline = online;
                     this.OnPropertyChanged(nameof(this.IsAmOffline));
+                }),
+            PingAndUpdate(
+                ApiService.ServiceUrls[BackendService.Opt],
+                online =>
+                {
+                    this.IsOptChecking = false;
+                    this.IsOptOnline = online;
+                    this.OnPropertyChanged(nameof(this.IsOptOffline));
                 }));
 
         this.lastRefreshed = DateTime.Now;
