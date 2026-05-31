@@ -1,4 +1,4 @@
-namespace Opt.Api.DTOs;
+namespace Opt.Api.Infrastructure.DTOs;
 
 public sealed class AmGasBoilerResponseDto
 {

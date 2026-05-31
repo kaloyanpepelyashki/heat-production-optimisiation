@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using Opt.Api.Application.Exceptions;
 using Opt.Api.Application.Interfaces;
 using Opt.Api.Domain.Models;
-using Opt.Api.DTOs;
+using Opt.Api.Infrastructure.DTOs;
 
 public class Optimizer
 {
