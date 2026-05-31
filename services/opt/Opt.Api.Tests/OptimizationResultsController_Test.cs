@@ -6,7 +6,7 @@ using Moq;
 using Opt.Api.Application.Interfaces;
 using Opt.Api.Application.Services;
 using Opt.Api.Controllers;
-using Opt.Api.DTOs;
+using Opt.Api.Infrastructure.DTOs;
 
 public class OptimizationResultsController_Test
 {
