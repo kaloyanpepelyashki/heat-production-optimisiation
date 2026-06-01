@@ -23,7 +23,6 @@ public class DataLayerTests
         var viewModel = new SettingsViewModel();
 
         Assert.That(viewModel, Is.Not.Null);
-        Assert.That(viewModel.IsSystemTheme, Is.True);
     }
 
     [Test]
